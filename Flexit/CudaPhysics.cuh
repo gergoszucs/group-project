@@ -1,0 +1,37 @@
+void ConstructMatrixOfInfluenceCoefficientsCuda(
+	const float *h_cp_x,
+	const float *h_cp_y,
+	const float *h_cp_z,
+	const float *h_n_x,
+	const float *h_n_y,
+	const float *h_n_z,
+	const float *h_vs_x,
+	const float *h_vs_y,
+	const float *h_vs_z,
+	const float *h_ve_x,
+	const float *h_ve_y,
+	const float *h_ve_z,
+	float *h_A, // Output.
+	int noOfUnknownVortexStrengths,
+	float RankineCoreRadius,
+	char rankineAlgorithmIndex,
+	int FrameNumber);
+
+void ComputeVelocitiesForBatchOfPointsCuda(
+	const float *h_cp_x,
+	const float *h_cp_y,
+	const float *h_cp_z,
+	const float *h_vs_x,
+	const float *h_vs_y,
+	const float *h_vs_z,
+	const float *h_ve_x,
+	const float *h_ve_y,
+	const float *h_ve_z,
+	float *h_cp_vx,
+	float *h_cp_vy,
+	float *h_cp_vz,
+	const float *h_vorticities,
+	int noOfVorticesPerPanel,
+	int noOfSubjectPanels,
+	int noOfVelocityPredictions,
+	int rankineAlgorithmIndex);

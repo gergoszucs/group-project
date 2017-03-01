@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FlexitClass</class>
+ <widget class="QMainWindow" name="FlexitClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1113</width>
+    <height>598</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Flexit</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QFrame" name="frame">
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Status window</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="myStatusTableWidget"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>10</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Hardware</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QTextEdit" name="hardwareReportTextEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Data file</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QTextEdit" name="fileTextEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>JSON tree</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QTreeView" name="jsonTreeView">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="expandAllButton">
+              <property name="text">
+               <string>Expand All</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="collapseAllButton">
+              <property name="text">
+               <string>Collapse All</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Graphics</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="MyGLWidget" name="myGLWidget"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Trajectories</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="MyTrajectoryGLWidget" name="myTrajectoryGLWidget"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>B matrix</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="MatrixViewGLWidget" name="myMatrixViewGLWidget"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_7">
+       <attribute name="title">
+        <string>Influence matrix</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QTableWidget" name="myInfluenceCoeffTableWidget"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_9">
+       <attribute name="title">
+        <string>Data view</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QTextEdit" name="myDataViewTextEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_8">
+       <attribute name="title">
+        <string>Output table</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QTableWidget" name="myOutputTableWidget"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_10">
+       <attribute name="title">
+        <string>Output graphics</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="MyOutputGraphicsGLWidget" name="myOutputGraphicsGLWidget"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_11">
+       <attribute name="title">
+        <string>Euler-Bernoulli</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <widget class="MyEBWidget" name="myEBWidget"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1113</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
+    <addaction name="actionExit"/>
+    <addaction name="actionSave_As"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionWeb_help"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionQuiet_graphics"/>
+    <addaction name="separator"/>
+    <addaction name="actionAxes"/>
+    <addaction name="actionControl_points"/>
+    <addaction name="actionInterpolated_points"/>
+    <addaction name="actionTracks"/>
+    <addaction name="actionPanels"/>
+    <addaction name="actionNormals"/>
+    <addaction name="actionVorticities"/>
+    <addaction name="actionBound_vortices"/>
+    <addaction name="actionWakes"/>
+    <addaction name="actionAnnotations"/>
+    <addaction name="actionPressure_distribution"/>
+    <addaction name="actionDrawVelocityField"/>
+    <addaction name="actionGust"/>
+    <addaction name="separator"/>
+    <addaction name="actionBeam_Elements"/>
+    <addaction name="actionBeam_ghost_elements"/>
+    <addaction name="actionBeam_nodes"/>
+    <addaction name="actionBeam_ghost_nodes"/>
+    <addaction name="actionBeam_loading"/>
+    <addaction name="separator"/>
+    <addaction name="actionDeflected_beam_nodes"/>
+    <addaction name="separator"/>
+    <addaction name="actionTranslate_view_with_surface"/>
+    <addaction name="separator"/>
+    <addaction name="actionX_reset"/>
+    <addaction name="actionY_reset"/>
+    <addaction name="actionZ_reset"/>
+   </widget>
+   <widget class="QMenu" name="menuDry">
+    <property name="title">
+     <string>Dry</string>
+    </property>
+    <addaction name="actionDry_run"/>
+    <addaction name="actionPause"/>
+   </widget>
+   <widget class="QMenu" name="menuCompute">
+    <property name="title">
+     <string>Compute</string>
+    </property>
+    <addaction name="actionStep"/>
+    <addaction name="actionStart"/>
+    <addaction name="actionStop"/>
+    <addaction name="actionReset"/>
+   </widget>
+   <widget class="QMenu" name="menuReplay">
+    <property name="title">
+     <string>Replay</string>
+    </property>
+    <addaction name="actionStartReplay"/>
+   </widget>
+   <widget class="QMenu" name="menuModes">
+    <property name="title">
+     <string>Modes</string>
+    </property>
+    <addaction name="actionUVLM"/>
+    <addaction name="actionEuler_Bernoulli"/>
+    <addaction name="actionVelocity_field"/>
+   </widget>
+   <widget class="QMenu" name="menuTest">
+    <property name="title">
+     <string>Testing</string>
+    </property>
+    <addaction name="actionTest"/>
+   </widget>
+   <widget class="QMenu" name="menuPrepocessing">
+    <property name="title">
+     <string>Prepocessing</string>
+    </property>
+    <addaction name="actionTrim"/>
+   </widget>
+   <widget class="QMenu" name="menuAccount">
+    <property name="title">
+     <string>Account</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuModes"/>
+   <addaction name="menuDry"/>
+   <addaction name="menuPrepocessing"/>
+   <addaction name="menuCompute"/>
+   <addaction name="menuReplay"/>
+   <addaction name="menuAccount"/>
+   <addaction name="menuTest"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="separator"/>
+   <addaction name="actionDry_run"/>
+   <addaction name="actionTrim"/>
+   <addaction name="actionStep"/>
+   <addaction name="actionStart"/>
+   <addaction name="actionPause"/>
+   <addaction name="actionReset"/>
+   <addaction name="actionStartReplay"/>
+   <addaction name="actionStop"/>
+   <addaction name="separator"/>
+   <addaction name="actionSave_As"/>
+   <addaction name="actionClose"/>
+   <addaction name="actionExit"/>
+   <addaction name="separator"/>
+   <addaction name="actionTest"/>
+   <addaction name="actionWeb_help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_open.png</normaloff>Resources/icon_open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open...</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_close.png</normaloff>Resources/icon_close.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_exit.png</normaloff>Resources/icon_exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionWeb_help">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_help.png</normaloff>Resources/icon_help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Web help</string>
+   </property>
+  </action>
+  <action name="actionAxes">
+   <property name="text">
+    <string>Axes</string>
+   </property>
+  </action>
+  <action name="actionControl_points">
+   <property name="text">
+    <string>Control points</string>
+   </property>
+  </action>
+  <action name="actionInterpolated_points">
+   <property name="text">
+    <string>Interpolated points</string>
+   </property>
+  </action>
+  <action name="actionDry_run">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_dryrun.png</normaloff>Resources/icon_dryrun.png</iconset>
+   </property>
+   <property name="text">
+    <string>Dry run</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_pause.png</normaloff>Resources/icon_pause.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actionTracks">
+   <property name="text">
+    <string>Tracks</string>
+   </property>
+  </action>
+  <action name="actionPanels">
+   <property name="text">
+    <string>Panels</string>
+   </property>
+  </action>
+  <action name="actionNormals">
+   <property name="text">
+    <string>Normals</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_cuda.png</normaloff>Resources/icon_cuda.png</iconset>
+   </property>
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_stop.png</normaloff>Resources/icon_stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionVorticities">
+   <property name="text">
+    <string>Vorticities</string>
+   </property>
+  </action>
+  <action name="actionWakes">
+   <property name="text">
+    <string>Wakes</string>
+   </property>
+  </action>
+  <action name="actionBound_vortices">
+   <property name="text">
+    <string>Bound vortices</string>
+   </property>
+  </action>
+  <action name="actionStartReplay">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_replay.png</normaloff>Resources/icon_replay.png</iconset>
+   </property>
+   <property name="text">
+    <string>Start replay</string>
+   </property>
+  </action>
+  <action name="actionTranslate_view_with_surface">
+   <property name="text">
+    <string>Translate view with surface</string>
+   </property>
+  </action>
+  <action name="actionAnnotations">
+   <property name="text">
+    <string>Annotations</string>
+   </property>
+  </action>
+  <action name="actionPressure_distribution">
+   <property name="text">
+    <string>Pressure distribution</string>
+   </property>
+  </action>
+  <action name="actionSave_As">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_save.png</normaloff>Resources/icon_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save As ...</string>
+   </property>
+  </action>
+  <action name="actionBeam_Elements">
+   <property name="text">
+    <string>Beam Elements</string>
+   </property>
+  </action>
+  <action name="actionBeam_nodes">
+   <property name="text">
+    <string>Beam nodes</string>
+   </property>
+  </action>
+  <action name="actionBeam_loading">
+   <property name="text">
+    <string>Beam loading</string>
+   </property>
+  </action>
+  <action name="actionBeam_ghost_nodes">
+   <property name="text">
+    <string>Beam ghost nodes</string>
+   </property>
+  </action>
+  <action name="actionBeam_ghost_elements">
+   <property name="text">
+    <string>Beam ghost elements</string>
+   </property>
+  </action>
+  <action name="actionDeflected_beam_nodes">
+   <property name="text">
+    <string>Deflected beam nodes</string>
+   </property>
+  </action>
+  <action name="actionUVLM">
+   <property name="text">
+    <string>UVLM</string>
+   </property>
+  </action>
+  <action name="actionEuler_Bernoulli">
+   <property name="text">
+    <string>Euler Bernoulli</string>
+   </property>
+  </action>
+  <action name="actionVelocity_field">
+   <property name="text">
+    <string>Velocity field</string>
+   </property>
+  </action>
+  <action name="actionQuiet_graphics">
+   <property name="text">
+    <string>Quiet graphics</string>
+   </property>
+  </action>
+  <action name="actionStep">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_step.png</normaloff>Resources/icon_step.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_test.png</normaloff>Resources/icon_test.png</iconset>
+   </property>
+   <property name="text">
+    <string>Test</string>
+   </property>
+  </action>
+  <action name="actionDrawVelocityField">
+   <property name="text">
+    <string>Velocity field</string>
+   </property>
+  </action>
+  <action name="actionTrim">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_trim.png</normaloff>Resources/icon_trim.png</iconset>
+   </property>
+   <property name="text">
+    <string>Trim node masses</string>
+   </property>
+  </action>
+  <action name="actionZ_reset">
+   <property name="text">
+    <string>Z reset</string>
+   </property>
+  </action>
+  <action name="actionY_reset">
+   <property name="text">
+    <string>Y reset</string>
+   </property>
+  </action>
+  <action name="actionX_reset">
+   <property name="text">
+    <string>X reset</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About ...</string>
+   </property>
+  </action>
+  <action name="actionSend_email">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_email.png</normaloff>Resources/icon_email.png</iconset>
+   </property>
+   <property name="text">
+    <string>Send email</string>
+   </property>
+  </action>
+  <action name="actionSend_HTTP_log_message">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_web.png</normaloff>Resources/icon_web.png</iconset>
+   </property>
+   <property name="text">
+    <string>Send HTTP log message</string>
+   </property>
+  </action>
+  <action name="actionReset">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_reset.png</normaloff>Resources/icon_reset.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset</string>
+   </property>
+  </action>
+  <action name="actionGust">
+   <property name="text">
+    <string>Gust</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MatrixViewGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>matrixviewglwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">myglwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyTrajectoryGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>mytrajectoryglwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyOutputGraphicsGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>myoutputgraphicsglwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyEBWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>myebwidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="flexit.qrc"/>
+ </resources>
+ <connections/>
+</ui>
