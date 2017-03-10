@@ -4,15 +4,11 @@
 
 class MyGaussianView : public QGLWidget
 {
-	    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit MyGaussianView(QWidget *parent = 0);
-	~MyGaussianView(void);
-
-signals:
-
-public slots:
+	~MyGaussianView(void) {};
 
 protected:
 
@@ -20,7 +16,7 @@ protected:
 	void paintGL();
 	void resizeGL(int width, int height);
 	void setViewOrtho(int width, int height);
-	void keyPressEvent( QKeyEvent * event );
+	void keyPressEvent(QKeyEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 

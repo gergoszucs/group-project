@@ -1,6 +1,5 @@
 #pragma once
 
-// System includes.
 #include <vector>
 #include <Eigen/Dense>
 #include "rapidjson/document.h" // https://github.com/miloyip/rapidjson
@@ -11,10 +10,6 @@ class ITControlPoint;
 
 class ITSurface
 {
-
-protected:
-
-
 private:
 
 	std::vector < std::vector <ITControlPoint*> > *_MyControlPoints; // The control points.
@@ -106,7 +101,6 @@ public:
 	Eigen::MatrixXd get_VPowerMatrix();
 	void set_VPowerMatrix(Eigen::MatrixXd vpm);
 
-
 	bool get_IsMorph();
 	void set_IsMorph(bool b);
 
@@ -133,5 +127,4 @@ public:
 
 	float get_FuselageRadius();
 	void set_FuselageRadius(float f);
-
 };

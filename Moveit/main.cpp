@@ -34,7 +34,7 @@
 // Global variables.
 Moveit* w;
 ITProject *project;
-bool IsScrutiny = true; // Enable HTTP logging.
+bool IsScrutiny = false; // Enable HTTP logging.
 QString PROGRAM_VERSION = QString("0.1.000");
 
 // Simulation progress variables.

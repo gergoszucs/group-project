@@ -95,5 +95,4 @@ enum EDIT_MODES_ENUM {NONE,
 
 extern EDIT_MODES_ENUM MY_EDIT_MODE; // GUI, BATCH.
 
-
 #endif /*  GLOBAL_H */

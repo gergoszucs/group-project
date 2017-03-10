@@ -6,12 +6,11 @@ using namespace rapidjson;
 
 class ITIO
 {
-
 public:
 
-	ITIO(void);
-	~ITIO(void);
-	
+	ITIO(void) {};
+	~ITIO(void) {};
+
 	static void readJSONInputFile(char *filename); // Class method.
 	static void writeMyProjectToFile(char *fileNameWithPath);
 
@@ -24,5 +23,4 @@ private:
 	static void writeMyITSurfacesToFile(rapidjson::Document* d);
 	static void writeDummyTranslationTrajectory(int k, rapidjson::Value *trajectoryObject, rapidjson::Document *d);
 	static void writeDummyRotationTrajectory(int k, rapidjson::Value *trajectoryObject, rapidjson::Document *d);
-
 };

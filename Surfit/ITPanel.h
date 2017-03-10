@@ -75,8 +75,6 @@ public:
 	float get_Area();
 	void set_Area(float a);
 
-
-
 	int get_I();
 	void set_I(int i);
 
@@ -85,5 +83,4 @@ public:
 
 	int get_K();
 	void set_K(int k);
-
 };

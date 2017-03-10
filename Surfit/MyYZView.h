@@ -1,16 +1,15 @@
 #pragma once
 
 #include <QGLWidget>
-
 #include "ITControlPoint.h"
 
 class MyYZView : public QGLWidget
 {
-	    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit MyYZView(QWidget *parent = 0);
-	~MyYZView(void);
+	~MyYZView(void) {};
 
 	// Accessors.
 	float get_EditValue();
@@ -31,17 +30,13 @@ public:
 	ITControlPoint *get_ScratchControlPoint();
 	void set_ScratchControlPoint(ITControlPoint *p);
 
-signals:
-
-public slots:
-
 protected:
 
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
 	void setViewOrtho(int width, int height);
-	void keyPressEvent( QKeyEvent * event );
+	void keyPressEvent(QKeyEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 
@@ -78,5 +73,4 @@ private:
 	void drawMyGrids();
 	void drawMyAnnotations();
 	void dragFocusPoints(float posY, float posZ, float old_posY, float old_posZ);
-
 };

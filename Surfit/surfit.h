@@ -3,8 +3,6 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_surfit.h"
-
-// Stuff for http requests.
 #include <QCoreApplication>
 #include <QDebug>
 #include <QNetworkAccessManager>
@@ -19,7 +17,7 @@ class Surfit : public QMainWindow
 
 public:
 	Surfit(QWidget *parent = 0);
-	~Surfit();
+	~Surfit() {};
 
 	void appendStatusTableWidget(const QString key, const QString val);
 	void sendHTTPRequest(QString actionKey, QString actionValue, float elapsedTimeSecs, int totalProblemSize, QString fileNameWithPath);
@@ -30,7 +28,7 @@ public:
 	void updateSpreadsheet();
 	void keyPressEvent(QKeyEvent *event);
 
-public slots:
+	public slots:
 
 	void on_actionOpen_triggered();
 	void on_actionExit_triggered();

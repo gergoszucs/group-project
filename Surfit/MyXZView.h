@@ -6,9 +6,10 @@
 
 class MyXZView : public QGLWidget
 {
-	    Q_OBJECT
+	Q_OBJECT
 
 public:
+
 	explicit MyXZView(QWidget *parent = 0);
 	~MyXZView(void);
 
@@ -24,7 +25,7 @@ public:
 
 	float get_EditValueY();
 	void set_EditValueY(float a);
-	
+
 	int get_Sense();
 	void set_Sense(int a);
 
@@ -40,17 +41,13 @@ public:
 	ITControlPoint *get_ScratchControlPoint();
 	void set_ScratchControlPoint(ITControlPoint *p);
 
-signals:
-
-public slots:
-
 protected:
 
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
 	void setViewOrtho(int width, int height);
-	void keyPressEvent( QKeyEvent * event );
+	void keyPressEvent(QKeyEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
@@ -92,5 +89,4 @@ private:
 
 	void findControlPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI, int *targetJ);
 	void AssignFocusPoint(QMouseEvent *event);
-
 };

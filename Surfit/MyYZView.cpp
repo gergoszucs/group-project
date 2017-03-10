@@ -1,11 +1,6 @@
 #include "MyYZView.h"
-
 #include <QtOpenGL>
-#include <GL/glu.h> // For gluUnproject.
-
-// Reference: http://www.bogotobogo.com/Qt/Qt5_OpenGL_QGLWidget.php
-
-// Dom's includes.
+#include <GL/glu.h>
 #include "global.h"
 #include "ITProject.h"
 #include "ITSurface.h"
@@ -30,14 +25,7 @@ MyYZView::MyYZView(QWidget *parent)
 
 	set_PrimedForFirstClick(false);
 	set_PrimedForSecondClick(false);
-
 }
-
-
-MyYZView::~MyYZView(void)
-{
-}
-
 
 void MyYZView::initializeGL()
 {
@@ -49,11 +37,9 @@ void MyYZView::initializeGL()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+
 	glDisable(GL_CULL_FACE); // Make sure both sides of QUADS are filled.
-
 }
-
 
 void MyYZView::paintGL()
 {
@@ -66,8 +52,7 @@ void MyYZView::paintGL()
 	glRotatef(0.0, 0.0, 0.0, 1.0);
 
 	draw();
-
-} // End of paintGL.
+}
 
 void MyYZView::resizeGL(int width, int height)
 {
@@ -89,25 +74,22 @@ void MyYZView::setViewOrtho(int width, int height)
 	glLoadIdentity();
 
 	// Landscape.
-	glOrtho(glYZPanCentreX - glYZViewHalfExtent, 
-			glYZPanCentreX + glYZViewHalfExtent,
-			glYZPanCentreY - glYZViewHalfExtent / aspect, 
-			glYZPanCentreY + glYZViewHalfExtent / aspect, 
-			-50000.0, 
-			50000.0);
+	glOrtho(glYZPanCentreX - glYZViewHalfExtent,
+		glYZPanCentreX + glYZViewHalfExtent,
+		glYZPanCentreY - glYZViewHalfExtent / aspect,
+		glYZPanCentreY + glYZViewHalfExtent / aspect,
+		-50000.0,
+		50000.0);
 
 	glMatrixMode(GL_MODELVIEW);
 }
 
-
-
-void MyYZView::keyPressEvent( QKeyEvent * event )
+void MyYZView::keyPressEvent(QKeyEvent * event)
 {
-
 	float factor = 0.0;
 
 	// Check for fine movement.
-	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true) 
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 	{
 		// Fine movement.
 		factor = 0.05;
@@ -118,35 +100,35 @@ void MyYZView::keyPressEvent( QKeyEvent * event )
 		factor = 1.0;
 	}
 
-	if( event->key() == Qt::Key_Up )
+	if (event->key() == Qt::Key_Up)
 	{
 		glYZPanCentreY = glYZPanCentreY + factor;
 	}
-	else if( event->key() == Qt::Key_Down )
+	else if (event->key() == Qt::Key_Down)
 	{
 		glYZPanCentreY = glYZPanCentreY - factor;
 	}
-	else if( event->key() == Qt::Key_Left )
+	else if (event->key() == Qt::Key_Left)
 	{
 		glYZPanCentreX = glYZPanCentreX - factor;
 	}
-	else if( event->key() == Qt::Key_Right )
+	else if (event->key() == Qt::Key_Right)
 	{
 		glYZPanCentreX = glYZPanCentreX + factor;
 	}
-	else if( event->key() == Qt::Key_V )
+	else if (event->key() == Qt::Key_V)
 	{
 		// User is holding the V key down, so restrict dragging to vertical only.
 		IsVerticalDragOnly = true;
 		IsHorizontalDragOnly = false;
 	}
-	else if( event->key() == Qt::Key_H )
+	else if (event->key() == Qt::Key_H)
 	{
 		// User is holding the H key down, so restrict dragging to horizontal only.
 		IsVerticalDragOnly = false;
 		IsHorizontalDragOnly = true;
 	}
-	else if( event->key() == Qt::Key_A )
+	else if (event->key() == Qt::Key_A)
 	{
 		// User is holding the A key down, so remove dragging restrictions.
 		IsVerticalDragOnly = false;
@@ -158,13 +140,10 @@ void MyYZView::keyPressEvent( QKeyEvent * event )
 
 	// Force redraw.
 	update();
-
-} // End of keyPressEvent.
-
+}
 
 void MyYZView::draw()
 {
-
 	if (IsDataLoaded)
 	{
 		drawMyAxes();
@@ -193,7 +172,6 @@ void MyYZView::draw()
 	}
 }
 
-
 void MyYZView::drawMyAxes()
 {
 	// Draw X axis.
@@ -221,78 +199,55 @@ void MyYZView::drawMyAxes()
 	renderText(30.0, 0.0, 0.0, QString("x-axis"));
 	renderText(0.0, 30.0, 0.0, QString("y-axis"));
 	renderText(0.0, 0.0, 30.0, QString("z-axis"));
-
-} // End of drawMyAxes.
-
+}
 
 void MyYZView::mousePressEvent(QMouseEvent *event)
 {
 	lastPos = event->pos();
 
-	if(!(event->modifiers())) // Just clicking without modifiers.
+	if (!(event->modifiers())) // Just clicking without modifiers.
 	{
-
 		if (MY_EDIT_MODE == DRAG)
 		{
-
 			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-
-		} // End of if DRAG
+		}
 		else if (MY_EDIT_MODE == DRAG_ROW)
 		{
-
 			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-
 		}
 		else if (MY_EDIT_MODE == DRAG_COL)
 		{
-
 			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-
 		}
 		else if (MY_EDIT_MODE == DRAG_ALL)
 		{
-
 			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-
 		}
 		else if (MY_EDIT_MODE == MEASURE_DISTANCE)
 		{
-
 			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-
 		}
-
-	} // End of if not event modifiers.
-
-} // End of mousePressEvent.
-
-
-
-
-
+	}
+}
 
 void MyYZView::AssignFocusPoint(QMouseEvent *event)
 {
-
-
 	// Empty focus point vectors
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		int N = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size();
-		for (int n=0; n<N; n++)
+		for (int n = 0; n < N; n++)
 		{
 			project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->pop_back();
 		}
 	}
 
-
 	GLint viewport[4];
 	GLdouble modelview[16];
 	GLdouble projection[16];
-	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-	glGetDoublev( GL_PROJECTION_MATRIX, projection );
-	glGetIntegerv( GL_VIEWPORT, viewport );
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
 
 	const int x = event->x();
 	const int y = viewport[3] - event->y();
@@ -301,10 +256,10 @@ void MyYZView::AssignFocusPoint(QMouseEvent *event)
 
 	GLdouble posX, posY, posZ;
 	GLint result;
-	result = gluUnProject( x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
-    
+	result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
+
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "3D point with POS: %f, %f, %f", posX, posY, posZ);
-	
+
 	// Find the vertex that is closest.
 	int i, j, k;
 	findControlPointIndicesNearMouse(posX, posY, posZ, &k, &i, &j);
@@ -317,75 +272,63 @@ void MyYZView::AssignFocusPoint(QMouseEvent *event)
 	set_EditValueX(0.0);
 	set_EditValueY(0.0);
 
-	if ( (k>-1) && (i>-1) && (j>-1) )
+	if ((k > -1) && (i > -1) && (j > -1))
 	{
 		if (MY_EDIT_MODE == DRAG)
 		{
 			// We have found a control point, so add it to the focus vector.
-			project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back( project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j) );
+			project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j));
 		}
 		else if (MY_EDIT_MODE == DRAG_ROW)
 		{
-
 			// We have found a control point, so add all control points for the k-th surface to the focus vector.
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
-				project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back( project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j) );
-			} // End of j loop.
-
+				project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j));
+			}
 		}
 		else if (MY_EDIT_MODE == DRAG_COL)
 		{
-
 			// We have found a control point, so add all control points for the k-th surface to the focus vector.
-			for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 			{
-				project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back( project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j) );
-			} // End of j loop.
-
+				project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j));
+			}
 		}
 		else if (MY_EDIT_MODE == DRAG_ALL)
 		{
-
 			// We have found a control point, so add all control points for the k-th surface to the focus vector.
-			for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 			{
-				for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+				for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 				{
-					project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back( project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j) );
-				} // End of j loop.
-			} // End of i-loop.
-
+					project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->push_back(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j));
+				}
+			}
 		}
 		else if (MY_EDIT_MODE == MEASURE_DISTANCE)
 		{
-
 			if (get_PrimedForFirstClick())
 			{
-
 				// Empty the focus vectors.
 				w->emptyFocusVectors();
 
 				// Save the first point.
-				set_ScratchControlPoint( project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j) );
+				set_ScratchControlPoint(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j));
 
 				// Cancel primed for first click and prime for second click.
 				set_PrimedForFirstClick(false);
 				set_PrimedForSecondClick(true);
 
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "First point has been captured.");
-
 			}
 			else if (get_PrimedForSecondClick())
 			{
-
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Second point has been captured.");
-
 
 				// Get second point and move it to the first one.
 				ITControlPoint *firstPoint = get_ScratchControlPoint();
 				ITControlPoint *secondPoint = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
-
 
 				// Find the distance.
 				float dist = firstPoint->distanceFrom(secondPoint);
@@ -406,25 +349,13 @@ void MyYZView::AssignFocusPoint(QMouseEvent *event)
 
 				// Empty the focus vectors.
 				w->emptyFocusVectors();
-
-
-			} // End of if get_PrimedForSecondClick().
-
-		} // End of MEASURE_DISTANCE.
-
-	} // End of 	if ( (k>-1) && (i>-1) && (j>-1) )
+			}
+		}
+	}
 
 	// Redraw everything.
 	updateGL();
-
-} // End of AssignFocusPoint.
-
-
-
-
-
-
-
+}
 
 void  MyYZView::findControlPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI, int *targetJ)
 {
@@ -434,11 +365,11 @@ void  MyYZView::findControlPointIndicesNearMouse(double posX, double posY, doubl
 	*targetJ = -1;
 	*targetK = -1;
 
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 		{
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
 				ITControlPoint *currentPoint = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
 
@@ -455,22 +386,17 @@ void  MyYZView::findControlPointIndicesNearMouse(double posX, double posY, doubl
 					*targetI = i;
 					*targetJ = j;
 				}
-
 			}
 		}
 	}
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Indices of nearest control point. k: %i, i: %i, j: %i", *targetK, *targetI, *targetJ);
-
-} // End of findControlPointIndicesNearMouse.
+}
 
 void MyYZView::mouseMoveEvent(QMouseEvent *event)
 {
-
-	if(event->modifiers() & Qt::ShiftModifier)
+	if (event->modifiers() & Qt::ShiftModifier)
 	{
-		// The shift key was pressed, so zoom.
-
 		// The shift key was pressed, so zoom.
 		float dx = (float)(event->x() - lastPos.x());
 		float dy = (float)(event->y() - lastPos.y());
@@ -478,7 +404,7 @@ void MyYZView::mouseMoveEvent(QMouseEvent *event)
 		float factor = 0.0;
 
 		// Check for fine movement.
-		if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true) 
+		if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 		{
 			// Fine movement.
 			factor = 0.05;
@@ -496,22 +422,17 @@ void MyYZView::mouseMoveEvent(QMouseEvent *event)
 		glYZViewHalfExtent = glYZViewHalfExtent + dy;
 
 		lastPos = event->pos();
-
 	}
-	else if(!(event->modifiers())) // Just clicking without modifiers.
+	else if (!(event->modifiers())) // Just clicking without modifiers.
 	{
-
-		if ( (MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL))
+		if ((MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL))
 		{
-
-
-
 			GLint viewport[4];
 			GLdouble modelview[16];
 			GLdouble projection[16];
-			glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-			glGetDoublev( GL_PROJECTION_MATRIX, projection );
-			glGetIntegerv( GL_VIEWPORT, viewport );
+			glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+			glGetDoublev(GL_PROJECTION_MATRIX, projection);
+			glGetIntegerv(GL_VIEWPORT, viewport);
 
 			const int x = event->x();
 			const int y = viewport[3] - event->y();
@@ -525,8 +446,8 @@ void MyYZView::mouseMoveEvent(QMouseEvent *event)
 			GLdouble old_posX, old_posY, old_posZ;
 			GLint result;
 
-			result = gluUnProject( xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
-			result = gluUnProject( x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
+			result = gluUnProject(xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
+			result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
 
 			// Drag the Focus points
 			dragFocusPoints(posY, posZ, old_posY, old_posZ);
@@ -536,14 +457,11 @@ void MyYZView::mouseMoveEvent(QMouseEvent *event)
 			UnsavedChanges = true;
 
 			// Display the distance moved.
-			set_EditValueX( get_EditValueX() + (posY - old_posY) );
-			set_EditValueY( get_EditValueY() + (posZ - old_posZ) );
-			w->setMyTextDataField(QString("Distance dragged y: %1, z: %2").arg( get_EditValueX() ).arg( get_EditValueY() ));
-
-		} // End of if DRAG or DRAG_ROW or DRAG_COL or DRAG_ALL mode.
-
-	} // End if no modifiers.
-
+			set_EditValueX(get_EditValueX() + (posY - old_posY));
+			set_EditValueY(get_EditValueY() + (posZ - old_posZ));
+			w->setMyTextDataField(QString("Distance dragged y: %1, z: %2").arg(get_EditValueX()).arg(get_EditValueY()));
+		}
+	}
 
 	// Adjust viewport view.
 	setViewOrtho(myWidth, myHeight);
@@ -553,16 +471,12 @@ void MyYZView::mouseMoveEvent(QMouseEvent *event)
 
 	// Redraw other views.
 	w->updateAllTabs();
-
-
-} // End of mouseMoveEvent.
-
+}
 
 void MyYZView::dragFocusPoints(float posY, float posZ, float old_posY, float old_posZ)
 {
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		int n = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size();
 
 		if (n == 0)
@@ -573,110 +487,88 @@ void MyYZView::dragFocusPoints(float posY, float posZ, float old_posY, float old
 		if (project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size() > 0)
 		{
 			// Loop over focus points vector and add dx and dy
-			for (int n=0; n<project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); n++)
+			for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); n++)
 			{
-
 				ITControlPoint *p = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(n);
 
 				if (IsVerticalDragOnly)
 				{
-					p->set_Z( p->get_Z() + (posZ - old_posZ) );
+					p->set_Z(p->get_Z() + (posZ - old_posZ));
 				}
 				else if (IsHorizontalDragOnly)
 				{
-					p->set_Y( p->get_Y() + (posY - old_posY) );
+					p->set_Y(p->get_Y() + (posY - old_posY));
 				}
 				else
 				{
-					p->set_Y( p->get_Y() + (posY - old_posY) );
-					p->set_Z( p->get_Z() + (posZ - old_posZ) );
+					p->set_Y(p->get_Y() + (posY - old_posY));
+					p->set_Z(p->get_Z() + (posZ - old_posZ));
 				}
-
-			} // End of n loop.
+			}
 
 			// Update interpolated points.
 			project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
-
-		} // End of of focus point vector contains points.
-
-	} // End of k loop
-
-} // End of dragFocusPoints.
-
-
-
+		}
+	}
+}
 
 void MyYZView::drawMyControlPointsNet()
 {
-
 	glColor3f(0.0f, 0.0f, 0.0f); // black
 
 	// Curves of constant u.
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Do the plotting.
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
 
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
-
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Z());
-
 			}
 
 			glEnd();
-
 		}
 
 		// Curves of constant v.
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
 
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); j++)
 			{
-
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(j).at(i)->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(j).at(i)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(j).at(i)->get_Z());
-
 			}
 
 			glEnd();
-
 		}
-
-	} // End of k loop.
-
+	}
 
 	// Now draw spheres.
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 		{
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
 				ITControlPoint *p = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
 
 				glTranslatef(0.0, p->get_Y(), p->get_Z());
 
-				float radius = glYZViewHalfExtent/100.0;
+				float radius = glYZViewHalfExtent / 100.0;
 				drawSphere(radius, 15, 15, 0.0, 0.0, 0.0);
 
 				glTranslatef(0.0, -p->get_Y(), -p->get_Z());
 			}
-
 		}
 	}
-
-}  // End of drawMyControlPointsNet.
-
+}
 
 void MyYZView::drawMyInterpolatedPointsNet()
 {
@@ -684,48 +576,43 @@ void MyYZView::drawMyInterpolatedPointsNet()
 	glColor3f(0.0f, 0.0f, 1.0f);
 
 	// Draw each surface.
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// First the curves of constant u
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).size(); j++)
 			{
-				glVertex3f(project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_X(), 
-					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_Y(), 
+				glVertex3f(project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_X(),
+					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_Z());
 			}
 			glEnd();
-		}		
+		}
 		// Next the curves of constant v
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(0).size(); i++) // i counts columns.
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(0).size(); i++) // i counts columns.
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); j++) // j counts rows.
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); j++) // j counts rows.
 			{
-				glVertex3f(project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_X(), 
-					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_Y(), 
+				glVertex3f(project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_X(),
+					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_Z());
 			}
 			glEnd();
-		}		
-
-	} // End of k loop.
-
-} // End of drawMyInterpolatedPointsNet.
-
+		}
+	}
+}
 
 void MyYZView::drawMyGrids()
 {
-
 	glEnable(GL_LINE_STIPPLE);
 	glLineStipple(3, 0xAAAA);
 	glColor3f(0.5f, 0.5f, 0.5f); // grey
 
 	// Draw horizontal lines.
-	for (int i=-10; i<11; i++)
+	for (int i = -10; i < 11; i++)
 	{
 		glBegin(GL_LINE_STRIP);
 		glVertex3f(0.0, (float)i*10.0, -100.0);
@@ -734,7 +621,7 @@ void MyYZView::drawMyGrids()
 	}
 
 	// Draw vertical lines.
-	for (int j=-10; j<11; j++)
+	for (int j = -10; j < 11; j++)
 	{
 		glBegin(GL_LINE_STRIP);
 		glVertex3f(0.0, -100.0, (float)j*10.0);
@@ -744,112 +631,96 @@ void MyYZView::drawMyGrids()
 
 	glColor3f(0.0, 0.0, 0.0);
 	glDisable(GL_LINE_STIPPLE);
-
-} // End of drawMyGrids.
+}
 
 void MyYZView::drawMyAnnotations()
 {
-
 	glColor3f(0.0f, 0.0f, 0.0f); // black
 
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Do the plotting.
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 		{
-
-			for (int j=0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
 				ITControlPoint *p = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
 
-				renderText(p->get_X(), p->get_Y(), p->get_Z(), QString("k: %1, i: %2, j: %3, x: %4, y: %5, z: %6").arg(p->get_K()).arg(p->get_I()).arg(p->get_J()).arg(p->get_X()).arg(p->get_Y()).arg(p->get_Z()));
+				renderText(p->get_X(), p->get_Y(), p->get_Z(), 
+					QString("k: %1, i: %2, j: %3, x: %4, y: %5, z: %6").arg(p->get_K()).arg(p->get_I()).arg(p->get_J()).arg(p->get_X()).arg(p->get_Y()).arg(p->get_Z()));
 			}
-
 		}
-
-	} // End of k loop.
-
-} // End of drawMyAnnotations.
+	}
+}
 
 void MyYZView::drawMyFocusControlPoints()
 {
-
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-		for (int t=0; t<project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); t++)
+		for (int t = 0; t < project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); t++)
 		{
 			ITControlPoint *fp = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(t);
 
 			glTranslatef(0.0, fp->get_Y(), fp->get_Z());
 
-			float radius = glYZViewHalfExtent/50.0;
+			float radius = glYZViewHalfExtent / 50.0;
 			drawSphere(radius, 15, 15, 1.0, 0.0, 0.0);
 
 			glColor3f(0.0, 0.0, 0.0);
-			renderText(radius, 0, radius, QString("k: %1, i: %2, j: %3, x: %4, y: %5, z: %6").arg(fp->get_K()).arg(fp->get_I()).arg(fp->get_J()).arg(fp->get_X()).arg(fp->get_Y()).arg(fp->get_Z()));
+			renderText(radius, 0, radius, 
+				QString("k: %1, i: %2, j: %3, x: %4, y: %5, z: %6").arg(fp->get_K()).arg(fp->get_I()).arg(fp->get_J()).arg(fp->get_X()).arg(fp->get_Y()).arg(fp->get_Z()));
 
 			glTranslatef(0.0, -fp->get_Y(), -fp->get_Z());
-
 		}
 	}
+}
 
-
-} // End of drawMyFocusControlPoints.
-
-
-
-void MyYZView::drawSphere(double r, int lats, int longs, float R, float GG, float B) 
+void MyYZView::drawSphere(double r, int lats, int longs, float R, float GG, float B)
 {
-	// Ref: http://stackoverflow.com/questions/22058111/opengl-draw-sphere-using-glvertex3f
-
 	glColor3f(R, GG, B);
 
-
-    int i, j;
-    for(i=0; i<=lats; i++) 
+	int i, j;
+	for (i = 0; i <= lats; i++)
 	{
-        double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-		double z0  = sin(lat0);
-		double zr0 =  cos(lat0);
+		double lat0 = M_PI * (-0.5 + (double)(i - 1) / lats);
+		double z0 = sin(lat0);
+		double zr0 = cos(lat0);
 
-		double lat1 = M_PI * (-0.5 + (double) i / lats);
+		double lat1 = M_PI * (-0.5 + (double)i / lats);
 		double z1 = sin(lat1);
 		double zr1 = cos(lat1);
 
 		glBegin(GL_QUAD_STRIP);
-		for(j = 0; j <= longs; j++) 
+		for (j = 0; j <= longs; j++)
 		{
-			double lng = 2 * M_PI * (double) (j - 1) / longs;
+			double lng = 2 * M_PI * (double)(j - 1) / longs;
 			double x = cos(lng);
 			double y = sin(lng);
 
-			glNormal3f(x * zr0 , y * zr0, z0);
+			glNormal3f(x * zr0, y * zr0, z0);
 			glVertex3f(x * zr0 * r, y * zr0 * r, z0 * r);
 			glNormal3f(x * zr1, y * zr1, z1);
 			glVertex3f(x * zr1 * r, y * zr1 * r, z1 * r);
-       }
-       glEnd();
-   }
-
-} // End of drawSphere.
+		}
+		glEnd();
+	}
+}
 
 // Accessors.
-float MyYZView::get_EditValue(){ return _EditValue; }
-void MyYZView::set_EditValue(float a){ _EditValue = a; }
+float MyYZView::get_EditValue() { return _EditValue; }
+void MyYZView::set_EditValue(float a) { _EditValue = a; }
 
-float MyYZView::get_EditValueX(){ return _EditValueX; }
-void MyYZView::set_EditValueX(float a){ _EditValueX = a; }
+float MyYZView::get_EditValueX() { return _EditValueX; }
+void MyYZView::set_EditValueX(float a) { _EditValueX = a; }
 
-float MyYZView::get_EditValueY(){ return _EditValueY; }
-void MyYZView::set_EditValueY(float a){ _EditValueY = a; }
+float MyYZView::get_EditValueY() { return _EditValueY; }
+void MyYZView::set_EditValueY(float a) { _EditValueY = a; }
 
-bool MyYZView::get_PrimedForFirstClick(){ return _PrimedForFirstClick; }
-void MyYZView::set_PrimedForFirstClick(bool p){ _PrimedForFirstClick = p; }
+bool MyYZView::get_PrimedForFirstClick() { return _PrimedForFirstClick; }
+void MyYZView::set_PrimedForFirstClick(bool p) { _PrimedForFirstClick = p; }
 
-bool MyYZView::get_PrimedForSecondClick(){ return _PrimedForSecondClick; }
-void MyYZView::set_PrimedForSecondClick(bool p){ _PrimedForSecondClick = p; }
+bool MyYZView::get_PrimedForSecondClick() { return _PrimedForSecondClick; }
+void MyYZView::set_PrimedForSecondClick(bool p) { _PrimedForSecondClick = p; }
 
-ITControlPoint *MyYZView::get_ScratchControlPoint(){return _ScratchControlPoint; }
-void MyYZView::set_ScratchControlPoint(ITControlPoint *p){ _ScratchControlPoint = p; }
+ITControlPoint *MyYZView::get_ScratchControlPoint() { return _ScratchControlPoint; }
+void MyYZView::set_ScratchControlPoint(ITControlPoint *p) { _ScratchControlPoint = p; }

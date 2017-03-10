@@ -12,7 +12,6 @@ class ITSurface;
 
 class ITProject
 {
-
 protected:
 
 	// ITProject instance variables.
@@ -29,7 +28,7 @@ protected:
 	std::vector <ITSurface*> *_MyBaseSurfaces;
 
 	int _MaxPropagationGeneration; // The maximum number of generations of wake panels to propagate (set to 0 if all generations are to be included).
-    float _FlowitPressureEps; // The distance perpendicular to surface tangent where velocity is calculated when using Bernoulli to calculate pressure distribution.
+	float _FlowitPressureEps; // The distance perpendicular to surface tangent where velocity is calculated when using Bernoulli to calculate pressure distribution.
 	bool _IsConstantSpeedTrajectories; // Use the constant speed reparametrization algorithms.
 	bool _IsDoVelocityField; // Whether or not to compute the velocity field.
 	std::string _RankineAlgorithm; // Indicates which Rankine algorithm is to be used. (Either Appendix C or D from the UVLM Monograph).
@@ -95,8 +94,8 @@ public:
 	int get_MaxPropagationGeneration();
 	void set_MaxPropagationGeneration(int i);
 
-    float get_FlowitPressureEps();
-    void set_FlowitPressureEps(float e);
+	float get_FlowitPressureEps();
+	void set_FlowitPressureEps(float e);
 
 	bool get_IsConstantSpeedTrajectories();
 	void set_IsConstantSpeedTrajectories(bool b);
@@ -144,7 +143,7 @@ public:
 	void set_Rho(float r);
 
 	float get_FramesPerSecond();
-	void set_FramesPerSecond(float f);	
+	void set_FramesPerSecond(float f);
 
 	float get_PressureDisplayFactor();
 	void set_PressureDisplayFactor(float f);
@@ -166,6 +165,4 @@ public:
 
 	bool get_IsActiveControlSurfaces();
 	void set_IsActiveControlSurfaces(bool b);
-
 };
-

@@ -1,17 +1,11 @@
-#include "surfit.h"
 #include <QtWidgets/QApplication>
-
-// Dom's includes
 #include "global.h"
-
-
+#include "surfit.h"
 
 // My app was not linking to cudart.lib. Adding cudart.lib to 
 // Properties > Configuration Properties > Linker > Input > Additional Dependencies
 // solves the problem. See
 // https://devtalk.nvidia.com/default/topic/415244/error-lnk2019-unresolved-external-symbol/
-
-
 // vs2012 Qt solution created using:
 // https://codeyarns.com/2013/12/13/how-to-create-qt-applications-using-visual-studio/
 // Add to SVN:
@@ -33,11 +27,10 @@
 // CURL code for sending emails.
 // http://www.codeproject.com/Questions/714669/Sending-Email-with-attachment-using-libcurl
 
-
 // Global variables.
 Surfit* w;
 ITProject *project;
-bool IsScrutiny = true; // Enable HTTP logging.
+bool IsScrutiny = false; // Enable HTTP logging.
 QString PROGRAM_VERSION = QString("0.1.000");
 
 // Data file name strings.
@@ -79,7 +72,6 @@ float gl3DViewHalfExtent = 50.0;
 float gl3DPanCentreX = 0.0;
 float gl3DPanCentreY = 0.0;
 
-
 // Drawing semaphores.
 bool drawRotateXHorizontal = false;
 bool drawRotateYHorizontal = false;
@@ -96,17 +88,11 @@ bool drawGrids = true;
 bool IsVerticalDragOnly = false;
 bool IsHorizontalDragOnly = false;
 
-// Editing modes
-
-
-
 int main(int argc, char *argv[])
 {
-
 	// Instanciate an ITproject object.
 	project = new ITProject();
 	project->set_DebugLevel(5);
-
 
 	// Set the run mode depending on whether or not there are data file argument(s).
 	if (argc > 1)
@@ -121,10 +107,8 @@ int main(int argc, char *argv[])
 
 	MY_EDIT_MODE = NONE;
 
-
 	if (MY_RUN_MODE == MYGUI)
 	{
-
 		QApplication a(argc, argv);
 		w = new Surfit();
 
@@ -133,11 +117,11 @@ int main(int argc, char *argv[])
 		w->statusBar()->showMessage(QObject::tr("Ready"));
 
 		// Set the main window icon.
-		QIcon icon("myappicon.ico"); 
+		QIcon icon("myappicon.ico");
 		w->setWindowIcon(icon);
 
 		w->show();
-		
+
 		return a.exec();
 	}
 }

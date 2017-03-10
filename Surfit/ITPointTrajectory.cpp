@@ -1,24 +1,19 @@
-// Dom's includes.
 #include "ITPointTrajectory.h"
 #include "global.h"
 #include "ITProject.h"
-
 
 ITPointTrajectory::ITPointTrajectory(float x, float y, float z) : ITPoint(x, y, z)
 {
 }
 
-
 ITPointTrajectory::~ITPointTrajectory(void)
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside destructor. ITPointTrajectory being destroyed.");
-
 }
 
-// Worker methods.
 void ITPointTrajectory::serializeMeAsJSONObject(int k, int i, int j, rapidjson::Value *controlPointsArray, rapidjson::Document *d)
 {
-    project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITPointTrajectory::serializeMeAsJSONObject. KeyFrame: %i", get_KeyFrame());
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITPointTrajectory::serializeMeAsJSONObject. KeyFrame: %i", get_KeyFrame());
 
 	// must pass an allocator when the object may need to allocate memory
 	rapidjson::Document::AllocatorType& allocator = d->GetAllocator();
@@ -51,11 +46,8 @@ void ITPointTrajectory::serializeMeAsJSONObject(int k, int i, int j, rapidjson::
 
 	// Finally add the point node to the array.
 	controlPointsArray->PushBack(pointObject, allocator);
-
-} // End of serializeMeAsJSONObject.
-
-
+}
 
 // Accessors.
-int ITPointTrajectory::get_KeyFrame(){ return _KeyFrame; }
-void ITPointTrajectory::set_KeyFrame(int i){ _KeyFrame = i; }
+int ITPointTrajectory::get_KeyFrame() { return _KeyFrame; }
+void ITPointTrajectory::set_KeyFrame(int i) { _KeyFrame = i; }

@@ -35,12 +35,13 @@ bool IsTrim = false;
 bool IsModeUVLM = true;
 bool IsModeEulerBernoulli = false;
 
+/*TODO check srv*/
 #ifdef NDEBUG
 // Release code.
-bool IsScrutiny = true; // Enable HTTP logging.
+bool IsScrutiny = false; // Enable HTTP logging.
 #else
 // Debug code.
-bool IsScrutiny = true; // Enable HTTP logging.
+bool IsScrutiny = false; // Enable HTTP logging.
 #endif // End of DEBUGGING
 
 // Program mode flags.
