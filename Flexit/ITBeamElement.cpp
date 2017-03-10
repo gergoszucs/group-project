@@ -1,22 +1,15 @@
-// System includes.
 #include <string>
-
-// Dom's includes.
 #include "ITBeamElement.h"
 #include "global.h"
 #include "ITPoint.h"
 
 ITBeamElement::ITBeamElement()
 {
-
 	_startPoint = new ITPoint(0.0, 0.0, 0.0);;
 	_endPoint = new ITPoint(0.0, 0.0, 0.0);;
 
 	set_Name("");
-
 }
-
-
 
 ITBeamElement::~ITBeamElement(void)
 {
@@ -26,13 +19,10 @@ ITBeamElement::~ITBeamElement(void)
 	delete _endPoint;
 }
 
-
 // Utilities.
 float ITBeamElement::length()
 {
-
 	return get_StartPoint()->distanceFrom(get_EndPoint());
-
 }
 
 // Accessors.

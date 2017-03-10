@@ -18,7 +18,7 @@ protected:
 public:
 
 	ITVortex(ITPoint* startPoint, ITPoint* endPoint);
-	~ITVortex(void);
+	~ITVortex(void) {};
 
 	// Worker methods.
 	ITPoint* calcFiniteSvensonAt(ITPoint *targetPoint);
@@ -39,5 +39,4 @@ public:
 
 	float get_MyLengthSquared();
 	void set_MyLengthSquared(float a);
-
 };

@@ -1,9 +1,6 @@
-// Dom's includes.
 #include "global.h"
 #include "ITProject.h"
 #include "ITPoint.h"
-
-// System includes.
 #include <stdarg.h>     /* va_list, va_start, va_arg, va_end */
 #include <QDebug>       // qDebug.
 #include <time.h>		// time, localtime, strftime
@@ -11,7 +8,6 @@
 
 ITProject::ITProject(void)
 {
-
 	// Instanciate the (empty) vector of ITSurfaces.
 	_MySurfaces = new std::vector <ITSurface*>;
 	_MyBaseSurfaces = new std::vector <ITSurface*>;
@@ -47,17 +43,15 @@ ITProject::ITProject(void)
 	set_VelocityFieldMaxx(40.0);
 	set_VelocityFieldMaxy(60.0);
 	set_VelocityFieldMaxz(60.0);
-
 }
 
 ITProject::~ITProject(void)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ITProject being destroyed.");
 
 	// Delete the Surfaces.
 	int noOfSurfaces = get_MySurfaces()->size();
-	for (int i = 0; i<noOfSurfaces; i++)
+	for (int i = 0; i < noOfSurfaces; i++)
 	{
 		delete get_MySurfaces()->at(i);
 	}
@@ -65,11 +59,9 @@ ITProject::~ITProject(void)
 	get_MySurfaces()->clear();
 	delete _MySurfaces;
 
-
-
-	// Delete the  Base Surfaces.
+	// Delete the Base Surfaces.
 	noOfSurfaces = get_MyBaseSurfaces()->size();
-	for (int i = 0; i<noOfSurfaces; i++)
+	for (int i = 0; i < noOfSurfaces; i++)
 	{
 		delete get_MyBaseSurfaces()->at(i);
 	}
@@ -79,14 +71,13 @@ ITProject::~ITProject(void)
 
 	// Delete the Influence coefficient matrix.
 	int noOfRows = get_A()->size();
-	for (int i = 0; i<noOfRows; i++)
+	for (int i = 0; i < noOfRows; i++)
 	{
 		get_A()->at(i).clear();
 	}
 
 	get_A()->clear();
 	delete _A;
-
 
 	// Delete the Wake Influence coefficient matrix.
 	get_B()->clear();
@@ -95,13 +86,12 @@ ITProject::~ITProject(void)
 	// Delete ITGust object.
 	delete _MyGust;
 
-
 	// Delete the Velocity Field data.
 	noOfRows = get_VelocityFieldData()->size();
-	for (int i = 0; i<noOfRows; i++)
+	for (int i = 0; i < noOfRows; i++)
 	{
 		int noOfCols = get_VelocityFieldData()->at(i).size();
-		for (int j = 0; j<noOfCols; j++)
+		for (int j = 0; j < noOfCols; j++)
 		{
 			delete get_VelocityFieldData()->at(i).at(j);
 		}
@@ -111,17 +101,15 @@ ITProject::~ITProject(void)
 	get_VelocityFieldData()->clear();
 	delete _VelocityFieldData;
 
-
-
 	// Delete the Velocity Field History.
 	int noOfGens = get_VelocityFieldDataHistory()->size();
-	for (int g = 0; g<noOfGens; g++)
+	for (int g = 0; g < noOfGens; g++)
 	{
 		noOfRows = get_VelocityFieldDataHistory()->at(g).size();
-		for (int i = 0; i<noOfRows; i++)
+		for (int i = 0; i < noOfRows; i++)
 		{
 			int noOfCols = get_VelocityFieldDataHistory()->at(g).at(i).size();
-			for (int j = 0; j<noOfCols; j++)
+			for (int j = 0; j < noOfCols; j++)
 			{
 				delete get_VelocityFieldDataHistory()->at(g).at(i).at(j);
 			}
@@ -133,10 +121,8 @@ ITProject::~ITProject(void)
 	delete _VelocityFieldDataHistory;
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ITProject destruction complete.");
-
 }
 
-// Utilities.
 void ITProject::currentDateTime(char* currentTime)
 {
 	time_t now = time(0);
@@ -207,7 +193,6 @@ void ITProject::printDebug(const char *FILE, int LINE, const char *FUNC, int lev
 			currentDateTime(currentTime);
 
 			qDebug("DG [%s:%d:%s()]:\t%i\t%s\t%s", FILE, LINE, FUNC, level, currentTime, buffer);
-
 		}
 	}
 	else
@@ -225,7 +210,6 @@ void ITProject::printDebug(const char *FILE, int LINE, const char *FUNC, int lev
 			currentDateTime(currentTime);
 
 			qDebug("DB [%s:%d:%s()]:\t%i\t%s\t%s", FILE, LINE, FUNC, level, currentTime, buffer);
-
 		}
 	}
 
@@ -233,7 +217,7 @@ void ITProject::printDebug(const char *FILE, int LINE, const char *FUNC, int lev
 
 	return;
 
-} // End of printDebug.
+}
 
 bool ITProject::custom_isnan(double var)
 {
@@ -241,7 +225,6 @@ bool ITProject::custom_isnan(double var)
 	return d != d;
 }
 
-  // Accessors.
 int ITProject::get_DebugLevel() { return _debugLevel; }
 void ITProject::set_DebugLevel(int d) { _debugLevel = d; }
 
@@ -277,8 +260,6 @@ void ITProject::set_RankineAlgorithm(std::string s) { _RankineAlgorithm = s; }
 
 float ITProject::get_RankineCoreRadius() { return _RankineCoreRadius; }
 void ITProject::set_RankineCoreRadius(float r) { _RankineCoreRadius = r; }
-
-
 
 std::string ITProject::get_VelocityFieldConstantPlane() { return _VelocityFieldConstantPlane; }
 void ITProject::set_VelocityFieldConstantPlane(std::string c) { _VelocityFieldConstantPlane = c; }
@@ -348,9 +329,6 @@ void ITProject::set_MyGust(ITGust *g) { _MyGust = g; }
 
 int ITProject::get_TotalProblemSize() { return _TotalProblemSize; }
 void ITProject::set_TotalProblemSize(int N) { _TotalProblemSize = N; }
-
-
-
 
 std::vector <ITSurface*> * ITProject::get_MySurfaces() { return _MySurfaces; }
 void ITProject::set_MySurfaces(std::vector <ITSurface*> *mySurfaces) { _MySurfaces = mySurfaces; }

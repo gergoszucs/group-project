@@ -2,9 +2,6 @@
 #include "device_launch_parameters.h" // blockIdx gridDim etc.
 #include "qmath.h"
 
-
-
-
 __host__ __device__ void kernelCalcFiniteSvensonAt(const float *px, // the coordinates of the object panel control point (the target point).
 	const float *py, // the coordinates of the object panel control point (the target point).
 	const float *pz, // the coordinates of the object panel control point (the target point).
@@ -19,8 +16,6 @@ __host__ __device__ void kernelCalcFiniteSvensonAt(const float *px, // the coord
 	float *dvz // Returned variables; the cartesian components of the velocity induced at the object panel by the current finite vortex on the subject panel.
 )
 {
-
-
 	// This method returns a prediction of the velocity (in a ITPoint object) induced at the target point by this vortex.
 
 	// Reference: 1. Sofia Werner MSc Report.
@@ -32,16 +27,12 @@ __host__ __device__ void kernelCalcFiniteSvensonAt(const float *px, // the coord
 	* Checked 20120708.
 	*/
 
-
 	// 20170203: Included denominator 4 PI.
-
 	// Note that the induced velocity formulation used here excludes the multiplicative factor 1/(4 PI).
-
 	float a, b, c, dx, dy, dz, term, sqrtABC, sqrtAterm, a1;
 
 	// a is the square of the distance from the vortex start point to the object (target) point.
 	// Since we are usually using a panel mid-point as a target point, the variable a will generally be greater than 0.
-
 	a = (*px - *vs_x)*(*px - *vs_x)
 		+ (*py - *vs_y)*(*py - *vs_y)
 		+ (*pz - *vs_z)*(*pz - *vs_z);
@@ -68,7 +59,6 @@ __host__ __device__ void kernelCalcFiniteSvensonAt(const float *px, // the coord
 
 	if (term == 0.0) // Denominator.
 	{
-
 		*dvx = 0.0;
 		*dvy = 0.0;
 		*dvz = 0.0;
@@ -93,7 +83,6 @@ __host__ __device__ void kernelCalcFiniteSvensonAt(const float *px, // the coord
 
 		return;
 	}
-
 
 	sqrtABC = sqrtf(a + b + c);
 	sqrtAterm = b / sqrtf(a);
@@ -124,11 +113,8 @@ __host__ __device__ void kernelCalcFiniteSvensonAt(const float *px, // the coord
 	//	return;
 	//}
 
-
 	return;
 } // End of kernelCalcFiniteSvensonAt.
-
-
 
 __global__ void kernelInfluenceCoefficient(
 	const float *px,
@@ -149,7 +135,6 @@ __global__ void kernelInfluenceCoefficient(
 	float RankineCoreRadius,
 	int FrameNumber)
 {
-
 	// An instance of this kernel gets instanciated for each entry in the A matrix of influence coefficients.
 
 	// =================================================================================
@@ -201,7 +186,6 @@ __global__ void kernelInfluenceCoefficient(
 		float Vy = 0.0;
 		float Vz = 0.0;
 
-
 		// DOM: Loop over all the finite vortices on the surface subject panel (4 segments on each panel).
 		// DOM: Note that the contribution from the wake quadrilateral vortex loops is accounted for in the b vector.
 		for (int n = 0; n < maxNoOfVortices; n++)
@@ -209,7 +193,6 @@ __global__ void kernelInfluenceCoefficient(
 			float dvx = 0.0;
 			float dvy = 0.0;
 			float dvz = 0.0;
-
 
 			// 20160616.
 			// Test for the zero vector.
@@ -221,7 +204,6 @@ __global__ void kernelInfluenceCoefficient(
 				// Points are (almost) colinear, so return with dv set to zero.
 				return;
 			}
-
 
 			// Calculate the induced velocity at the colocation point of the object panel due to all the finite vortices on the current subject panel.
 			// Use Biot-Savart vortex with Rankine viscous core.
@@ -245,23 +227,14 @@ __global__ void kernelInfluenceCoefficient(
 			Vx = Vx + dvx;
 			Vy = Vy + dvy;
 			Vz = Vz + dvz;
-
-
-		} // End of loop over vortices in the current panel.
-
+		}
 		  // Now compute A[ index ].
 		  // This is the dot-product of the
 		  // induced velocity with the unit normal at 
 		  // the target point (colocation point of the object panel).
 		A[index] = (nx[row] * Vx + ny[row] * Vy + nz[row] * Vz);
-
-	} // End of if (index < noOfUnknownVortexStrengths*noOfUnknownVortexStrengths)
-
-} // End of kernelInfluenceCoefficient
-
-
-
-
+	}
+}
 
 __global__ void kernelFunctionPredictVelocityAtPoint(
 	const float *px,
@@ -285,7 +258,6 @@ __global__ void kernelFunctionPredictVelocityAtPoint(
 	int indexOfStartOfTranche,
 	char rankineAlgorithmIndex)
 {
-
 	// Input parameters:
 	// px - the x-coordinate of the object panel control point.
 	// py - the y-coordinate of the object panel control point.
@@ -330,29 +302,22 @@ __global__ void kernelFunctionPredictVelocityAtPoint(
 	// DOM: Only do the computation if we are in a valid thread.
 	if (threadIndex < noOfVelocityPredictions)
 	{
-
 		// DOM: Only do the computation if the threadIndex is in this tranche.
 		if ((threadIndex >= indexOfStartOfTranche) && (threadIndex < (indexOfStartOfTranche + threadsPerTranche)))
 		{
-
 			// DOM: Loop through the panels in the project.
-			for (int panelIndex = 0; panelIndex<noOfPanels; panelIndex++) // Loop through all the subject panels.
+			for (int panelIndex = 0; panelIndex < noOfPanels; panelIndex++) // Loop through all the subject panels.
 			{
-
 				// DOM: Loop through the vortices of the current panel.
-				for (int vortexIndex = 0; vortexIndex<noOfVorticesPerPanel; vortexIndex++)
+				for (int vortexIndex = 0; vortexIndex < noOfVorticesPerPanel; vortexIndex++)
 				{
-
 					// Initialize the velocity induced by the current vortex at the object point.
 					float dvx = 0.0;
 					float dvy = 0.0;
 					float dvz = 0.0;
 
 					// DOM: Actually calculate the velocity induced at the object point due to the current vortex.
-
 					// ROW_MAJOR_IDX2C(panelIndex, vortexIndex, maxNoOfVortices)
-
-
 					// Avoid computing Svendsen induced velocity for object points close to the current vortex.
 					float dsxSquared = (vs_x[panelIndex*noOfVorticesPerPanel + vortexIndex] - px[threadIndex]) * (vs_x[panelIndex*noOfVorticesPerPanel + vortexIndex] - px[threadIndex]);
 					float dsySquared = (vs_y[panelIndex*noOfVorticesPerPanel + vortexIndex] - py[threadIndex]) * (vs_y[panelIndex*noOfVorticesPerPanel + vortexIndex] - py[threadIndex]);
@@ -389,24 +354,15 @@ __global__ void kernelFunctionPredictVelocityAtPoint(
 							&dvz);
 					}
 
-
 					Vx = Vx + dvx*vorticities[panelIndex];
 					Vy = Vy + dvy*vorticities[panelIndex];
 					Vz = Vz + dvz*vorticities[panelIndex];
-
-
-				} // End of loop through vorticies of the current panel.
-
-			} // End of loop over panels.
+				}
+			}
 
 			p_vx[threadIndex] = Vx;
 			p_vy[threadIndex] = Vy;
 			p_vz[threadIndex] = Vz;
-
-		} // End of loop through threads in this tranche.
-
-	} // End of if valid thread.
-
-
-} // End of kernelFunctionPredictVelocityAtPoint
-
+		}
+	}
+}

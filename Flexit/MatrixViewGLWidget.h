@@ -1,4 +1,5 @@
 #pragma once
+
 #include "qgl.h"
 #include <QGLWidget>
 
@@ -22,12 +23,10 @@ protected:
 
 public:
 	explicit MatrixViewGLWidget(QWidget *parent = 0);
-	~MatrixViewGLWidget(void);
+	~MatrixViewGLWidget(void) {};
 
 	void updateMyDisplay();
 	void updateDisplayMatrix();
 	void populateDisplayMatrix(int noOfPanels);
 	void freeDisplayMatrix();
-
 };
-

@@ -1,14 +1,10 @@
 // Command line argument for batch mode: 
 // "C:\Users\e802508\Documents\Visual Studio 2015\Projects\Flexit\Flexit\Data\AX1i_100_frames_no_duplicates.json"
 
-
-
 #include "Flexit.h"
 #include <QtWidgets/QApplication>
 #include "CudaUtilities.cuh"
 #include <iostream> 
-
-// Dom's includes
 #include "global.h"
 
 // Global variables.
@@ -85,7 +81,6 @@ bool drawRotateXHorizontal = false;
 bool drawRotateYHorizontal = false;
 bool drawRotateZVertical = true;
 
-
 #pragma comment(lib, "cudart") 
 
 using std::endl;
@@ -125,11 +120,9 @@ int main(int argc, char *argv[])
 	// End of CUDA Test
 	// =========================================================================
 
-
 	// Instanciate an ITProject object.
 	project = new ITProject();
 	project->set_DebugLevel(5);
-
 
 	// Set the run mode depending on whether or not there are data file argument(s).
 	if (argc > 1)
@@ -142,12 +135,9 @@ int main(int argc, char *argv[])
 		MY_RUN_MODE = MYGUI;
 	}
 
-
 	if (MY_RUN_MODE == MYGUI)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "GUI MODE.");
-
-
 		QApplication a(argc, argv);
 
 		// Create the main application window widget.
@@ -160,9 +150,7 @@ int main(int argc, char *argv[])
 		// Set the main window icon.
 		QIcon icon("myappicon.ico");
 		w->setWindowIcon(icon);
-
 		w->show();
-
 
 		// Get details about the GPU.
 		// Note that this call needs to be made after MY_RUN_MODE has been initialized, after the window show, and before the Qt loop starts.
@@ -189,9 +177,6 @@ int main(int argc, char *argv[])
 	{
 		// Do batch mode calculations here.
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "BATCH MODE. Argument: %s", argv[1]);
-
 		w->loadData(QString(argv[1]));
-
 	}
-
 }

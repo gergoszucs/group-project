@@ -2,13 +2,13 @@
 
 #include <vector>
 
-// Forward declarations.
 class ITPoint;
 class ITPointTrajectory;
 
 class ITTrajectoryCurveSegment
 {
 private:
+
 	ITPointTrajectory *_P0_p; // Note that only the x component contains the data.
 	ITPointTrajectory *_P1_p; // Note that only the x component contains the data.
 
@@ -68,4 +68,3 @@ public:
 	float get_ArcLength();
 	void set_ArcLength(float l);
 };
-

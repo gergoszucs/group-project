@@ -2,14 +2,11 @@
 #include <QGridLayout>
 #include <QLabel.h>
 #include <QPixmap.h>
-
-// Dom's includes.
 #include "global.h"
 #include "ITProject.h"
 
 MyAboutDialogBox::MyAboutDialogBox(QWidget * parent) : QWidget(parent)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside MyAboutDialogBox constructor");
 
 	QGridLayout *layout = new QGridLayout;
@@ -41,7 +38,6 @@ MyAboutDialogBox::MyAboutDialogBox(QWidget * parent) : QWidget(parent)
 	m_imageLabel->setPixmap(*m_image);
 	layout->addWidget(m_imageLabel, 3, 0);
 
-
 	// Create Close button.
 	m_button = new QPushButton("Close", this);
 	QPalette* p = new QPalette();
@@ -69,12 +65,6 @@ MyAboutDialogBox::MyAboutDialogBox(QWidget * parent) : QWidget(parent)
 
 	setFixedSize(203, 320);
 }
-
-
-MyAboutDialogBox::~MyAboutDialogBox(void)
-{
-}
-
 
 void MyAboutDialogBox::handleButton()
 {

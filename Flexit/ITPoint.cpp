@@ -1,12 +1,8 @@
-// System includes.
 #include <string>
-
-// Dom's includes.
 #include "ITPoint.h"
 #include "ITSurface.h"
 #include "ITControlPoint.h"
 #include "global.h"
-
 
 ITPoint::ITPoint(float x, float y, float z)
 {
@@ -24,13 +20,7 @@ ITPoint::ITPoint(float x, float y, float z)
 	set_Name("");
 
 	set_Mass(0.0);
-
 }
-
-ITPoint::ITPoint()
-{
-}
-
 
 ITPoint::~ITPoint(void)
 {
@@ -45,7 +35,6 @@ float ITPoint::magnitude()
 
 void ITPoint::normalize()
 {
-
 	float tempMag = magnitude();
 
 	set_X(get_X() / tempMag);
@@ -53,17 +42,13 @@ void ITPoint::normalize()
 	set_Z(get_Z() / tempMag);
 }
 
-
 void ITPoint::propagateMeWithMorph(ITPoint* cp, ITPoint* rotationPoint, ITPoint* translationPoint, bool isMorph, int startFrame, int endFrame, std::string typeOfMorph)
 {
 	// Moves a temporary point from the base position during FlowitCudaUnsteady play out.
-
 	// cp is the surface "datum" point about which rotations should take place.
 	// rotationPoint is the point in roll-pitch-yaw space representing the required rotation.
 	// translationPoint is the point in translation space representing the required translation.
-
 	// This method operates on the coordinates of this ITPoint object in place.
-
 	float x, y, z;
 
 	// Do the morphing.
@@ -85,10 +70,9 @@ void ITPoint::propagateMeWithMorph(ITPoint* cp, ITPoint* rotationPoint, ITPoint*
 
 		}
 	}
+
 	// Morphing is complete.
-
 	// Now do rigid body transformation.
-
 	// Translate this point back to the datum point (in preparation for rotation).
 	set_X(get_X() - cp->get_X());
 	set_Y(get_Y() - cp->get_Y());
@@ -125,22 +109,14 @@ void ITPoint::propagateMeWithMorph(ITPoint* cp, ITPoint* rotationPoint, ITPoint*
 	set_X(get_X() + cp->get_X() + translationPoint->get_X());
 	set_Y(get_Y() + cp->get_Y() + translationPoint->get_Y());
 	set_Z(get_Z() + cp->get_Z() + translationPoint->get_Z());
-
-
-} // End of propagateMeWithMorph.
-
-
-
-
+}
 
 void ITPoint::propagateMeWithMorphForTrajectorySpeed(ITPoint* cp, ITPoint* rotationPoint, ITPoint* translationPoint, bool isMorph, int startFrame, int endFrame, std::string typeOfMorph, int k, int myFrameNumber)
 {
 	// Moves a temporary point from the base position during FlowitCudaUnsteady play out.
-
 	// cp is the surface "datum" point about which rotations should take place.
 	// rotationPoint is the point in roll-pitch-yaw space representing the required rotation.
 	// translationPoint is the point in translation space representing the required translation.
-
 	// This method operates on the coordinates of this ITPoint object in place.
 
 	float x, y, z;
@@ -161,13 +137,11 @@ void ITPoint::propagateMeWithMorphForTrajectorySpeed(ITPoint* cp, ITPoint* rotat
 			{
 				set_Y(-get_Y());
 			}
-
 		}
 	}
+
 	// Morphing is complete.
-
 	// Now do rigid body transformation.
-
 	// Translate this point back to the datum point (in preparation for rotation).
 	set_X(get_X() - cp->get_X());
 	set_Y(get_Y() - cp->get_Y());
@@ -207,14 +181,6 @@ void ITPoint::propagateMeWithMorphForTrajectorySpeed(ITPoint* cp, ITPoint* rotat
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i", k);
 
-
-
-
-
-
-
-
-
 	// FIXME: Finally apply deformation.
 	if (IsModeEulerBernoulli)
 	{
@@ -223,11 +189,10 @@ void ITPoint::propagateMeWithMorphForTrajectorySpeed(ITPoint* cp, ITPoint* rotat
 		int myI = 0;
 		int myJ = 0;
 
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 		{
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
-
 				float currentDist = this->distanceFrom(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j));
 
 				if (currentDist < dist)
@@ -236,12 +201,10 @@ void ITPoint::propagateMeWithMorphForTrajectorySpeed(ITPoint* cp, ITPoint* rotat
 					myI = i;
 					myJ = j;
 				}
-
-			} // End of j loop.
-
-		} // End of i loop.
-
-		  // Finally apply EULER-BERNOULLI deformations of the surface.
+			}
+		}
+		
+		// Finally apply EULER-BERNOULLI deformations of the surface.
 		if (myFrameNumber == FrameNumber)
 		{
 			set_X(get_X() + project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(myI).at(myJ)->get_W()->get_X());
@@ -258,9 +221,7 @@ void ITPoint::propagateMeWithMorphForTrajectorySpeed(ITPoint* cp, ITPoint* rotat
 			set_Z(get_Z() + project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(myI).at(myJ)->get_W()->get_Z());
 		}
 	}
-
-} // End of propagateMeWithMorphForTrajectorySpeed.
-
+}
 
 float ITPoint::distanceFrom(ITPoint* secondPoint)
 {
@@ -269,7 +230,7 @@ float ITPoint::distanceFrom(ITPoint* secondPoint)
 		+ (this->get_Y() - secondPoint->get_Y())*(this->get_Y() - secondPoint->get_Y())
 		+ (this->get_Z() - secondPoint->get_Z())*(this->get_Z() - secondPoint->get_Z())
 	);
-} // End of distanceFrom.
+}
 
 float ITPoint::dot(ITPoint *otherPt)
 {
@@ -289,11 +250,6 @@ ITPoint *ITPoint::cross(ITPoint *otherPt, ITPoint *result)
 
 	return result;
 }
-
-
-
-
-
 
 void ITPoint::serializeMeAsJSONObject(int k, int i, int j, rapidjson::Value *controlPointsArray, rapidjson::Document *d)
 {
@@ -329,15 +285,8 @@ void ITPoint::serializeMeAsJSONObject(int k, int i, int j, rapidjson::Value *con
 
 	// Finally add the point node to the array.
 	controlPointsArray->PushBack(pointObject, allocator);
+}
 
-} // End of serializeMeAsJSONObject.
-
-
-
-
-
-
-  // Accessors.
 float ITPoint::get_X() { return _X; }
 void ITPoint::set_X(float x) { _X = x; }
 

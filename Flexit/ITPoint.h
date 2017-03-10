@@ -28,8 +28,9 @@ private:
 	float _V; // Intrinsic coordinate.
 
 public:
+
 	ITPoint(float x, float y, float z);
-	ITPoint(void);
+	ITPoint(void) {};
 	~ITPoint(void);
 
 	// Utilities.
@@ -45,7 +46,6 @@ public:
 
 	// IO
 	void serializeMeAsJSONObject(int k, int i, int j, rapidjson::Value *controlPointsArray, rapidjson::Document *d);
-
 
 	// Accessors.	
 	float get_X();
@@ -81,15 +81,9 @@ public:
 	std::string get_Name();
 	void set_Name(std::string s);
 
-
 	float get_U();
 	void set_U(float u);
 
 	float get_V();
 	void set_V(float v);
-
-
-protected:
-
-
 };

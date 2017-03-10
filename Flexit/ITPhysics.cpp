@@ -1,9 +1,4 @@
-// System includes.
 #include <QTime> // Used in the delay function.
-
-
-
-// Dom's includes.
 #include "ITPhysics.h"
 #include "global.h"
 #include "ITProject.h"
@@ -20,20 +15,7 @@
 #include "ITPointTrajectory.h" // Used in playoutTest.
 #include "ITGust.h"
 #include "ITControlSurface.h"
-
 #include "CudaPhysics.cuh"
-
-
-
-ITPhysics::ITPhysics(void)
-{
-}
-
-
-ITPhysics::~ITPhysics(void)
-{
-}
-
 
 void ITPhysics::delay(int millisecondsToWait)
 {
@@ -42,40 +24,31 @@ void ITPhysics::delay(int millisecondsToWait)
 	{
 		QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 	}
-} // End of delay.
-
-
-
+}
 
 int ITPhysics::multiplyArbitraryMatrices(int rA, int cA, char storageModeA, float*A, int rB, int cB, char storageModeB, float*B, float*C)
 {
-
 	// This function takes input matrices as either ROW MAJOR or COL MAJOR and computes the output matrix as ROW MAJOR.
 	// Note that only ROW MAJOR is currently implemented.
 	// The output matrix R has dimensions rA x cB.
-
 	// Return codes: 0 - Success.
 	//				 1 - cA != rB
-
 	//  First check that cA == rB
 	if (cA == rB)
 	{
-		for (int i = 0; i<rA; i++) // Loop over the rows of R.
+		for (int i = 0; i < rA; i++) // Loop over the rows of R.
 		{
-
-			for (int j = 0; j<cB; j++) // Loop over the columns of R.
+			for (int j = 0; j < cB; j++) // Loop over the columns of R.
 			{
-
 				C[ROW_MAJOR_IDX2C(i, j, cB)] = 0.0;
 
-				for (int k = 0; k<cA; k++) // Walk along the columns of A and the rows of B adding element products.
+				for (int k = 0; k < cA; k++) // Walk along the columns of A and the rows of B adding element products.
 				{
 					C[ROW_MAJOR_IDX2C(i, j, cB)] = C[ROW_MAJOR_IDX2C(i, j, cB)] + A[ROW_MAJOR_IDX2C(i, k, cA)] * B[ROW_MAJOR_IDX2C(k, j, cB)];
 					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "A[%i,%i]: %f, B[%i,%i]: %f, C[%i,%i]: %f", i, k, A[ROW_MAJOR_IDX2C(i, k, cA)], k, j, B[ROW_MAJOR_IDX2C(k, j, cB)], i, j, C[ROW_MAJOR_IDX2C(i, j, cB)]);
 				}
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, " ");
 			}
-
 		}
 		return 0;
 	}
@@ -84,29 +57,27 @@ int ITPhysics::multiplyArbitraryMatrices(int rA, int cA, char storageModeA, floa
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 0, "Matrix dimensions are not compatible. First matrix has %i columns, and second matrix has %i rows", cA, rB);
 		return 1;
 	}
-} // End of multiplyArbitraryMatrices.
+}
 
 void ITPhysics::printThreeByThreeMatrix(int r, int c, char storageModeA, float*A, std::string title, int debugLevel)
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, debugLevel, "%s", title.c_str());
-	for (int i = 0; i<3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, debugLevel, "%f %f %f", A[ROW_MAJOR_IDX2C(i, 0, 3)], A[ROW_MAJOR_IDX2C(i, 1, 3)], A[ROW_MAJOR_IDX2C(i, 2, 3)]);
 	}
-
 }
 
 
 void ITPhysics::printDebugMatrix(int r, int c, char storageModeA, float*A, std::string title, int debugLevel)
 {
-
 	// This prints to the output.txt file.
 	if (debugLevel < project->get_DebugLevel())
 	{
 		printf("%s\n", title.c_str());
-		for (int i = 0; i<r; i++)
+		for (int i = 0; i < r; i++)
 		{
-			for (int j = 0; j<c; j++)
+			for (int j = 0; j < c; j++)
 			{
 				printf("%f, ", A[ROW_MAJOR_IDX2C(i, j, c)]);
 			}
@@ -114,9 +85,6 @@ void ITPhysics::printDebugMatrix(int r, int c, char storageModeA, float*A, std::
 		}
 	}
 }
-
-
-
 
 void ITPhysics::playOutStep()
 {
@@ -130,7 +98,6 @@ void ITPhysics::playOutStep()
 
 	if ((!IsPaused) && (!IsReplay) && (!IsDryRun) && (!IsSimulating) && (IsStep))
 	{
-
 		UnsavedChanges = true;
 
 		LARGE_INTEGER t1, t2, frequency;
@@ -158,43 +125,28 @@ void ITPhysics::playOutStep()
 			ITPhysics::delay(10); // 10 msecs for rendering the current Frame.
 		}
 
-
 		// Finally increment the frame number.
 		FrameNumber++;
-
-	} // End of while mode is IsStep.
-
-
-} // End of playOutStep.
-
-
-
-
-
-
-
-
-
-
+	}
+}
 
 void ITPhysics::prepareForSimulation()
 {
-
 	// Reset the elapsed time.
 	cummulativeElapsedTimeSeconds = 0.0;
 
 	// Loop through surfaces deleting wake panels.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		project->get_MySurfaces()->at(k)->prepareForSimulation();
 	}
 
 	// Delete any pre-existing velocity field data.
 	int noOfRows = project->get_VelocityFieldData()->size();
-	for (int i = 0; i<noOfRows; i++)
+	for (int i = 0; i < noOfRows; i++)
 	{
 		int noOfCols = project->get_VelocityFieldData()->at(i).size();
-		for (int j = 0; j<noOfCols; j++)
+		for (int j = 0; j < noOfCols; j++)
 		{
 			delete project->get_VelocityFieldData()->at(i).at(j);
 		}
@@ -202,21 +154,14 @@ void ITPhysics::prepareForSimulation()
 	}
 
 	project->get_VelocityFieldData()->clear();
-
-
-} // End of prepareForSimulation.
-
-
-
+}
 
 void ITPhysics::PropagateFlexit(int FrameNumber)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 1, "Start FrameNumber: %i of %i", FrameNumber, project->get_MaxKeyFrame());
 
 	LARGE_INTEGER t1, t2, frequency;
 	double elapsedTime;
-
 
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&t1);
@@ -248,7 +193,6 @@ void ITPhysics::PropagateFlexit(int FrameNumber)
 
 	if (FrameNumber > 0) // This is necessary 20160716.
 	{
-
 		QueryPerformanceFrequency(&frequency);
 		QueryPerformanceCounter(&t1);
 		ITPhysics::PropagateWakeGeometry(FrameNumber);
@@ -266,7 +210,6 @@ void ITPhysics::PropagateFlexit(int FrameNumber)
 			elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Time for calcVelocityFieldCuda is %f, msecs", elapsedTime);
 		}
-
 	}
 
 	// Store data for replay.
@@ -276,46 +219,35 @@ void ITPhysics::PropagateFlexit(int FrameNumber)
 	QueryPerformanceCounter(&t2);
 	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Time for StoreDataForReplay is %f, msecs", elapsedTime);
-
 }
-
-
-
 
 void ITPhysics::CreateMatrixAndSolveForVortexStrengths(int FrameNumber)
 {
 	// This function is called from PropagateFlexit
-
-
 	// =====================================================================================
 	// This function calculates the linear sum of velocities induced on each panel by unit
 	// strength vortices on all the other panels. Then it computes the actual vortex strengths
 	// required to satisfy the boundary condition of tangential flow on each panel.
 	// It does this by constructing and solving a linear system using matrix methods.
 	// =====================================================================================
-
-	// =====================================================================================
 	// Compute the dimensions of the A matrix.
 	// The A matrix is of size rxr, where r is the total number of bound panels in
 	// the project (on all surfaces, including reflected ones).
 	// =====================================================================================
 
-
 	int noOfUnknownVortexStrengths = 0; // Initialize r. This is just the number of surface panels.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through all the surfaces, adding the number of panels to r.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through all the surfaces, adding the number of panels to r.
 	{
-		noOfUnknownVortexStrengths = noOfUnknownVortexStrengths + (project->get_MySurfaces()->at(k)->get_MyPanels()->size()  *  project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size());
+		noOfUnknownVortexStrengths = noOfUnknownVortexStrengths + 
+			(project->get_MySurfaces()->at(k)->get_MyPanels()->size()  *  project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size());
 	}
 
 	// The solution vector (that will contain the vortex strengths).
 	std::vector <float> *solPointer = new std::vector <float>(noOfUnknownVortexStrengths);
 
 	project->set_TotalProblemSize(noOfUnknownVortexStrengths);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Total problem size: %i", project->get_TotalProblemSize());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Size of solPointer: %i. Last value is: %f", solPointer->size(), solPointer->back());
-
 
 	LARGE_INTEGER t1, t2, frequency;
 	double elapsedTime;
@@ -340,7 +272,6 @@ void ITPhysics::CreateMatrixAndSolveForVortexStrengths(int FrameNumber)
 	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Time for ManageCalculationOfVectorB is %f, msecs", elapsedTime);
 
-
 	// =====================================================================================
 	// Solve for the unknown surface panel vortex strengths.
 	// =====================================================================================
@@ -351,21 +282,18 @@ void ITPhysics::CreateMatrixAndSolveForVortexStrengths(int FrameNumber)
 	elapsedTime = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Time for SolveForSol is %f, msecs", elapsedTime);
 
-
 	// Assign the vorticities to the surface panels (not the wake panels).
 	// This is just storing solPointer in a more object-oriented way.
 	int solCounter = 0;
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through all the surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through all the surfaces.
 	{
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
-
 				project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->set_MyVorticity(solPointer->at(solCounter));
-
-				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Setting vorticity: %f, solPointer: %f", project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyVorticity(), solPointer->at(solCounter));
-
+				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Setting vorticity: %f, solPointer: %f",
+					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyVorticity(), solPointer->at(solCounter));
 				solCounter++;
 			}
 		}
@@ -374,18 +302,13 @@ void ITPhysics::CreateMatrixAndSolveForVortexStrengths(int FrameNumber)
 	// Empty and delete solPointer.
 	solPointer->clear();
 	delete solPointer;
-
-} // End of CreateMatrixAndSolveForVortexStrengths.
-
-
-
+}
 
 void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *solPointer, int noOfUnknownVortexStrengths)
 {
 	// The matrix of influence coefficients only includes terms from the vortices on the bounding surfaces (not the wake).
 	// The bounding surface geometry needs to be uploaded to the GPU at each frame because the geometry changes at each frame.
 	// This is unlike the Steady VLM case where the geometry remains fixed from one Frame to the next.
-
 	int totalNumberOfCudaComputations = noOfUnknownVortexStrengths*noOfUnknownVortexStrengths;
 
 	// Define the maximum number of vortices of any panel.
@@ -428,25 +351,22 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 		exit(EXIT_FAILURE);
 	}
 
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Host memory allocated successfully.");
 
 	// Initialize the host array of coefficients (the square matrix of coefficients).
-	for (int i = 0; i<totalNumberOfCudaComputations; i++) { h_A[i] = 0.0; }
+	for (int i = 0; i < totalNumberOfCudaComputations; i++) { h_A[i] = 0.0; }
 
 	// Initialize the host arrays of panel colocation points and vortex segment end-points.
 	int panelIndex = 0; // Panel index.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // DOM: Loop through the surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // DOM: Loop through the surfaces.
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "================================= k: %i", k);
 
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++) // DOM: Loop through the rows of the panels.
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++) // DOM: Loop through the rows of the panels.
 		{
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // DOM: Loop through the columns of the panels.
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // DOM: Loop through the columns of the panels.
 			{
 				// DOM: Colocation point data.
-
 				// DOM: Assign panel control point coordinates.
 				h_cp_x[panelIndex] = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X();
 				h_cp_y[panelIndex] = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y();
@@ -458,12 +378,11 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 				h_n_z[panelIndex] = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z();
 
 				// DOM: Vortex data.               
-
 				// ============================================================================
 				// DOM: Loop through all the four bound vortices on the current panel.
 				// DOM: The way to think of this is matrix with a row for each panel, and a column for each vortex on the panel. In this implementation, the number of columns is always 4.
 				// ============================================================================
-				for (int jj = 0; jj<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyVortices()->size(); jj++)
+				for (int jj = 0; jj < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyVortices()->size(); jj++)
 				{
 					// DOM: Vortex coordinates.
 					h_vs_x[ROW_MAJOR_IDX2C(panelIndex, jj, maxNoOfVortices)] = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyVortices()->at(jj)->get_StartPoint()->get_X();
@@ -482,12 +401,9 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 					{
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Zero length bound vortex detected - Matrix of Coeffs.");
 					}
-
-
 				}
 
 				// DOM: Number of bound vortices associated with this panel is assumed to always be 4.
-
 				panelIndex++; // Increment the panel counting index.
 			}
 		}
@@ -516,7 +432,6 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ConstructMatrixOfInfluenceCoefficientsCuda finished.");
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "h_A[20] = %f", h_A[20]);
 
-
 	// Debugging print the matrix of influence coefficients.
 	printDebugMatrix(noOfUnknownVortexStrengths, noOfUnknownVortexStrengths, 'R', h_A, "A", 12);
 	printDebugMatrix(panelIndex, 1, 'R', h_cp_x, "CP x", 12);
@@ -530,7 +445,7 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 	// Empty project->get_A() and delete and re-create in preparation for filling it with new influence coefficient matrix values.
 	if (!project->get_A()->empty())
 	{
-		for (int i = 0; i<project->get_A()->size(); i++)
+		for (int i = 0; i < project->get_A()->size(); i++)
 		{
 			project->get_A()->at(i).clear();
 		}
@@ -538,28 +453,25 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 	}
 
 	delete project->get_A();
-
 	project->set_A(new std::vector < std::vector <double> >);
 
 	// Fill project->get_A().
 	int arrayIndex = 0; // Counts through the h_A array (that represents the square matrix of coefficients A).
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++) // Loop through the rows of the (object) panels i.
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++) // Loop through the rows of the (object) panels i.
 		{
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Loop through the columns of the (object) panels i.
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Loop through the columns of the (object) panels i.
 			{
 				std::vector <double> *dummy = new std::vector <double>; // This vector will contain entries for a row of the coefficient matrix (all entries are for a single object panel i).
 
-				for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // Loop through the (subject) surfaces j.
+				for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // Loop through the (subject) surfaces j.
 				{
-
 					// Loop through all the (subject) panels.
-					for (int ii = 0; ii<project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++)
+					for (int ii = 0; ii < project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++)
 					{
-						for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++)
+						for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++)
 						{
-
 							dummy->push_back((double)h_A[arrayIndex]);
 							arrayIndex++;
 						}
@@ -571,8 +483,7 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 		}
 	}
 
-
-	for (int i = 0; i<noOfUnknownVortexStrengths*maxNoOfVortices; i++)
+	for (int i = 0; i < noOfUnknownVortexStrengths*maxNoOfVortices; i++)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "h_vs_x[ %i ] = %f, h_ve_x[ %i ] = %f", i, h_vs_x[i], i, h_ve_x[i]);
 	}
@@ -599,21 +510,16 @@ void ITPhysics::ManageCalculationOfMatrixOfCoefficients(std::vector <float> *sol
 	free(h_A);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "End of ManageCalculationOfMatrixOfCoefficients");
-
-} // End of ManageCalculationOfMatrixOfCoefficients.
-
-
+}
 
 void ITPhysics::ManageCalculationOfVectorB(int noOfUnknownVortexStrengths)
 {
-
 	// This function computes the entries of the vector b (RHS of equation 4.21) where
 	// b = -(V.n + T.n) = - V.n - T.n. Note that the elements of b include the minus sign.
 	//
 	// Reference:   1. /Users/dominiquefleischmann/Documents/WorkingFolder/Mathematics/Tex/Surfit/Aeroelasticity Monograph/master.pdf
 	// Revision History:
 	// 20161214: Include Gust velocities. Remove temp b parameter and use project instance variable instead.
-
 	// Empty project->get_B() and delete and re-create in preparation for filling it with new wake influence coefficient matrix values.
 	if (!project->get_B()->empty())
 	{
@@ -624,13 +530,12 @@ void ITPhysics::ManageCalculationOfVectorB(int noOfUnknownVortexStrengths)
 
 	project->set_B(new std::vector <double>);
 
-
 	// DOM: fill  B.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++) // Loop through the rows of the (object) panels i.
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++) // Loop through the rows of the (object) panels i.
 		{
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Loop through the columns of the (object) panels j.
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Loop through the columns of the (object) panels j.
 			{
 				// Each pass through this inner loop corresponds to a single entry in the b vector.
 
@@ -664,9 +569,12 @@ void ITPhysics::ManageCalculationOfVectorB(int noOfUnknownVortexStrengths)
 				// Note that the RHS vector of the matrix equation is the negative of the dot product of the flow velocities with the panel normals.
 				// Since the panel earth velocities are the velocities of the panel in the earth frame, the flow velocity is the negative of these vectors. 
 				// This means that the positive of the earth velocity should be used in the below calculation here. 
-				float TiDotN = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyMidPointEarthVelocity()->get_X()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X()
-					+ project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyMidPointEarthVelocity()->get_Y()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y()
-					+ project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyMidPointEarthVelocity()->get_Z()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z();
+				float TiDotN = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyMidPointEarthVelocity()->get_X()
+					*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X()
+					+ project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyMidPointEarthVelocity()->get_Y()
+					*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y()
+					+ project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyMidPointEarthVelocity()->get_Z()
+					*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z();
 
 				// 20150612.
 
@@ -680,10 +588,8 @@ void ITPhysics::ManageCalculationOfVectorB(int noOfUnknownVortexStrengths)
 
 				if (IsIncludeWakeTerms)
 				{
-
-					for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // Loop through the subject surfaces.
+					for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // Loop through the subject surfaces.
 					{
-
 						// Find the maximum and minimum generation indices for this run.
 						int firstGeneration;
 						int lastGeneration;
@@ -708,17 +614,16 @@ void ITPhysics::ManageCalculationOfVectorB(int noOfUnknownVortexStrengths)
 						}
 
 						// Loop through all the subject wake panel generations.
-						for (int ii = firstGeneration; ii<lastGeneration; ii++)
+						for (int ii = firstGeneration; ii < lastGeneration; ii++)
 						{
 							// Loop down the trailing edge of subject panels within the current generation.
-							for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++)
+							for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++)
 							{
 								ITWakePanel* currentSubjectWakePanel = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj);
 
 								// Loop around all the vortices in the current wake panel.
-								for (int tt = 0; tt<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->size(); tt++)
+								for (int tt = 0; tt < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->size(); tt++)
 								{
-
 									//  Find the velocity induced at the colocation point of the current object panel due to the unit strength tt-th vortex of the ii,jj subject wake panel.
 									ITVortex* currentSubjectWakeVortex = currentSubjectWakePanel->get_MyVortices()->at(tt);
 
@@ -754,21 +659,14 @@ void ITPhysics::ManageCalculationOfVectorB(int noOfUnknownVortexStrengths)
 									delete velInducedAtObjectPanel;
 
 								} // End loop over vortex segments of a subject panel.
-
-
-							} // End of jj loop.
-
-						} // End of loop through generations.
-
-					} // End of loop through subject surfaces.
-
-
-				} // End of IsIncludeWakeTerms.
+							}
+						}
+					}
+				}
 
 				float gustVelocityDotN = 0.0;
 				if (project->get_IsGust())
 				{
-
 					// The dot product of the gust velocity with the object panel normal.
 					float x = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X();
 					float y = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y();
@@ -785,30 +683,18 @@ void ITPhysics::ManageCalculationOfVectorB(int noOfUnknownVortexStrengths)
 						+ vz*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z();
 				}
 
-
-
 				// This is the RHS of the main linear system equation.
 				// See equation 4.19 from the paper.
 				// The element of B is the velocity components normal to the object panel due to the panel trajectory velocity minus the velocity induced by the wakes minus the gust velocity.
 				project->get_B()->push_back((double)(TiDotN - VWdotN - gustVelocityDotN));
-
-			} // End of j loop though object panels.
-
-		} // End of i loop though object panels. 
-
-	} // End of k loop through the object surfaces.
-
-
-} // End of ManageCalculationOfVectorB.
-
-
-
+			}
+		}
+	} 
+}
 
 void ITPhysics::SolveForSol(std::vector <float> *solPointer, int noOfUnknownVortexStrengths)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside SolveForSol. FrameNumber: %i ...", FrameNumber);
-
 
 	// Allocate memory for the A matrix and the LU matrix.
 	float* A = 0;  // Pointer to the square matrix on the host with dimensions numvar rows x numvar cols.
@@ -824,12 +710,10 @@ void ITPhysics::SolveForSol(std::vector <float> *solPointer, int noOfUnknownVort
 	L = (float *)malloc(noOfUnknownVortexStrengths * noOfUnknownVortexStrengths * sizeof(*L)); // Lower triangular decomposition of B.
 	U = (float *)malloc(noOfUnknownVortexStrengths * noOfUnknownVortexStrengths * sizeof(*U)); // Upper triangular decomposition of B.
 	R = (float *)malloc(noOfUnknownVortexStrengths * noOfUnknownVortexStrengths * sizeof(*R)); // R will contain L x U.
-
-																							   // Initialize the B matrix from vv_B (B*ExternalSol = b).
-																							   // Loop through vv_B.
-	for (int i = 0; i<noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
+																					  
+	for (int i = 0; i < noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
 	{
-		for (int j = 0; j<noOfUnknownVortexStrengths; j++) // Loop over the columns of vv_B.
+		for (int j = 0; j < noOfUnknownVortexStrengths; j++) // Loop over the columns of vv_B.
 		{
 			A[ROW_MAJOR_IDX2C(i, j, noOfUnknownVortexStrengths)] = (float)(project->get_A()->at(i).at(j));
 		}
@@ -848,7 +732,6 @@ void ITPhysics::SolveForSol(std::vector <float> *solPointer, int noOfUnknownVort
 
 	// Separate the upper and lower triangular matrices.
 	ITPhysics::separateDoolittleLandU(noOfUnknownVortexStrengths, LU, L, U); // vv_B and v_b are global.
-
 
 	// ======================================================================================================================
 	// Do Dom's CPU Gaussian Elimination algorithm. http://www.it.uom.gr/teaching/linearalgebra/NumericalRecipiesInC/c2-2.pdf
@@ -875,78 +758,55 @@ void ITPhysics::SolveForSol(std::vector <float> *solPointer, int noOfUnknownVort
 	free(R);
 
 	// Debugging output.
-	for (int i = 0; i<solPointer->size(); i++)
+	for (int i = 0; i < solPointer->size(); i++)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "%f", solPointer->at(i));
 	}
-
-
-
-} // End of SolveForSol.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 void ITPhysics::DoolittleWallstedt(int d, float *S, float *D)
 {
 	// References:
 	// http://www.sci.utah.edu/~wallstedt
-
 	// The Doolittle convention is that the lower triangular matrix has 1's on the diagonal.
 	// The destination matrix D combines L and U.
 
-	for (int k = 0; k<d; ++k)
+	for (int k = 0; k < d; ++k)
 	{
-		for (int j = k; j<d; ++j)
+		for (int j = k; j < d; ++j)
 		{
 			float sum = 0.0;
-			for (int p = 0;p<k;++p)
+			for (int p = 0; p < k; ++p)
 			{
 				sum += D[k*d + p] * D[p*d + j];
 			}
 			D[k*d + j] = (S[k*d + j] - sum); // not dividing by diagonals
 		}
 
-		for (int i = k + 1; i<d; ++i)
+		for (int i = k + 1; i < d; ++i)
 		{
 			float sum = 0.0;
-			for (int p = 0; p<k; ++p)
+			for (int p = 0; p < k; ++p)
 			{
 				sum += D[i*d + p] * D[p*d + k];
 			}
 			D[i*d + k] = (S[i*d + k] - sum) / D[k*d + k];
 		}
 	}
-} // End of DoolittleWallstedt.
+}
 
 void ITPhysics::separateDoolittleLandU(int d, float *LU, float *L, float *U)
 {
 	//This function copies the upper triangle of LU into U and the lower triangle of LU into L.
 	// References: http://www.sci.utah.edu/~wallstedt
-
 	// According to the Doolittle convention, L has 1's on the diagonal and the diagonal entries of U 
 	// are equal to the diagonal entries of LU.
-
 	// Extract the lower matrix.
-	for (int i = 0; i<d; ++i)
+	for (int i = 0; i < d; ++i)
 	{
-		for (int j = 0; j<d; ++j)
+		for (int j = 0; j < d; ++j)
 		{
-			if (i>j)
+			if (i > j)
 			{
 				L[i*d + j] = LU[i*d + j]; // We are below the diagonal.
 			}
@@ -962,9 +822,9 @@ void ITPhysics::separateDoolittleLandU(int d, float *LU, float *L, float *U)
 	}
 
 	// Extract the upper matrix.
-	for (int i = 0; i<d; ++i)
+	for (int i = 0; i < d; ++i)
 	{
-		for (int j = 0; j<d; ++j)
+		for (int j = 0; j < d; ++j)
 		{
 			if (i <= j)
 			{
@@ -976,14 +836,10 @@ void ITPhysics::separateDoolittleLandU(int d, float *LU, float *L, float *U)
 			}
 		}
 	}
-
-} // End of separateDoolittleLandU.
-
-
+}
 
 void ITPhysics::TwoStageGaussianEliminationCPU(float *L, float *U, int noOfPanels, std::vector <float> *solPointer)
 {
-
 	// ======================================================================================================================
 	// Do Dom's CPU Gaussian Elimination algorithm. http://www.it.uom.gr/teaching/linearalgebra/NumericalRecipiesInC/c2-2.pdf
 	// Consider:
@@ -993,7 +849,6 @@ void ITPhysics::TwoStageGaussianEliminationCPU(float *L, float *U, int noOfPanel
 	// First solve Ly = b for y.
 	// Then solve Ux = y for x.
 	// ======================================================================================================================
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "TwoStageGaussianEliminationCPU 1");
 
 	// First stage.
@@ -1002,18 +857,16 @@ void ITPhysics::TwoStageGaussianEliminationCPU(float *L, float *U, int noOfPanel
 
 	y[0] = project->get_B()->at(0) / L[0];
 
-	for (int i = 1; i<noOfPanels; i++)
+	for (int i = 1; i < noOfPanels; i++)
 	{
-
 		float sum = 0.0;
 
-		for (int j = 0; j<i; j++)
+		for (int j = 0; j < i; j++)
 		{
 			sum = sum + L[i*noOfPanels + j] * y[j];
 		}
 
 		y[i] = (1.0 / L[i*noOfPanels + i]) * (project->get_B()->at(i) - sum);
-
 	}
 
 	//for (int i=0; i<noOfPanels; i++)
@@ -1021,79 +874,49 @@ void ITPhysics::TwoStageGaussianEliminationCPU(float *L, float *U, int noOfPanel
 	//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Dom's y[ %i ] = %f", i, y[i]);
 	//}
 
-
 	// Second stage.
 	float *x;
 	x = (float *)malloc(noOfPanels * sizeof(float));
-
 	x[noOfPanels - 1] = y[noOfPanels - 1] / U[noOfPanels*(noOfPanels - 1) + (noOfPanels - 1)];
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "solPointer size = %i", solPointer->size());
-
 
 	solPointer->at(noOfPanels - 1) = x[noOfPanels - 1];
 
 	for (int i = noOfPanels - 2; i >= 0; i--) // Step through the rows from penultimate to zeroth.
 	{
 		float sum = 0.0;
-		for (int j = noOfPanels - 1; j>i; j--)
+		for (int j = noOfPanels - 1; j > i; j--)
 		{
 			sum = sum + U[i*noOfPanels + j] * x[j];
 		}
 
 		x[i] = (1.0 / U[i*noOfPanels + i]) * (y[i] - sum);
 
-
-
 		// Assign the persistent data.
 		solPointer->at(i) = x[i];
-
 	}
 
-
-
-	for (int i = 0; i<noOfPanels; i++)
+	for (int i = 0; i < noOfPanels; i++)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Dom's solPointer[ %i ] = %f", i, solPointer->at(i));
 	}
 
 	free(x);
 	free(y);
-
-} // End of TwoStageGaussianEliminationCPU.
-
-
-
-
-
-
-
-
-
+}
 
 void ITPhysics::PropagatePressureDistributionAndForces()
 {
 	// Revision history. 
 	// 20161102: Svendsen vorticity is multiplied by 4 PI before performing K & P pressure computation.
 	// Called once every frame from PropagateFlexit.
-
-
-
-
-
-
-
-
-
-
-
 	bool IsKatzAndPlotkin = true; // Use Katz and Plotkin equation 12.25 etc.
 
 	if (IsKatzAndPlotkin)
 	{
-
 		// Calculate the lift on each panel and sum for the whole surface.
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through all the surfaces.
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through all the surfaces.
 		{
 			float totalSurfaceLift = 0.0;
 			float totalSurfaceForceX = 0.0;
@@ -1101,19 +924,16 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 			float totalSurfaceForceZ = 0.0;
 			float totalSurfaceArea = 0.0;
 
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 			{
-				for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+				for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 				{
-
 					ITPanel *p = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j);
 
 					float panelLift = 0.0;
 
 					if (!(p->get_IgnoreForces()))
 					{
-
-
 						// Find the magnitude of the panel mid point velocity 
 						// (and assume the earth velocity of the vortex is the same 
 						// as that of the colocation point).
@@ -1139,8 +959,10 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 						else
 						{
 							// K&P 12.25. ( * 4 * PI)
-							//							panelLift = panelLift + project->get_Rho() * mag * (p->get_MyVorticity() - project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j-1)->get_MyVorticity()) * 4.0 * PI;
-							panelLift = project->get_Rho() * ev->get_X() * (p->get_MyVorticity() - project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j - 1)->get_MyVorticity()) * vortexVector->get_Y()  * 4.0 * PI;
+							// panelLift = panelLift + project->get_Rho() * mag * (p->get_MyVorticity() 
+							// - project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j-1)->get_MyVorticity()) * 4.0 * PI;
+							panelLift = project->get_Rho() * ev->get_X() * (p->get_MyVorticity() - 
+								project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j - 1)->get_MyVorticity()) * vortexVector->get_Y()  * 4.0 * PI;
 						}
 
 
@@ -1151,7 +973,6 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 
 						// Now compute pressure difference Delta P using Katz and Plotkin equation 12.26.
 						p->set_DeltaPressure(panelLift / p->get_Area());
-
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "i: %i, j: %i, lift: %f, area: %f", i, j, p->get_MyVorticity(), p->get_Area());
 
 						// Now compute the total force cartesian coordinates.
@@ -1160,16 +981,12 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 						totalSurfaceForceZ = totalSurfaceForceZ + panelLift*p->get_Normal()->get_Z();
 
 						totalSurfaceLift = totalSurfaceLift + panelLift;
-
 						totalSurfaceArea = totalSurfaceArea + p->get_Area();
+					}
+				}
+			}
 
-					} // End of if !IgnoreForces.
-
-				} // j panel loop
-			} // i panel loop
-
-
-			  // Debugging print of surface lift coefficient.
+			// Debugging print of surface lift coefficient.
 			ITPoint *averageSurfaceVelocity = project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).at(0)->get_MyMidPointEarthVelocity();
 			float averageSurfaceSpeedSquared = averageSurfaceVelocity->get_X()*averageSurfaceVelocity->get_X()
 				+ averageSurfaceVelocity->get_Y()*averageSurfaceVelocity->get_Y()
@@ -1182,8 +999,6 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface Lift: %f", totalSurfaceLift);
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface Area: %f", totalSurfaceArea);
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface CL: %f", CL);
-
-
 
 			// Format output to ui.
 			if (MY_RUN_MODE == MYGUI)
@@ -1200,20 +1015,7 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 			project->get_MySurfaces()->at(k)->get_MyForceHistory()->push_back(f);
 
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "========================= k: %i, Force History z: %f", k, project->get_MySurfaces()->at(k)->get_MyForceHistory()->back()->get_Z());
-
-		} // k surface loop.
-
-
-
-
-
-
-
-
-
-
-
-
+		}
 
 		bool IsDrag = true;
 
@@ -1224,36 +1026,31 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 
 			std::vector <float> *sol = new std::vector <float>;
 
-			for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 			{
-
-				for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+				for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 				{
-
-					for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Walk along chord from leading edge to trailing edge.
+					for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Walk along chord from leading edge to trailing edge.
 					{
-
 						sol->push_back(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyVorticity());
-
 					}
-
 				}
-
 			}
 
 			// Now move the matrix _B to memory using ROW_MAJOR_IDX2C.
 			int noOfUnknownVortexStrengths = 0; // Initialize r. This is just the number of surface panels.
-			for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through all the surfaces, adding the number of panels to r.
+			for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through all the surfaces, adding the number of panels to r.
 			{
-				noOfUnknownVortexStrengths = noOfUnknownVortexStrengths + (project->get_MySurfaces()->at(k)->get_MyPanels()->size()  *  project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size());
+				noOfUnknownVortexStrengths = noOfUnknownVortexStrengths + (project->get_MySurfaces()->at(k)->get_MyPanels()->size()  
+					*  project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size());
 			}
 
 			float* B = 0;
 			B = (float *)malloc(noOfUnknownVortexStrengths * noOfUnknownVortexStrengths * sizeof(*B));
 
-			for (int i = 0; i<noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
+			for (int i = 0; i < noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
 			{
-				for (int j = 0; j<noOfUnknownVortexStrengths; j++) // Loop over the columns of vv_B.
+				for (int j = 0; j < noOfUnknownVortexStrengths; j++) // Loop over the columns of vv_B.
 				{
 					B[ROW_MAJOR_IDX2C(i, j, noOfUnknownVortexStrengths)] = (float)(project->get_A()->at(i).at(j));
 				}
@@ -1262,7 +1059,7 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 			float* S = 0;
 			S = (float *)malloc(noOfUnknownVortexStrengths * sizeof(*S));
 
-			for (int i = 0; i<noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
+			for (int i = 0; i < noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
 			{
 				S[i] = sol->at(i);
 			}
@@ -1271,7 +1068,7 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 			float* W = 0;
 			W = (float *)malloc(noOfUnknownVortexStrengths * sizeof(*W));
 
-			for (int i = 0; i<noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
+			for (int i = 0; i < noOfUnknownVortexStrengths; i++) // Loop over the rows of vv_B.
 			{
 				W[i] = 0.0;
 			}
@@ -1291,21 +1088,18 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 
 			// Now that we have W, we can compute the drag using Katz and Plotkin equation 12.27.
 			int index = 0;
-			for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 			{
 				float totalSurfaceDrag = 0.0;
 				float totalSurfaceArea = 0.0;
 
-				for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+				for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 				{
-
-					for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Walk along chord from leading edge to trailing edge.
+					for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++) // Walk along chord from leading edge to trailing edge.
 					{
-
 						ITPanel *currentPanel = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j);
 
 						float length = currentPanel->get_BottomRightPoint()->distanceFrom(currentPanel->get_TopRightPoint());
-
 						float deltaD = 0.0;
 
 						if (j == 0)
@@ -1321,7 +1115,6 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 							deltaD = -project->get_Rho() * W[index] * (currentPanel->get_MyVorticity() - lastPanel->get_MyVorticity()) * length * 4.0 * PI;
 						}
 
-
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "i: %i, j: %i, deltaD: %f", i, j, deltaD);
 
 						totalSurfaceDrag = totalSurfaceDrag + deltaD;
@@ -1333,9 +1126,7 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i, D: %f", k, totalSurfaceDrag);
 
-
 				// Compute Drag coefficient.
-
 				ITPoint *averageSurfaceVelocity = project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).at(0)->get_MyMidPointEarthVelocity();
 				float averageSurfaceSpeedSquared = averageSurfaceVelocity->get_X()*averageSurfaceVelocity->get_X()
 					+ averageSurfaceVelocity->get_Y()*averageSurfaceVelocity->get_Y()
@@ -1350,41 +1141,24 @@ void ITPhysics::PropagatePressureDistributionAndForces()
 					QString msg1 = QString("Surface: %1, CD: %2").arg(QString::number(k)).arg(QString::number(CD));
 					w->appendDataViewTextEdit(msg1);
 				}
-
-			} // End of loop over surfaces.
+			}
 
 			free(W);
-
-		} // End of if IsDrag.
+		}
 		else
 		{
-			for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 			{
 				project->get_MySurfaces()->at(k)->get_MyCDHistory()->push_back(0.0);
 			}
 		}
-
-
-
-	} // End of IsKatzAndPlotkin.
-
-} // End of PropagatePressureDistributionAndForces
-
-
-
-
-
-
-
-
-
-
-
+	}
+}
 
 void ITPhysics::PropagateSurfaceGeometry(int FrameNumber)
 {
 	// Propagate the surface geometries.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		//============================================================================================
 		// Compute new surface, panel and bound vortex segment geometry for this frame.
@@ -1394,83 +1168,67 @@ void ITPhysics::PropagateSurfaceGeometry(int FrameNumber)
 	}
 
 	drawTranslationCompleteSemaphore = false;
-
-} // End of PropagateSurfaceGeometry.
-
+}
 
 void ITPhysics::InsertWakePanels(int FrameNumber)
 {
-
 	// Propagate the wake geometries.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		//============================================================================================
 		// Compute new wake geometry for this frame.
 		//============================================================================================
 		project->get_MySurfaces()->at(k)->insertWakePanels();
 	}
-
-} // End of InsertWakePanels.
-
+}
 
 void ITPhysics::PropagateWakeGeometry(int FrameNumber)
 {
-
 	// Propagate the wake along the local streamline.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		project->get_MySurfaces()->at(k)->propagateWakeGeometryCuda(k);
 	}
-
-} // End of PropagateWakeGeometry.
-
-
-
-
+}
 
 void ITPhysics::calcVelocityFieldCuda(int t)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside calcVelocityFieldCuda");
-
 
 	// noOfSubjectPanels is the total number of panels in the project
 	// (both on the surface and in the wake, on all surfaces, including reflected ones).
 	int noOfSubjectPanels = 0; // Initialize noOfPanels.
-	for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // Loop through all the surfaces.
+	for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // Loop through all the surfaces.
 	{
 		// Add the number of bound surface panels to noOfSubjectPanels
-		for (int ii = 0; ii<project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++)
+		for (int ii = 0; ii < project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++)
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++)
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++)
 			{
 				// Add surface subject panels.
 				noOfSubjectPanels++;
 			}
 		}
 
-
 		// Add the number of wake panels to noOfSubjectPanels.
 		// This takes account of surfaces without wakes.
 		int lastGeneration = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->size();
-		for (int ii = 0; ii<lastGeneration; ii++) // Loop over generations.
+		for (int ii = 0; ii < lastGeneration; ii++) // Loop over generations.
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++)
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++)
 			{
 				// Add wake subject panels.
 				noOfSubjectPanels++;
 			}
 		}
-
 	}
-
 
 	// Empty any existing velocity field data.
 	if (!project->get_VelocityFieldData()->empty())
 	{
-		for (int i = 0; i<project->get_VelocityFieldData()->size(); i++)
+		for (int i = 0; i < project->get_VelocityFieldData()->size(); i++)
 		{
-			for (int j = 0; j<project->get_VelocityFieldData()->at(i).size(); j++)
+			for (int j = 0; j < project->get_VelocityFieldData()->at(i).size(); j++)
 			{
 				delete project->get_VelocityFieldData()->at(i).at(j);
 			}
@@ -1479,8 +1237,6 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 		}
 		project->get_VelocityFieldData()->clear();
 	}
-
-
 
 	// Calculate a grid of flow vectors at some fixed plane.
 	int nx = project->get_VelocityFieldNx();
@@ -1502,19 +1258,17 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 	// noOfVelocityPredictions is the number of points at which we require a prediction of the velocity.   
 	int noOfVelocityPredictions = 0; // The total number of velocity field grid points at this generation t.
 
-									 // Actually generate the point geometry.
+	// Actually generate the point geometry.
 	if (project->get_VelocityFieldConstantPlane() == std::string("X"))
 	{
 		float x = (project->get_VelocityFieldMinx() + project->get_VelocityFieldMaxx()) / 2.0;
-		for (int rowIndex = 0; rowIndex<nz; rowIndex++)
+		for (int rowIndex = 0; rowIndex < nz; rowIndex++)
 		{
 			std::vector <ITPoint*> dummy_rowFiledPointsVector;
-
 			float z = minz + rowIndex*dz;
 
-			for (int colIndex = 0; colIndex<ny; colIndex++)
+			for (int colIndex = 0; colIndex < ny; colIndex++)
 			{
-
 				float y = miny + colIndex*dy;
 
 				// Instanciate the seed point.
@@ -1524,97 +1278,83 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 
 				// Increment the number of predictions required.
 				noOfVelocityPredictions++;
-
-			} // End of colIndex loop.
+			}
 
 			project->get_VelocityFieldData()->push_back(dummy_rowFiledPointsVector);
-
-		} // End of rowIndex loop.
+		}
 	}
 	else if (project->get_VelocityFieldConstantPlane() == std::string("Y"))
 	{
 		float y = (project->get_VelocityFieldMiny() + project->get_VelocityFieldMaxy()) / 2.0;
-		for (int rowIndex = 0; rowIndex<nz; rowIndex++)
+		for (int rowIndex = 0; rowIndex < nz; rowIndex++)
 		{
 			std::vector <ITPoint*> dummy_rowFiledPointsVector;
-
 			float z = minz + rowIndex*dz;
 
-			for (int colIndex = 0; colIndex<nx; colIndex++)
+			for (int colIndex = 0; colIndex < nx; colIndex++)
 			{
-
 				float x = minx + colIndex*dx;
 
 				// Instanciate the seed point.
 				ITPoint* s = new ITPoint(x, y, z);
-
 				dummy_rowFiledPointsVector.push_back(s);
 
 				// Increment the number of predictions required.
 				noOfVelocityPredictions++;
-
-			} // End of colIndex loop.
+			}
 
 			project->get_VelocityFieldData()->push_back(dummy_rowFiledPointsVector);
-
-		} // End of rowIndex loop.
+		}
 	}
 	else if (project->get_VelocityFieldConstantPlane() == std::string("Z"))
 	{
 		float z = (project->get_VelocityFieldMinz() + project->get_VelocityFieldMaxz()) / 2.0;
-		for (int rowIndex = 0; rowIndex<nx; rowIndex++)
+		for (int rowIndex = 0; rowIndex < nx; rowIndex++)
 		{
 			std::vector <ITPoint*> dummy_rowFiledPointsVector;
-
 			float x = minx + rowIndex*dx;
 
-			for (int colIndex = 0; colIndex<ny; colIndex++)
+			for (int colIndex = 0; colIndex < ny; colIndex++)
 			{
-
 				float y = miny + colIndex*dy;
 
 				// Instanciate the seed point.
 				ITPoint* s = new ITPoint(x, y, z);
-
 				dummy_rowFiledPointsVector.push_back(s);
 
 				// Increment the number of predictions required.
 				noOfVelocityPredictions++;
-
-			} // End of colIndex loop.
+			}
 
 			project->get_VelocityFieldData()->push_back(dummy_rowFiledPointsVector);
-
-		} // End of rowIndex loop.
+		}
 	}
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "============================= VelocityField noOfVelocityPredictions: %i", noOfVelocityPredictions);
-
 	// Now put the object data into host memory arrays, ready for copying to the GPU device.
-
 	// DOM: Set up allocation of arrays of panels and vertices in host memory.
 	size_t sizeOfSubjectPanelsFloat = noOfSubjectPanels * sizeof(float); // Memory required for noOfPanels floats.
 	size_t sizeOfSubjectPanelsInt = noOfSubjectPanels * sizeof(int); // Memory required for noOfPanels ints.
 	size_t sizeVelocityPredictionsFloat = noOfVelocityPredictions * sizeof(float); // Memory required for noOfVelocityPredictions floats. This is for each (normalised) velocity component.
 
-																				   // Allocate memory for Kernel input data on the host.
-																				   // Coordinates of points at which velocities are to be computed.
+	// Allocate memory for Kernel input data on the host.
+	// Coordinates of points at which velocities are to be computed.
 	float *h_cp_x = (float *)malloc(sizeVelocityPredictionsFloat); // Allocate the host object-point x-coordinate.
 	float *h_cp_y = (float *)malloc(sizeVelocityPredictionsFloat); // Allocate the host object-point y-coordinate.
 	float *h_cp_z = (float *)malloc(sizeVelocityPredictionsFloat); // Allocate the host object-point z-coordinate.
 
-																   // Subject Vortex start point coordinates.
+	// Subject Vortex start point coordinates.
 	int noOfVorticesPerPanel = 4;
 	float *h_vs_x = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex start point x-coord.
 	float *h_vs_y = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex start point y-coord.
 	float *h_vs_z = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex start point z-coord.
 
-																					// Subject Vortex end point coordinates.
+	// Subject Vortex end point coordinates.
 	float *h_ve_x = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex end point x-coord.
 	float *h_ve_y = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex end point y-coord.
 	float *h_ve_z = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex end point z-coord.
 
-																					// Allocate memory for vorticity values for each subject panel.
+	// Allocate memory for vorticity values for each subject panel.
 	float *h_vorticities = (float *)malloc(sizeOfSubjectPanelsFloat);
 
 	// Allocate the host output vectors of velocity components for each object point.
@@ -1644,7 +1384,7 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Host memory allocated successfully.");
 
 	// Now initialize the host array of object point velocity components (output).
-	for (int i = 0; i<noOfVelocityPredictions; i++)
+	for (int i = 0; i < noOfVelocityPredictions; i++)
 	{
 		h_cp_vx[i] = 0.0f;
 		h_cp_vy[i] = 0.0f;
@@ -1655,21 +1395,18 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 
 	// Now initialize the host arrays of object point position
 	// coordinates (the windward and leeward panel mid-points for all the surfaces).
-
 	int objectPointIndex = 0; // DOM: Object point index.
 
-	for (int i = 0; i<project->get_VelocityFieldData()->size(); i++)
+	for (int i = 0; i < project->get_VelocityFieldData()->size(); i++)
 	{
-		for (int j = 0; j<project->get_VelocityFieldData()->at(i).size(); j++)
+		for (int j = 0; j < project->get_VelocityFieldData()->at(i).size(); j++)
 		{
-
 			// DOM: Assign object point coordinates.	
 			h_cp_x[objectPointIndex] = project->get_VelocityFieldData()->at(i).at(j)->get_X();
 			h_cp_y[objectPointIndex] = project->get_VelocityFieldData()->at(i).at(j)->get_Y();
 			h_cp_z[objectPointIndex] = project->get_VelocityFieldData()->at(i).at(j)->get_Z();
 
 			objectPointIndex++;
-
 		}
 	}
 
@@ -1677,20 +1414,17 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 
 	int subjectSurfacePanelIndex = 0; // Panel index (counts over all the surface panels).
 
-									  // Do the bound vortices.
-	for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
+	// Do the bound vortices.
+	for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
 	{
-		for (int ii = 0; ii<project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++) // DOM: Loop through the rows of panels on each surface.
+		for (int ii = 0; ii < project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++) // DOM: Loop through the rows of panels on each surface.
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
 			{
-
 				// DOM: Vortex data.
-
 				// DOM: Loop through all the bound vortices on the current panel.
-				for (int mm = 0; mm<project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
+				for (int mm = 0; mm < project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
 				{
-
 					// DOM: Vortex coordinates.
 					h_vs_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_X();
 					h_vs_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Y();
@@ -1699,7 +1433,6 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 					h_ve_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_X();
 					h_ve_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Y();
 					h_ve_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Z();
-
 
 					// Check for vortices of zero length.
 					float epsilon = 0.0001;
@@ -1710,75 +1443,68 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Zero length bound vortex detected.");
 					}
 
-
-				} // End of mm loop.
-
-				  // DOM: Host vorticity assignments
-
+				} 
+				  
+				// DOM: Host vorticity assignments
 				h_vorticities[subjectSurfacePanelIndex] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVorticity();
 
 				// Increment panel index.
 				subjectSurfacePanelIndex++;
-
-			} // End of jj loop.
-
-		} // End of ii loop.
-
-	} // End of kk loop.
-
-	  // Now initialize the vortex segment end point data for wake subject panels.
-
+			}
+		}
+	}
+	// Now initialize the vortex segment end point data for wake subject panels.
 	int subjectWakePanelIndex = subjectSurfacePanelIndex; // Panel index (counts over all the wake panels).
 
-														  // Do the free (wake) vortices.
-	for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
+	// Do the free (wake) vortices.
+	for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
 	{
 		int lastGeneration = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->size();
 
-		for (int ii = 0; ii<lastGeneration; ii++) // DOM: Loop through the generations of wake panels of the current surface.
+		for (int ii = 0; ii < lastGeneration; ii++) // DOM: Loop through the generations of wake panels of the current surface.
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
 			{
-
 				// DOM: Vortex data.
-
 				// DOM: Loop through all the bound vortices on the current panel.
-				for (int mm = 0; mm<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
+				for (int mm = 0; mm < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
 				{
-
 					// DOM: Vortex coordinates.
-					h_vs_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_X();
-					h_vs_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Y();
-					h_vs_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Z();
+					h_vs_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_X();
+					h_vs_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Y();
+					h_vs_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Z();
 
-					h_ve_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_X();
-					h_ve_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Y();
-					h_ve_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Z();
-
+					h_ve_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_X();
+					h_ve_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Y();
+					h_ve_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Z();
 
 					// Check for vortices of zero length.
 					float epsilon = 0.0001;
-					if ((fabs(h_vs_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] - h_ve_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
-						&& (fabs(h_vs_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] - h_ve_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
-						&& (fabs(h_vs_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] - h_ve_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon))
+					if ((fabs(h_vs_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] 
+						- h_ve_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
+						&& (fabs(h_vs_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] 
+							- h_ve_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
+						&& (fabs(h_vs_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] 
+							- h_ve_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon))
 					{
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Zero length wake vortex detected.");
 					}
+				}
 
-				} // End of for mm loop.
-
-				  // DOM: Host vorticity assignments
-
+				// DOM: Host vorticity assignments
 				h_vorticities[subjectWakePanelIndex] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVorticity();
 
 				// Increment panel index.
 				subjectWakePanelIndex++;
-
-			} // End of jj loop.
-
-		} // End of ii loop.
-
-	} // End of kk loop.
+			}
+		}
+	}
 
 	// =======================================================================================================================
 	// DOM: Copy data from host to device, do Cuda calculations, and copy data back to host. (CudaCode.cu)
@@ -1802,18 +1528,14 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 		noOfVelocityPredictions,
 		project->get_RankineAlgorithm().at(0));
 
-
-
-
 	// Extract the velocity data from h_cp_vx, h_cp_vy and h_cp_vz.
 	objectPointIndex = 0; // DOM: Object point index.
 
-						  // Store the data in the velocity field ITPoint instance variables.
-	for (int i = 0; i<project->get_VelocityFieldData()->size(); i++)
+	// Store the data in the velocity field ITPoint instance variables.
+	for (int i = 0; i < project->get_VelocityFieldData()->size(); i++)
 	{
-		for (int j = 0; j<project->get_VelocityFieldData()->at(i).size(); j++)
+		for (int j = 0; j < project->get_VelocityFieldData()->at(i).size(); j++)
 		{
-
 			// Check if we should add gust velocity.
 			float gustVx = 0.0;
 			float gustVy = 0.0;
@@ -1821,9 +1543,7 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 
 			if (project->get_IsGust())
 			{
-
 				project->get_MyGust()->computeVelocityAtPoint(h_cp_x[objectPointIndex], h_cp_y[objectPointIndex], h_cp_z[objectPointIndex], &gustVx, &gustVy, &gustVz);
-
 			}
 
 			// DOM: Assign object point velocity components.
@@ -1834,8 +1554,6 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 			objectPointIndex++;
 		}
 	}
-
-
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Sample velocity: vx: %f, vy: %f, vz: %f", project->get_VelocityFieldData()->at(0).at(0)->get_VX(),
 		project->get_VelocityFieldData()->at(0).at(0)->get_VY(),
@@ -1859,29 +1577,20 @@ void ITPhysics::calcVelocityFieldCuda(int t)
 	free(h_cp_vz);
 
 	free(h_vorticities);
-
-} // End of calcVelocityFieldCuda.
-
-
-
-
-
+}
 
 void ITPhysics::StoreDataForReplay()
 {
-
 	// Store wake panel geometry snapshot.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-
 		std::vector < std::vector <ITWakePanel*> > *dummyVectorOfVectorsOfWakePanels = new std::vector < std::vector <ITWakePanel*> >;
 
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyWakePanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyWakePanels()->size(); i++)
 		{
-
 			std::vector <ITWakePanel*> *dummyVectorOfWakePanels = new std::vector <ITWakePanel*>;
 
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).size(); j++)
 			{
 				ITPoint *bl = new ITPoint(project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).at(j)->get_BottomLeftPoint()->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).at(j)->get_BottomLeftPoint()->get_Y(),
@@ -1909,32 +1618,27 @@ void ITPhysics::StoreDataForReplay()
 				p->set_MyVorticity(project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).at(j)->get_MyVorticity());
 
 				dummyVectorOfWakePanels->push_back(p);
-
 			}
 
 			dummyVectorOfVectorsOfWakePanels->push_back(*dummyVectorOfWakePanels);
-
 		}
 
 		// Store a snapshot of data.
 		project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->push_back(*(dummyVectorOfVectorsOfWakePanels));
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside StoreDataForReplay. Number of layers: %i", project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->size());
-	} // End of loop through surfaces.
+	}
 
-
-	  // Now store surface control point deflections.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	// Now store surface control point deflections.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-
 		std::vector < std::vector <ITPoint*> > *dummyVectorOfVectorsOfControlPointDeflections = new std::vector < std::vector <ITPoint*> >;
 
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 		{
-
 			std::vector <ITPoint*> *dummyVectorOfControlPointDeflections = new std::vector <ITPoint*>;
 
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
 				ITPoint *pW = new ITPoint(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_W()->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_W()->get_Y(),
@@ -1944,85 +1648,63 @@ void ITPhysics::StoreDataForReplay()
 				pW->set_VZ(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_W()->get_VZ());
 
 				dummyVectorOfControlPointDeflections->push_back(pW);
-
 			}
 
 			dummyVectorOfVectorsOfControlPointDeflections->push_back(*dummyVectorOfControlPointDeflections);
-
 		}
 
 		// Store a snapshot of data.
 		project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->push_back(*(dummyVectorOfVectorsOfControlPointDeflections));
+	}
 
-	} // End of loop through surfaces.
-
-
-
-
-
-
-
-
-
-	  // Now store surface pressure distribution snapshot.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	// Now store surface pressure distribution snapshot.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-
 		std::vector < std::vector <float> > *dummyVectorOfVectorsOfPressures = new std::vector < std::vector <float> >;
 
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
-
 			std::vector <float> *dummyVectorOfPressures = new std::vector <float>;
 
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
 				dummyVectorOfPressures->push_back(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_DeltaPressure());
 			}
 
 			dummyVectorOfVectorsOfPressures->push_back(*dummyVectorOfPressures);
-
 		}
 
 		// Store a snapshot of data.
 		project->get_MySurfaces()->at(k)->get_MyPressureHistory()->push_back(*(dummyVectorOfVectorsOfPressures));
-
-	} // End of loop over surfaces.
-
-
-	  // Now store surface vorticity distribution snapshot.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	}
+	
+	// Now store surface vorticity distribution snapshot.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-
 		std::vector < std::vector <float> > *dummyVectorOfVectorsOfVorticities = new std::vector < std::vector <float> >;
 
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
-
 			std::vector <float> *dummyVectorOfVorticities = new std::vector <float>;
 
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
 				dummyVectorOfVorticities->push_back(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MyVorticity());
 			}
 
 			dummyVectorOfVectorsOfVorticities->push_back(*dummyVectorOfVorticities);
-
 		}
 
 		// Store a snapshot of data.
 		project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->push_back(*(dummyVectorOfVectorsOfVorticities));
-
-	} // End of loop over surfaces.
-
-
-	  // Now store beam deflection snapshot.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	}
+	
+	// Now store beam deflection snapshot.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-
 		std::vector <ITBeamNode*> *dummyVectorOfNodes = new std::vector <ITBeamNode*>;
 
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
 		{
 			// Create history object.
 			ITBeamNode* n = new ITBeamNode(project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->at(i)->get_X(),
@@ -2046,24 +1728,16 @@ void ITPhysics::StoreDataForReplay()
 
 		// Store a snapshot of data.
 		project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->push_back(*(dummyVectorOfNodes));
+	}
 
-
-	} // End of loop over surfaces.
-
-
-
-
-
-
-	  // Now store velocity field snapshot.
+	// Now store velocity field snapshot.
 	std::vector < std::vector <ITPoint*> > *dummyVectorOfVectorsOfVelocities = new std::vector < std::vector <ITPoint*> >;
 
-	for (int i = 0; i<project->get_VelocityFieldData()->size(); i++)
+	for (int i = 0; i < project->get_VelocityFieldData()->size(); i++)
 	{
-
 		std::vector <ITPoint*> *dummyVectorOfVelocities = new std::vector <ITPoint*>;
 
-		for (int j = 0; j<project->get_VelocityFieldData()->at(i).size(); j++)
+		for (int j = 0; j < project->get_VelocityFieldData()->at(i).size(); j++)
 		{
 			ITPoint* v = new ITPoint(project->get_VelocityFieldData()->at(i).at(j)->get_X(),
 				project->get_VelocityFieldData()->at(i).at(j)->get_Y(),
@@ -2076,42 +1750,19 @@ void ITPhysics::StoreDataForReplay()
 		}
 
 		dummyVectorOfVectorsOfVelocities->push_back(*dummyVectorOfVelocities);
-
 	}
-
 	project->get_VelocityFieldDataHistory()->push_back(*dummyVectorOfVectorsOfVelocities);
 
-
 	// Store control surface deflection history.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through the surfaces.
 	{
-		for (int g = 0; g<project->get_MySurfaces()->at(k)->get_MyControlSurfaces()->size(); g++)
+		for (int g = 0; g < project->get_MySurfaces()->at(k)->get_MyControlSurfaces()->size(); g++)
 		{
-
-			project->get_MySurfaces()->at(k)->get_MyControlSurfaces()->at(g)->get_MyDeflectionHistory()->push_back(project->get_MySurfaces()->at(k)->get_MyControlSurfaces()->at(g)->get_DeflectionAngle());
-
-		} // End of loop over control surfaces.
-
-	} // End of loop over surfaces.
-
-
-} // End of StoreDataForReplay.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			project->get_MySurfaces()->at(k)->get_MyControlSurfaces()->at(g)->get_MyDeflectionHistory()->
+				push_back(project->get_MySurfaces()->at(k)->get_MyControlSurfaces()->at(g)->get_DeflectionAngle());
+		}
+	}
+}
 
 void ITPhysics::playOutFlexit()
 {
@@ -2125,7 +1776,6 @@ void ITPhysics::playOutFlexit()
 
 	while ((FrameNumber < project->get_MaxKeyFrame()) && (!IsPaused) && (!IsReplay) && (!IsDryRun) && (!IsStep) && (!IsTrim) && (IsSimulating))
 	{
-
 		UnsavedChanges = true;
 
 		if (MY_RUN_MODE == MYGUI)
@@ -2153,27 +1803,17 @@ void ITPhysics::playOutFlexit()
 			ITPhysics::delay(10); // 10 msecs for rendering the current Frame.
 		}
 
-
 		// Finally increment the frame number.
 		FrameNumber++;
-
-	} // End of while FrameNumber < project->get_MaxKeyFrame()
-
-
-} // End of playOutFlexit
-
-
-
-
-
+	}
+}
 
 void ITPhysics::playOutDryRun()
 {
-
 	// At the start of the dry run, we move points back to base.
 	if (FrameNumber == 0)
 	{
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
 			project->get_MySurfaces()->at(k)->moveMeBackToBase(k);
 		} // k
@@ -2181,7 +1821,6 @@ void ITPhysics::playOutDryRun()
 
 	while ((FrameNumber < project->get_MaxKeyFrame()) && (!IsPaused) && (!IsSimulating) && (!IsReplay) && (IsDryRun)) // Note that we do NOT require !IsStep here. This allows us to dry run after stepping.
 	{
-
 		if (MY_RUN_MODE == MYGUI)
 		{
 			w->statusBar()->showMessage(QString("Dry run in Progress. Frame: %1 of %2").arg(FrameNumber).arg(project->get_MaxKeyFrame()));
@@ -2198,36 +1837,25 @@ void ITPhysics::playOutDryRun()
 
 		FrameNumber++;
 	}
-
-} // End of playOutDryRun.
-
-
-
+}
 
 void ITPhysics::playOutReplay()
 {
-
 	// At the start of the replay, we move points back to base.
 	if (FrameNumber == 0)
 	{
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
 			project->get_MySurfaces()->at(k)->moveMeBackToBase(k);
-		} // k
+		}
 	}
-
 
 	while ((FrameNumber < project->get_MaxKeyFrame()) && (!IsPaused) && (!IsSimulating) && (!IsStep) && (!IsTrim) && (IsReplay))
 	{
-
 		if (MY_RUN_MODE == MYGUI)
 		{
 			w->statusBar()->showMessage(QString("Replay in Progress. Frame: %1 of %2").arg(FrameNumber).arg(project->get_MaxKeyFrame()));
 		}
-
-
-		// Apply the deformations.
-//		ApplyReplayDeformations();
 
 		ITPhysics::PropagateSurfaceGeometry(FrameNumber);
 
@@ -2240,16 +1868,11 @@ void ITPhysics::playOutReplay()
 
 		FrameNumber++;
 	}
-
-} // End of playOutReplay.
-
-
-
+}
 
 void ITPhysics::playOutTest()
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside playOutTest.");
-
 
 	bool Is20170203 = true;
 	if (Is20170203)
@@ -2257,7 +1880,6 @@ void ITPhysics::playOutTest()
 		// 20170203 =====================================================================================
 		// Compute surface fluid-dynamic forces using Lorentz.
 		// 20170203 =====================================================================================
-
 		// Calculate the forces on each vortex line segment and sum to get the total force vector on the whole surface.
 		for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through all the surfaces.
 		{
@@ -2344,15 +1966,6 @@ void ITPhysics::playOutTest()
 					totalSurfaceForceY = totalSurfaceForceY + Fy;
 					totalSurfaceForceZ = totalSurfaceForceZ + Fz;
 
-
-
-
-
-
-
-
-
-
 					// Next do right vortex. ============================================================
 					ITVortex *rightVortex = p->get_MyVortices()->at(1);
 
@@ -2400,10 +2013,7 @@ void ITPhysics::playOutTest()
 					totalSurfaceForceY = totalSurfaceForceY + Fy;
 					totalSurfaceForceZ = totalSurfaceForceZ + Fz;
 
-
 					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "evx: %10.2f, vx: % 10.2f, vy: % 10.2f, vz: % 10.2f, Fx: % 10.2f, Fy: % 10.2f, Fz: % 10.2f", p->get_MyMidPointEarthVelocity()->get_X(), vx, vy, vz, Fx, Fy, Fz);
-
-
 
 					// Next do top vortex. ============================================================
 					if (i == noOfRows - 1)
@@ -2447,14 +2057,11 @@ void ITPhysics::playOutTest()
 						totalSurfaceForceX = totalSurfaceForceX + Fx;
 						totalSurfaceForceY = totalSurfaceForceY + Fy;
 						totalSurfaceForceZ = totalSurfaceForceZ + Fz;
-
-					} // End of if i == noOfRows-1.
-
-				} // End of j loop.
-
-			} // End of i loop.
-
-			  // Multiply by 4.0 * PI
+					}
+				}
+			}
+			
+			// Multiply by 4.0 * PI
 			totalSurfaceForceX = totalSurfaceForceX * 4.0 * PI;
 			totalSurfaceForceY = totalSurfaceForceY * 4.0 * PI;
 			totalSurfaceForceZ = totalSurfaceForceZ * 4.0 * PI;
@@ -2466,46 +2073,35 @@ void ITPhysics::playOutTest()
 			delete totalVelocity;
 			delete vortexVector;
 			delete T;
-
-		} // End of loop over surfaces.
-
-	} // End of if Is20170203.
-
-
-
-
-} // End of playOutTest.
-
+		}
+	}
+}
 
 void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t, float x, float y, float z, float *vx, float *vy, float *vz)
 {
-
 	//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside calcInducedVelocityAtEdgeMidPointCuda. k: %i, i: %i, j: %i, t: %i", k, i, j, t);
-
 	// Now put the object data into host memory arrays, ready for copying to the GPU device.
-
 	// noOfSubjectPanels is the total number of panels in the project
 	// (both on the surface and in the wake, on all surfaces, including reflected ones).
 	int noOfSubjectPanels = 0; // Initialize noOfPanels.
-	for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // Loop through all the surfaces.
+	for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // Loop through all the surfaces.
 	{
 		// Add the number of bound surface panels to noOfSubjectPanels
-		for (int ii = 0; ii<project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++)
+		for (int ii = 0; ii < project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++)
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++)
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++)
 			{
 				// Add surface subject panels.
 				noOfSubjectPanels++;
 			}
 		}
 
-
 		// Add the number of wake panels to noOfSubjectPanels.
 		// This takes account of surfaces without wakes.
 		int lastGeneration = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->size();
-		for (int ii = 0; ii<lastGeneration; ii++) // Loop over generations.
+		for (int ii = 0; ii < lastGeneration; ii++) // Loop over generations.
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++)
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++)
 			{
 				// Add wake subject panels.
 				noOfSubjectPanels++;
@@ -2516,30 +2112,29 @@ void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t
 
 	int noOfVelocityPredictions = 1; // The total number of velocity field grid points at this generation t.
 
-
-									 // DOM: Set up allocation of arrays of panels and vertices in host memory.
+	// DOM: Set up allocation of arrays of panels and vertices in host memory.
 	size_t sizeOfSubjectPanelsFloat = noOfSubjectPanels * sizeof(float); // Memory required for noOfPanels floats.
 	size_t sizeOfSubjectPanelsInt = noOfSubjectPanels * sizeof(int); // Memory required for noOfPanels ints.
 	size_t sizeVelocityPredictionsFloat = noOfVelocityPredictions * sizeof(float); // Memory required for noOfVelocityPredictions floats. This is for each (normalised) velocity component.
 
-																				   // Allocate memory for Kernel input data on the host.
-																				   // Coordinates of points at which velocities are to be computed.
+	// Allocate memory for Kernel input data on the host.
+	// Coordinates of points at which velocities are to be computed.
 	float *h_cp_x = (float *)malloc(sizeVelocityPredictionsFloat); // Allocate the host object-point x-coordinate.
 	float *h_cp_y = (float *)malloc(sizeVelocityPredictionsFloat); // Allocate the host object-point y-coordinate.
 	float *h_cp_z = (float *)malloc(sizeVelocityPredictionsFloat); // Allocate the host object-point z-coordinate.
 
-																   // Subject Vortex start point coordinates.
+	// Subject Vortex start point coordinates.
 	int noOfVorticesPerPanel = 4;
 	float *h_vs_x = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex start point x-coord.
 	float *h_vs_y = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex start point y-coord.
 	float *h_vs_z = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex start point z-coord.
 
-																					// Subject Vortex end point coordinates.
+	// Subject Vortex end point coordinates.
 	float *h_ve_x = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex end point x-coord.
 	float *h_ve_y = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex end point y-coord.
 	float *h_ve_z = (float *)malloc(sizeOfSubjectPanelsFloat*noOfVorticesPerPanel); // Vortex end point z-coord.
 
-																					// Allocate memory for vorticity values for each subject panel.
+	// Allocate memory for vorticity values for each subject panel.
 	float *h_vorticities = (float *)malloc(sizeOfSubjectPanelsFloat);
 
 	// Allocate the host output vectors of velocity components for each object point.
@@ -2569,7 +2164,7 @@ void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Host memory allocated successfully.");
 
 	// Now initialize the host array of object point velocity components (output).
-	for (int i = 0; i<noOfVelocityPredictions; i++)
+	for (int i = 0; i < noOfVelocityPredictions; i++)
 	{
 		h_cp_vx[i] = 0.0f;
 		h_cp_vy[i] = 0.0f;
@@ -2579,87 +2174,76 @@ void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Host object point velocities initialized successfully.");
 
 	// Now initialize the host arrays of object point position
-
-
 	// DOM: Assign object point coordinates.	
 	h_cp_x[0] = x;
 	h_cp_y[0] = y;
 	h_cp_z[0] = z;
 
-
 	// Now initialize the vortex segment end point data for all surface subject panels.
 
 	int subjectSurfacePanelIndex = 0; // Panel index (counts over all the surface panels).
 
-									  // Do the bound vortices.
-	for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
+	// Do the bound vortices.
+	for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
 	{
-		for (int ii = 0; ii<project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++) // DOM: Loop through the rows of panels on each surface.
+		for (int ii = 0; ii < project->get_MySurfaces()->at(kk)->get_MyPanels()->size(); ii++) // DOM: Loop through the rows of panels on each surface.
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
 			{
-
 				// DOM: Vortex data.
-
 				// DOM: Loop through all the bound vortices on the current panel.
-				for (int mm = 0; mm<project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
+				for (int mm = 0; mm < project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
 				{
-
 					// DOM: Vortex coordinates.
-					h_vs_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_X();
-					h_vs_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Y();
-					h_vs_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Z();
+					h_vs_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_X();
+					h_vs_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Y();
+					h_vs_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = 
+						project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Z();
 
 					h_ve_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_X();
 					h_ve_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Y();
 					h_ve_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Z();
 
-
 					// Check for vortices of zero length.
 					float epsilon = 0.0001;
-					if ((fabs(h_vs_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] - h_ve_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
-						&& (fabs(h_vs_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] - h_ve_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
-						&& (fabs(h_vs_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] - h_ve_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon))
+					if ((fabs(h_vs_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] 
+						- h_ve_x[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
+						&& (fabs(h_vs_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] 
+							- h_ve_y[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
+						&& (fabs(h_vs_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)] 
+							- h_ve_z[ROW_MAJOR_IDX2C(subjectSurfacePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon))
 					{
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Zero length bound vortex detected.");
 					}
-
-
-				} // End of mm loop.
-
-				  // DOM: Host vorticity assignments
-
+				}
+				
+				// DOM: Host vorticity assignments
 				h_vorticities[subjectSurfacePanelIndex] = project->get_MySurfaces()->at(kk)->get_MyPanels()->at(ii).at(jj)->get_MyVorticity();
 
 				// Increment panel index.
 				subjectSurfacePanelIndex++;
+			}
+		}
+	}
 
-			} // End of jj loop.
-
-		} // End of ii loop.
-
-	} // End of kk loop.
-
-	  // Now initialize the vortex segment end point data for wake subject panels.
-
+	// Now initialize the vortex segment end point data for wake subject panels.
 	int subjectWakePanelIndex = subjectSurfacePanelIndex; // Panel index (counts over all the wake panels).
 
-														  // Do the free (wake) vortices.
-	for (int kk = 0; kk<project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
+	// Do the free (wake) vortices.
+	for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++) // DOM: Loop through all the surfaces.
 	{
 		int lastGeneration = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->size();
 
-		for (int ii = 0; ii<lastGeneration; ii++) // DOM: Loop through the generations of wake panels of the current surface.
+		for (int ii = 0; ii < lastGeneration; ii++) // DOM: Loop through the generations of wake panels of the current surface.
 		{
-			for (int jj = 0; jj<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
+			for (int jj = 0; jj < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).size(); jj++) // DOM: Loop through the columns of panels on each surface.
 			{
-
 				// DOM: Vortex data.
-
 				// DOM: Loop through all the bound vortices on the current panel.
-				for (int mm = 0; mm<project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
+				for (int mm = 0; mm < project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->size(); mm++)
 				{
-
 					// DOM: Vortex coordinates.
 					h_vs_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_X();
 					h_vs_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_StartPoint()->get_Y();
@@ -2669,7 +2253,6 @@ void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t
 					h_ve_y[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Y();
 					h_ve_z[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVortices()->at(mm)->get_EndPoint()->get_Z();
 
-
 					// Check for vortices of zero length.
 					float epsilon = 0.0001;
 					if ((fabs(h_vs_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)] - h_ve_x[ROW_MAJOR_IDX2C(subjectWakePanelIndex, mm, noOfVorticesPerPanel)]) < epsilon)
@@ -2678,25 +2261,20 @@ void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t
 					{
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Zero length wake vortex detected.");
 					}
+				}
 
-				} // End of for mm loop.
-
-				  // DOM: Host vorticity assignments
-
+				// DOM: Host vorticity assignments
 				h_vorticities[subjectWakePanelIndex] = project->get_MySurfaces()->at(kk)->get_MyWakePanels()->at(ii).at(jj)->get_MyVorticity();
 
 				// Increment panel index.
 				subjectWakePanelIndex++;
+			}
+		}
+	}
 
-			} // End of jj loop.
-
-		} // End of ii loop.
-
-	} // End of kk loop.
-
-	  // =======================================================================================================================
-	  // DOM: Copy data from host to device, do Cuda calculations, and copy data back to host. (CudaCode.cu)
-	  // =======================================================================================================================
+	// =======================================================================================================================
+	// DOM: Copy data from host to device, do Cuda calculations, and copy data back to host. (CudaCode.cu)
+	// =======================================================================================================================
 	ComputeVelocitiesForBatchOfPointsCuda(h_cp_x,
 		h_cp_y,
 		h_cp_z,
@@ -2714,9 +2292,6 @@ void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t
 		noOfSubjectPanels,
 		noOfVelocityPredictions,
 		project->get_RankineAlgorithm().at(0));
-
-
-
 
 	// Extract the velocity data from h_cp_vx, h_cp_vy and h_cp_vz.
 	*vx = h_cp_vx[0];
@@ -2741,7 +2316,4 @@ void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t
 	free(h_cp_vz);
 
 	free(h_vorticities);
-
-} // End of calcInducedVelocityAtEdgeMidPointCuda.
-
-
+}

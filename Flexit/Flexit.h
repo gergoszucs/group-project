@@ -1,6 +1,5 @@
 #pragma once
 
-// Stuff for http requests.
 #include <QCoreApplication>
 #include <QDebug>
 #include <QNetworkAccessManager>
@@ -8,7 +7,6 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QUrlQuery>
-
 #include <QtWidgets/QMainWindow>
 #include "ui_Flexit.h"
 
@@ -27,7 +25,7 @@ public:
 	void manageUpdateOfDisplayMatrix(int noOfPanels);
 	void appendDataViewTextEdit(const QString str);
 
-public slots:
+	public slots:
 
 	void on_actionOpen_triggered();
 	void on_collapseAllButton_clicked();

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-// Forward declarations.
 class ITTrajectoryCurveSegment;
 
 class ITTrajectoryCurve
@@ -20,5 +19,4 @@ public:
 	// Accessors.
 	std::vector <ITTrajectoryCurveSegment*> *get_MyTrajectoryCurveSegments();
 	void set_MyTrajectoryCurveSegments(std::vector <ITTrajectoryCurveSegment*> *v);
-
 };

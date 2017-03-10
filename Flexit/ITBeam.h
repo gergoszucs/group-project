@@ -51,9 +51,6 @@ public:
 	void propagateGhostBeamNodes();
 	void computeMyLaxRichtmyerDeltaT();
 
-	// IO
-
-
 	// Accessors.	
 
 	std::string get_Name();
@@ -91,8 +88,4 @@ public:
 
 	std::vector < std::vector <ITBeamNode*> > *get_MyNodeHistory();
 	void set_MyNodeHistory(std::vector < std::vector <ITBeamNode*> > *h);
-
-protected:
-
-
 };

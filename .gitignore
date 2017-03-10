@@ -39,8 +39,9 @@ local.properties
 # User-specific files
 *.suo
 *db
-*.pdb
+*pdb
 *.sln.docstates
+*vcxproj
 
 # Build results
 
@@ -216,3 +217,5 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.pdb
+Flexit/vc140.pdb

@@ -18,7 +18,7 @@ private:
 	float _MassPerUnitLength;
 	float _RotationAngle; // Used in torque analysis.
 
-						  // The following three instance variables are the values of E and I of the beam at the point where it passes though the node.
+	// The following three instance variables are the values of E and I of the beam at the point where it passes though the node.
 	float _E; // Youngs Modulus.
 	float _Ix; // Second moment of area opposing rotation parallel to the x-axis.
 	float _Iz; // Second moment of area opposing rotation parallel to the z-axis.
@@ -27,11 +27,6 @@ public:
 
 	ITBeamNode(float x, float y, float z);
 	~ITBeamNode(void);
-
-	// Utilities.
-
-	// IO
-
 
 	// Accessors.	
 	std::string get_Name();
@@ -55,9 +50,6 @@ public:
 	float get_MassPerUnitLength();
 	void set_MassPerUnitLength(float m);
 
-
-
-
 	float get_E();
 	void set_E(float e);
 
@@ -69,9 +61,4 @@ public:
 
 	float get_RotationAngle();
 	void set_RotationAngle(float r);
-
-
-protected:
-
-
 };

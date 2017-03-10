@@ -1,10 +1,8 @@
 #pragma once
 
-// System includes.
 #include <vector>
 #include <Eigen/Dense>
 
-// Forward declarations.
 class ITPoint;
 class ITControlPoint;
 class ITTrajectoryCurve;
@@ -15,10 +13,6 @@ class ITBeam;
 
 class ITSurface
 {
-
-protected:
-
-
 private:
 
 	// ITSurface instance variables.
@@ -53,7 +47,6 @@ private:
 	float _PistolesiPanelOffsetFraction; // Normally this would be set to 0.25.
 	float _FuselageRadius;
 	int _ParentSurfaceIndex; // Used when project _IsSurfaceHierarchy is true. (set to -1 when not used).
-
 
 	ITPoint* _MyCentreOfRotationPoint; // The point about which trajectory rotations take place.
 
@@ -108,7 +101,6 @@ public:
 	// Utilities.
 	void manageComputationOfInterpolatedPoints();
 
-
 	// Flexit worker methods.
 	void instanciateMyPanels(int mySurfaceIndex);
 	void propagateGeometry(int k);
@@ -161,7 +153,6 @@ public:
 
 	std::vector <ITPoint*> *get_MyForceHistory();
 	void set_MyForceHistory(std::vector <ITPoint*> *f);
-
 
 	int get_NoOfInterpolatedPointsU();
 	void set_NoOfInterpolatedPointsU(int u);
@@ -224,5 +215,4 @@ public:
 
 	ITBeam *get_MyBeam();
 	void set_MyBeam(ITBeam* b);
-
 };

@@ -15,7 +15,6 @@ private:
 	ITPoint* _startPoint;
 	ITPoint* _endPoint;
 
-
 public:
 
 	ITBeamElement(void);
@@ -24,11 +23,7 @@ public:
 	// Utilities.
 	float length();
 
-	// IO
-
-
 	// Accessors.	
-
 	std::string get_Name();
 	void set_Name(std::string s);
 
@@ -37,8 +32,4 @@ public:
 
 	ITPoint* get_EndPoint();
 	void set_EndPoint(ITPoint* p);
-
-protected:
-
-
 };

@@ -2,8 +2,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <time.h>
-
-// Dom's includes.
 #include "CudaPhysics.cuh"
 #include "CudaKernels.cuh"
 
@@ -90,7 +88,6 @@ void ConstructMatrixOfInfluenceCoefficientsCuda(
 
 	err = cudaMemcpy(d_A, h_A, sizeMatrixFloat, cudaMemcpyHostToDevice); if (err != cudaSuccess) { exit(EXIT_FAILURE); }
 
-
 	// ============================================================================
 	// Call the Kernel.
 	// ============================================================================
@@ -106,7 +103,7 @@ void ConstructMatrixOfInfluenceCoefficientsCuda(
 	dim3 block(threadsPerBlock, 1, 1);
 
 	// Call noOfBlocksX*noOfBlocksY*threadsPerBlock instances of the kernel.
-	kernelInfluenceCoefficient << <grid, block >> >(
+	kernelInfluenceCoefficient << <grid, block >> > (
 		d_cp_x,
 		d_cp_y,
 		d_cp_z,
@@ -142,7 +139,6 @@ void ConstructMatrixOfInfluenceCoefficientsCuda(
 	// ====================================================================================================
 	err = cudaMemcpy(h_A, d_A, sizeMatrixFloat, cudaMemcpyDeviceToHost);
 
-
 	// ============================================================================
 	// Free the GPU memory.
 	// ============================================================================
@@ -160,10 +156,7 @@ void ConstructMatrixOfInfluenceCoefficientsCuda(
 	err = cudaFree(d_ve_z); if (err != cudaSuccess) { exit(EXIT_FAILURE); }
 
 	err = cudaFree(d_A); if (err != cudaSuccess) { exit(EXIT_FAILURE); }
-
 }
-
-
 
 void ComputeVelocitiesForBatchOfPointsCuda(
 	const float *h_cp_x,
@@ -184,7 +177,6 @@ void ComputeVelocitiesForBatchOfPointsCuda(
 	int noOfVelocityPredictions,
 	int rankineAlgorithmIndex)
 {
-
 	// DOM: Error code to check return values for CUDA calls.
 	cudaError_t err;
 
@@ -226,7 +218,6 @@ void ComputeVelocitiesForBatchOfPointsCuda(
 	float *d_vorticities = NULL;
 	err = cudaMalloc((void **)&d_vorticities, sizeSubjectPanelsFloat); if (err != cudaSuccess) { exit(EXIT_FAILURE); }
 
-
 	// ============================================================================
 	// Copy host memory to device memory.
 	// ============================================================================
@@ -264,7 +255,7 @@ void ComputeVelocitiesForBatchOfPointsCuda(
 	int threadsPerTranche = 6000;
 	int noOfTranches = (noOfVelocityPredictions + threadsPerTranche - 1) / threadsPerTranche;
 
-	for (int trancheIndex = 0; trancheIndex<noOfTranches; trancheIndex++)
+	for (int trancheIndex = 0; trancheIndex < noOfTranches; trancheIndex++)
 	{
 		clock_t time_end;
 		time_end = clock() + 10 * CLOCKS_PER_SEC / 1000;
@@ -276,7 +267,7 @@ void ComputeVelocitiesForBatchOfPointsCuda(
 		int indexOfStartOfTranche = trancheIndex*threadsPerTranche;
 
 		// Call noOfBlocksX*noOfBlocksY*threadsPerBlock instances of the kernel.
-		kernelFunctionPredictVelocityAtPoint << <grid, block >> >(
+		kernelFunctionPredictVelocityAtPoint << <grid, block >> > (
 			d_cp_x,
 			d_cp_y,
 			d_cp_z,
@@ -300,7 +291,6 @@ void ComputeVelocitiesForBatchOfPointsCuda(
 
 		cudaDeviceSynchronize();
 
-
 		// Deal with any errors.
 		err = cudaGetLastError();
 		if (err != cudaSuccess)
@@ -308,8 +298,6 @@ void ComputeVelocitiesForBatchOfPointsCuda(
 			std::cout << "Failed to launch kernelFunctionPredictVelocityAtPoint kernel (error code " << cudaGetErrorString(err) << ")" << std::endl;
 			exit(EXIT_FAILURE);
 		}
-
-
 	} // End of for tranches.
 
 	err = cudaMemcpy(h_cp_vx, d_cp_vx, sizeVelocityPredictionsFloat, cudaMemcpyDeviceToHost);

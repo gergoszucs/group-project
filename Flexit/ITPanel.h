@@ -1,12 +1,11 @@
 #pragma once
-// Forward declaration.
+
 class ITSurface;
 class ITPoint;
 class ITVortex;
 
 class ITPanel
 {
-
 private:
 
 	ITPoint* _bottomLeftPoint;
@@ -56,7 +55,6 @@ public:
 
 	void calculateMyTrajectoryVelocity(int k); // Gets called from ITPhysics.
 
-											   // Accessors.
 	ITSurface *get_MyITSurface();
 	void set_MyITSurface(ITSurface *s);
 
@@ -72,10 +70,8 @@ public:
 	ITPoint *get_TopRightPoint();
 	void set_TopRightPoint(ITPoint *p);
 
-
 	std::vector <ITVortex*> *get_MyVortices();
 	void set_MyVortices(std::vector <ITVortex*> *v);
-
 
 	ITPoint *get_LeadingDiagonal();
 	void set_LeadingDiagonal(ITPoint *p);
@@ -104,7 +100,6 @@ public:
 	float get_MyVorticity();
 	void set_MyVorticity(float v);
 
-
 	int get_I();
 	void set_I(int i);
 
@@ -119,6 +114,4 @@ public:
 
 	bool get_IsControlSurface();
 	void set_IsControlSurface(bool isControlSurface);
-
-
 };

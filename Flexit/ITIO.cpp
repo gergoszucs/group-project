@@ -1,4 +1,3 @@
-// System includes.
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -7,9 +6,6 @@
 #include <fstream> // std::ifstream
 #include <QMessageBox> // QMessageBox
 
-
-
-// Dom's includes.
 #include "ITIO.h"
 #include "global.h"
 #include "ITProject.h"
@@ -28,20 +24,8 @@
 
 using namespace rapidjson;
 
-ITIO::ITIO(void)
-{
-}
-
-
-ITIO::~ITIO(void)
-{
-}
-
-
-
 void ITIO::readJSONInputFile(char *filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Start");
 
 	FILE* fp = fopen(filenameWithPath, "r"); // non-Windows use "r"
@@ -63,8 +47,6 @@ void ITIO::readJSONInputFile(char *filenameWithPath)
 
 	fclose(fp);
 
-
-
 	// Now go through and assign ITProject instance variables.
 	readMyITProjectFromJSONObject(d, filenameWithPath);
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Project data read successfully.");
@@ -78,17 +60,12 @@ void ITIO::readJSONInputFile(char *filenameWithPath)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface hierarchy chains managed successfully.");
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "End of readJSONInputFile");
-
-} // End of readJSONInputFile.
-
-
+}
 
 void ITIO::readMyITProjectFromJSONObject(Document& d, char * filenameWithPath)
 {
-
 	assert(d.IsObject());
 	assert(d.HasMember("ITProject Data"));
-
 
 	// Read ITProject data.
 	const Value& p = d["ITProject Data"]["General Data"];
@@ -126,7 +103,6 @@ void ITIO::readMyITProjectFromJSONObject(Document& d, char * filenameWithPath)
 	project->set_RankineCoreRadius(d["ITProject Data"]["FlowitCudaUnsteady Data"]["RankineCoreRadius"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "RankineCoreRadius = %f", project->get_RankineCoreRadius());
 
-
 	// Velocity Field parameters.
 	project->set_VelocityFieldConstantPlane(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldConstantPlane"].GetString());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldConstantPlane = %s", project->get_VelocityFieldConstantPlane().c_str());
@@ -158,17 +134,12 @@ void ITIO::readMyITProjectFromJSONObject(Document& d, char * filenameWithPath)
 	project->set_VelocityFieldMaxz(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMaxz"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldMaxz = %f", project->get_VelocityFieldMaxz());
 
-
-
 	// Physical constants.
 	project->set_Rho(d["ITProject Data"]["FlowitCudaUnsteady Data"]["Rho"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Rho = %f", project->get_Rho());
 
 	project->set_FramesPerSecond(d["ITProject Data"]["FlowitCudaUnsteady Data"]["FramesPerSecond"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "FramesPerSecond = %f", project->get_FramesPerSecond());
-
-
-
 
 	// Pressure Display Factors.
 	project->set_PressureDisplayFactor(d["ITProject Data"]["FlowitCudaUnsteady Data"]["PressureDisplayFactor"].GetDouble());
@@ -221,17 +192,10 @@ void ITIO::readMyITProjectFromJSONObject(Document& d, char * filenameWithPath)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "========================================================= IsActiveControlSurfaces NOT FOUND");
 	}
-
-
-
-} // End of readMyITProjectFromJSONObject.
-
-
-
+}
 
 void ITIO::readMyITPointsFromFile(Document& d, char * filenameWithPath)
 {
-
 	assert(d.IsObject());
 	assert(d.HasMember("ITSurfaces"));
 
@@ -271,7 +235,6 @@ void ITIO::readMyITPointsFromFile(Document& d, char * filenameWithPath)
 		bs->set_MorphType(d["ITSurfaces"][k]["Properties"]["MorphType"].GetString());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "MorphType = %s", s->get_MorphType().c_str());
 
-
 		// Decide whether or not this surface sheds a wake.
 		s->set_IsWake(d["ITSurfaces"][k]["Properties"]["IsWake"].GetInt());
 		bs->set_IsWake(d["ITSurfaces"][k]["Properties"]["IsWake"].GetInt());
@@ -307,7 +270,6 @@ void ITIO::readMyITPointsFromFile(Document& d, char * filenameWithPath)
 			bs->set_FuselageRadius(0.0);
 		}
 
-
 		// Push the surface into the array.
 		project->get_MySurfaces()->push_back(s);
 		project->get_MyBaseSurfaces()->push_back(bs);
@@ -315,27 +277,13 @@ void ITIO::readMyITPointsFromFile(Document& d, char * filenameWithPath)
 		// Read the control points from the JSON document and initialise the control points for MySurfaces and MyBaseSurfaces.
 		createControlPointsFromJSONObject(d, filenameWithPath, k);
 
-
-
 		// Create the new trajectory curves from the JSON data (20160408).
 		createTrajectoryCurvesFromJSON(d, k);
-
-
-
-
-
-
-
-	} // End of loop over surfaces.
-
-} // End of readMyITPointsFromFile.
-
-
-
+	}
+}
 
 void ITIO::createControlPointsFromJSONObject(Document& d, char * filenameWithPath, int k)
 {
-
 	//Find the number of rows and columns of control points in the k-th surface.
 	int noOfRows = d["ITSurfaces"][k]["Properties"]["Number of rows of control points"].GetInt();
 	int noOfCols = d["ITSurfaces"][k]["Properties"]["Number of cols of control points"].GetInt();
@@ -344,14 +292,13 @@ void ITIO::createControlPointsFromJSONObject(Document& d, char * filenameWithPat
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "No of cols = %i", noOfCols);
 
 	int counter = 0;
-	for (int i = 0; i<noOfRows; i++)
+	for (int i = 0; i < noOfRows; i++)
 	{
 		std::vector <ITControlPoint *> v_dummy;
 		std::vector <ITControlPoint *> vb_dummy;
 
-		for (int j = 0; j<noOfCols; j++)
+		for (int j = 0; j < noOfCols; j++)
 		{
-
 			float x = d["ITSurfaces"][k]["Control Points"][counter]["Properties"]["x"].GetDouble();
 			float y = d["ITSurfaces"][k]["Control Points"][counter]["Properties"]["y"].GetDouble();
 			float z = d["ITSurfaces"][k]["Control Points"][counter]["Properties"]["z"].GetDouble();
@@ -360,33 +307,25 @@ void ITIO::createControlPointsFromJSONObject(Document& d, char * filenameWithPat
 			ITControlPoint* p = new ITControlPoint(x, y, z);
 			ITControlPoint *pb = new ITControlPoint(x, y, z);
 
-
 			v_dummy.push_back(p);
 			vb_dummy.push_back(pb);
 
 			counter++;
-
-		} // End of loop over columns of control points.
+		}
 
 		project->get_MySurfaces()->at(k)->get_MyControlPoints()->push_back(v_dummy);
 		project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->push_back(vb_dummy);
 
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "No of rows in vector of vectors of control points = %i, %i", project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(), project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->size());
-
-
-	} // End of loop over rows of control points
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "No of rows in vector of vectors of control points = %i, %i", 
+			project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(), project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->size());
+	}
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "End of createControlPointsFromJSONObject");
-
-} // End of createControlPointsFromJSONObject.
-
-
+}
 
 void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Reading from createTrajectoryCurvesFromJSON");
-
-	// Do translations.
 
 	const Value& translationCurveControlPoints = d["ITSurfaces"][k]["Trajectory Translation Curve"]["Control Points"];
 
@@ -405,7 +344,6 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	int i = 0;
 	for (Value::ConstValueIterator itr = translationCurveControlPoints.Begin(); itr != translationCurveControlPoints.End() - 1; ++itr)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "translation segment %i", i);
 
 		float p0x = (float)translationCurveControlPoints[i]["Properties"]["x"].GetDouble();
@@ -473,9 +411,7 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	project->get_MyBaseSurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(bcy);
 	project->get_MyBaseSurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(bcz);
 
-
 	// Do rotations.
-
 	const Value& rotationCurveControlPoints = d["ITSurfaces"][k]["Trajectory Rotation Curve"]["Control Points"];
 
 	// Instanciate the ITTrajectoryCurve curves.
@@ -492,7 +428,6 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	i = 0;
 	for (Value::ConstValueIterator itr = rotationCurveControlPoints.Begin(); itr != rotationCurveControlPoints.End() - 1; ++itr)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "rotation segment %i", i);
 
 		float p0r = (float)rotationCurveControlPoints[i]["Properties"]["x"].GetDouble();
@@ -558,7 +493,6 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	project->get_MyBaseSurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(bcp);
 	project->get_MyBaseSurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(bcyaw);
 
-
 	// Read the centre of rotation point.
 	float rotX = (float)d["ITSurfaces"][k]["Trajectory Rotation Curve"]["Centre of Rotation"]["x"].GetDouble();
 	float rotY = (float)d["ITSurfaces"][k]["Trajectory Rotation Curve"]["Centre of Rotation"]["y"].GetDouble();
@@ -572,27 +506,19 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(rotY);
 	project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(rotZ);
 
-
 	// Finally update the project maxKeyFrame instance variable.
 	// Set it to the end key frame of the last segment of the z trajectory of the last surface.
 	project->set_MaxKeyFrame(project->get_MySurfaces()->back()->get_MyTrajectoryCurves()->back()->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
-
-
-} // End of createTrajectoryCurvesFromJSON.
-
-
-
+}
 
 void ITIO::createSurfaceHierarchyChains()
 {
 	// Organise surface index hierarchy chains for all surfaces.
 	if (project->get_IsSurfaceHierarchy())
 	{
-
 		// Loop through all the surfaces.
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
-
 			ITSurface *s = project->get_MySurfaces()->at(k);
 
 			// Check if the k-th surface has ancestors.
@@ -613,22 +539,17 @@ void ITIO::createSurfaceHierarchyChains()
 			std::reverse(s->get_MyAncestorSurfaceIndices()->begin(), s->get_MyAncestorSurfaceIndices()->end());
 
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Ancestors for surface %i:", k);
-			for (int kk = 0; kk<s->get_MyAncestorSurfaceIndices()->size(); kk++)
+			for (int kk = 0; kk < s->get_MyAncestorSurfaceIndices()->size(); kk++)
 			{
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Ancestor %i is %i", kk, s->get_MyAncestorSurfaceIndices()->at(kk));
 			}
-
-		} // End of loop through all surfaces.
-
+		}
 	}
-
-} // End of createSurfaceHierarchyChains.
-
+}
 
 void ITIO::readJSONControlSurfaces(char *filenameWithPath)
 {
 	// The interpolated points and the ITPanels have been instanciated, so we can set Control Surface flags.
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Start readJSONControlSurfaces. Filename: %s", filenameWithPath);
 
 	FILE* fp = fopen(filenameWithPath, "r"); // non-Windows use "r"
@@ -637,13 +558,11 @@ void ITIO::readJSONControlSurfaces(char *filenameWithPath)
 	Document d;
 
 	ParseResult ok = d.ParseStream(is);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "End %i", ok);
 
 	if (!ok)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "RapidJSON Parse error = %s", d.GetParseError());
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Error(offset %u)", (unsigned)d.GetErrorOffset());
 	}
 
@@ -655,18 +574,15 @@ void ITIO::readJSONControlSurfaces(char *filenameWithPath)
 	assert(d.HasMember("ITSurfaces"));
 
 	// Loop through the surfaces and instanciate ITSurface objects.
-	for (int k = 0; k<d["ITSurfaces"].Size(); k++)
+	for (int k = 0; k < d["ITSurfaces"].Size(); k++)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Checking control surfaces for ITSurface: %i", k);
 
 		// Loop over control surfaces for the current ITSurface.
 		if (d["ITSurfaces"][k].HasMember("Control Surfaces"))
 		{
-
-			for (int n = 0; n<d["ITSurfaces"][k]["Control Surfaces"].Size(); n++)
+			for (int n = 0; n < d["ITSurfaces"][k]["Control Surfaces"].Size(); n++)
 			{
-
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "        Reading control surface %i for ITSurface: %i", n, k);
 
 				ITControlSurface *cs = new ITControlSurface();
@@ -676,9 +592,8 @@ void ITIO::readJSONControlSurfaces(char *filenameWithPath)
 				project->get_MyBaseSurfaces()->at(k)->get_MyControlSurfaces()->push_back(csb);
 
 				// Loop over the panels of the current 
-				for (int g = 0; g<d["ITSurfaces"][k]["Control Surfaces"][n]["Panels"].Size(); g++)
+				for (int g = 0; g < d["ITSurfaces"][k]["Control Surfaces"][n]["Panels"].Size(); g++)
 				{
-
 					int cs_row = d["ITSurfaces"][k]["Control Surfaces"][n]["Panels"][g]["row"].GetInt();
 					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============================================ cs_row = %i", cs_row);
 					int cs_col = d["ITSurfaces"][k]["Control Surfaces"][n]["Panels"][g]["col"].GetInt();
@@ -691,16 +606,11 @@ void ITIO::readJSONControlSurfaces(char *filenameWithPath)
 					// Push the ITPanel onto the vector of ITPanels in the current ITControlSurface.
 					cs->get_MyITPanels()->push_back(project->get_MySurfaces()->at(k)->get_MyPanels()->at(cs_row).at(cs_col));
 					csb->get_MyITPanels()->push_back(project->get_MyBaseSurfaces()->at(k)->get_MyPanels()->at(cs_row).at(cs_col));
-
-
-				} // End of loop over the panels in the current control surface.
-
-			} // End of loop over control surfaces of the current ITSurface.
-
-		} // End of if current ITSurface has control surfaces.
+				}
+			}
+		}
 	}
-
-} // End of readJSONControlSurfaces.
+}
 
 bool ITIO::doesFileExist(const char *filename)
 {
@@ -718,42 +628,30 @@ bool ITIO::doesFileExist(const char *filename)
 	}
 
 	return fsize > 0;
-} // End of doesFileExist.
-
+}
 
 void ITIO::readMyVelocityFieldHistoryFromFile(char * filenameWithPath)
 {
-
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside readMyVelocityFieldHistoryFromFile.");
 
-
 	// Create file path name string.
-
 	// Create a std:string from filenameWithPath.
 	std::string fileNameWithPathString(filenameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".VFH".
 	newfileNameWithPathString.append(".VFH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
-
-
 	int iii = ITIO::doesFileExist(newfileNameWithPathString.c_str());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "doesFileExist return value: %i", iii);
 
 	if (iii)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Velocity Field History file found!!!");
 
 		// Open the file for reading.
@@ -771,30 +669,24 @@ void ITIO::readMyVelocityFieldHistoryFromFile(char * filenameWithPath)
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "noOfFrames: %i, noOfRows: %i, noOfCols: %i, headerString: %s", noOfFrames, noOfRows, noOfCols, headerString);
 
 		// Read the data into vector of vectors.
-
 		// Treat first frame separately.
 		std::vector < std::vector <ITPoint*> > *dummyVectorOfVectorsOfVelocityFieldPointsFrame0 = new std::vector < std::vector <ITPoint*> >;
 		// Store a snapshot of data.
 		project->get_VelocityFieldDataHistory()->push_back(*(dummyVectorOfVectorsOfVelocityFieldPointsFrame0));
 
-
 		// Read the array into memory.
-		for (int n = 1; n<noOfFrames; n++)
+		for (int n = 1; n < noOfFrames; n++)
 		{
-
 			std::vector < std::vector <ITPoint*> > *dummyVectorOfVectorsOfVelocityFieldPoints = new std::vector < std::vector <ITPoint*> >;
-
 			int velocityFieldArrayIndex = 0;
 
-			for (int i = 0; i<noOfRows; i++) // Loop over the rows of points in the current frame.
+			for (int i = 0; i < noOfRows; i++) // Loop over the rows of points in the current frame.
 			{
 				std::vector <ITPoint*> *dummyVectorOfVeocityFieldPoints = new std::vector <ITPoint*>;
 
-				for (int j = 0; j<noOfCols; j++) // Loop over the cols of points in the current frame.
+				for (int j = 0; j < noOfCols; j++) // Loop over the cols of points in the current frame.
 				{
-
 					// Copy file data to new ITPoint object.  
-
 					int ntemp;
 					int itemp;
 					int jtemp;
@@ -802,81 +694,57 @@ void ITIO::readMyVelocityFieldHistoryFromFile(char * filenameWithPath)
 					float x;
 					float y;
 					float z;
-
 					float vx;
 					float vy;
 					float vz;
 
 					fscanf(fp, " %i %i %i %f %f %f %f %f %f", &ntemp, &itemp, &jtemp, &x, &y, &z, &vx, &vy, &vz);
-
 					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "ntemp: %i, itemp: %i, jtemp: %i, x: %f, y: %f, z: %f", ntemp, itemp, jtemp, x, y, z);
 
-
 					ITPoint * p = new ITPoint(x, y, z);
-
 					p->set_VX(vx);
 					p->set_VY(vy);
 					p->set_VZ(vz);
-
 
 					// Store the velocity field ITPoint object in the vector.
 					dummyVectorOfVeocityFieldPoints->push_back(p);
 
 					velocityFieldArrayIndex++;
-
-				} // End of loop over columns.
+				}
 
 				dummyVectorOfVectorsOfVelocityFieldPoints->push_back(*dummyVectorOfVeocityFieldPoints);
+			}
 
-			} // End of loop over rows.
-
-			  // Store a snapshot of data.
+			// Store a snapshot of data.
 			project->get_VelocityFieldDataHistory()->push_back(*(dummyVectorOfVectorsOfVelocityFieldPoints));
-
-		} // End of loop through frames.
-
-		  // Close the file.
+		}
+		// Close the file.
 		fclose(fp);
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Velocity Field History has been read successfully!!!");
-
-
-	} // End of if Velocity Field History file found.
-
-
-} // End of readMyVelocityFieldHistoryFromFile.
+	}
+}
 
 void ITIO::readMyPressureHistoryFromFile(char * filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside readMyPressureHistoryFromFile.");
-
 	// Create file path name string.
-
 	// Create a std:string from filenameWithPath.
 	std::string fileNameWithPathString(filenameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".PDH".
 	newfileNameWithPathString.append(".PDH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
-
-
 	int iii = ITIO::doesFileExist(newfileNameWithPathString.c_str());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "doesFileExist return value: %i", iii);
 
 	if (iii)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Pressure Distribution History file found!!!");
 
 		// Open the file for reading.
@@ -896,86 +764,60 @@ void ITIO::readMyPressureHistoryFromFile(char * filenameWithPath)
 		int ktemp, ntemp, itemp, jtemp;
 		float currentPressure;
 
-
 		// Read the data into vector of vectors.
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
-			for (int n = 0; n<noOfFrames; n++)
+			for (int n = 0; n < noOfFrames; n++)
 			{
-
 				std::vector < std::vector <float> > *dummyVectorOfVectorsOfPressures = new std::vector < std::vector <float> >;
 
-				for (int i = 0; i<project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++)
+				for (int i = 0; i < project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++)
 				{
-
 					std::vector <float> *dummyVectorOfPressures = new std::vector <float>;
 
-					for (int j = 0; j<project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsV() - 1; j++)
+					for (int j = 0; j < project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsV() - 1; j++)
 					{
-
 						fscanf(fp, "  %i %i %i %i %f", &ktemp, &ntemp, &itemp, &jtemp, &currentPressure);
-
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "ktemp: %i ntemp: %i, itemp: %i, jtemp: %i, currentPressure: %f", ktemp, ntemp, itemp, jtemp, currentPressure);
-
 						// Store the pressure value from the JSON array.
 						dummyVectorOfPressures->push_back(currentPressure);
-
-					} // End of loop over columns.
+					}
 
 					dummyVectorOfVectorsOfPressures->push_back(*dummyVectorOfPressures);
+				}
 
-				} // End of loop over rows.
-
-				  // Store a snapshot of data for this frame.
+				// Store a snapshot of data for this frame.
 				project->get_MySurfaces()->at(k)->get_MyPressureHistory()->push_back(*(dummyVectorOfVectorsOfPressures));
-
-			} // End of loop over frames.
-
-		} // End of loop over surfaces.
-
-		  // Close the file.
+			}
+		}
+		// Close the file.
 		fclose(fp);
-
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Pressure Distribution History has been read successfully!!!");
-
-	} // End of if file exists.
-
-
-} // End of readMyPressureHistoryFromFile.
-
+	}
+}
 
 void ITIO::readMyVorticityHistoryFromFile(char * filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside readMyVorticityHistoryFromFile.");
 
 	// Create file path name string.
-
 	// Create a std:string from filenameWithPath.
 	std::string fileNameWithPathString(filenameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".VDH".
 	newfileNameWithPathString.append(".VDH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
-
-
 	int iii = ITIO::doesFileExist(newfileNameWithPathString.c_str());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "doesFileExist return value: %i", iii);
 
 	if (iii)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Vorticity Distribution History file found!!!");
 
 		// Open the file for reading.
@@ -989,90 +831,67 @@ void ITIO::readMyVorticityHistoryFromFile(char * filenameWithPath)
 
 		fscanf(fp, "%i, %i, %i", &noOfFrames, &noOfRows, &noOfCols);
 		fscanf(fp, "%s", headerString);
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "noOfFrames: %i, noOfRows: %i, noOfCols: %i, headerString: %s", noOfFrames, noOfRows, noOfCols, headerString);
 
 		int ktemp, ntemp, itemp, jtemp;
 		float currentVorticity;
 
-
 		// Read the data into vector of vectors.
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
-			for (int n = 0; n<noOfFrames; n++)
+			for (int n = 0; n < noOfFrames; n++)
 			{
-
 				std::vector < std::vector <float> > *dummyVectorOfVectorsOfVorticities = new std::vector < std::vector <float> >;
 
-				for (int i = 0; i<project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++)
+				for (int i = 0; i < project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++)
 				{
-
 					std::vector <float> *dummyVectorOfVorticities = new std::vector <float>;
 
-					for (int j = 0; j<project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsV() - 1; j++)
+					for (int j = 0; j < project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsV() - 1; j++)
 					{
-
 						fscanf(fp, "  %i %i %i %i %f", &ktemp, &ntemp, &itemp, &jtemp, &currentVorticity);
-
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "ktemp: %i ntemp: %i, itemp: %i, jtemp: %i, currentVorticity: %f", ktemp, ntemp, itemp, jtemp, currentVorticity);
 
 						// Store the pressure value from the JSON array.
 						dummyVectorOfVorticities->push_back(currentVorticity);
-
-					} // End of loop over columns.
+					}
 
 					dummyVectorOfVectorsOfVorticities->push_back(*dummyVectorOfVorticities);
+				}
 
-				} // End of loop over rows.
-
-				  // Store a snapshot of data for this frame.
+				// Store a snapshot of data for this frame.
 				project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->push_back(*(dummyVectorOfVectorsOfVorticities));
+			}
+		}
 
-			} // End of loop over frames.
-
-		} // End of loop over surfaces.
-
-		  // Close the file.
+		// Close the file.
 		fclose(fp);
-
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Vorticity Distribution History has been read successfully!!!");
-
-	} // End of if file exists.
-
-
-} // End of readMyVorticityHistoryFromFile.
+	}
+}
 
 void ITIO::readMyWakePanelHistoryFromFile(char * filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside readMyWakePanelHistoryFromFile.");
 
 	// Create file path name string.
-
 	// Create a std:string from filenameWithPath.
 	std::string fileNameWithPathString(filenameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".WPH".
 	newfileNameWithPathString.append(".WPH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
-
 	int iii = ITIO::doesFileExist(newfileNameWithPathString.c_str());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "doesFileExist return value: %i", iii);
 
 	if (iii)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Wake Panel History file found!!!");
 
 		// Open the file for reading.
@@ -1086,24 +905,19 @@ void ITIO::readMyWakePanelHistoryFromFile(char * filenameWithPath)
 
 		fscanf(fp, "%i, %i, %i", &noOfFrames, &dummy, &noOfRows);
 		fscanf(fp, "%s", headerString);
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "noOfFrames: %i, dummy: %i noOfRows: %i, headerString: %s", noOfFrames, dummy, noOfRows, headerString);
 
 		int ktemp, ntemp, gtemp, itemp;
 		float vorticity, blx, bly, blz, brx, bry, brz, trx, trY, trz, tlx, tly, tlz, mpx, mpy, mpz, nx, ny, nz;
 
-
-
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop over the surfaces.
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop over the surfaces.
 		{
-
 			// Push an empty vector onto the instance variable for the first (0) frame.
 			std::vector < std::vector <ITWakePanel*> > *dummyVectorOfVectors = new std::vector < std::vector <ITWakePanel*> >;
 			project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->push_back(*(dummyVectorOfVectors));
 
-			for (int n = 0; n<noOfFrames; n++) // Loop over the frames. Note that the data file only contains wake panels for frame 1 and beyond.
+			for (int n = 0; n < noOfFrames; n++) // Loop over the frames. Note that the data file only contains wake panels for frame 1 and beyond.
 			{
-
 				std::vector < std::vector <ITWakePanel*> > *dummyVectorOfVectorsOfWakes = new std::vector < std::vector <ITWakePanel*> >;
 
 				// Account for truncated wakes.
@@ -1113,18 +927,15 @@ void ITIO::readMyWakePanelHistoryFromFile(char * filenameWithPath)
 					noOfGenerationsInCurrentFrame = project->get_MaxPropagationGeneration();
 				}
 
-
-
-				for (int g = 0; g<noOfGenerationsInCurrentFrame; g++) // Loop over generations in current frame.
+				for (int g = 0; g < noOfGenerationsInCurrentFrame; g++) // Loop over generations in current frame.
 				{
 					std::vector <ITWakePanel*> *dummyVectorOfWakes = new std::vector <ITWakePanel*>;
+					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Reading wake panel history for frame: %i, generation: %i, number of rows: %i", 
+						n, g, project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU());
 
-					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Reading wake panel history for frame: %i, generation: %i, number of rows: %i", n, g, project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU());
-
-					for (int i = 0; i<project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++) // Loop along ITPanels on trailing edge. Note that different surfaces may have different numbers of rows of trailing edge panels.
+					// Loop along ITPanels on trailing edge. Note that different surfaces may have different numbers of rows of trailing edge panels.
+					for (int i = 0; i < project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++) 
 					{
-
-
 						fscanf(fp, " %i %i %i %i %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f", &ktemp, &ntemp, &gtemp, &itemp, &vorticity,
 							&blx,
 							&bly,
@@ -1147,10 +958,7 @@ void ITIO::readMyWakePanelHistoryFromFile(char * filenameWithPath)
 						);
 
 						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "ktemp: %i, ntemp: %i gtemp: %i, itemp: %i", ktemp, ntemp, gtemp, itemp);
-
-
 						// Copy file data to new ITWakePanel object.
-
 						// Next get the mid point and normal.
 						ITPoint * midPt = new ITPoint(mpx, mpy, mpz);
 						ITPoint * normalPt = new ITPoint(nx, ny, nz);
@@ -1171,63 +979,46 @@ void ITIO::readMyWakePanelHistoryFromFile(char * filenameWithPath)
 						currentWakePanelObject->set_F(n);
 
 						currentWakePanelObject->set_MyVorticity(vorticity);
-
 						// Store the Wake Panel object in the vector.
 						dummyVectorOfWakes->push_back(currentWakePanelObject);
-
-					} // End of loop along trailing edge.
+					}
 
 					dummyVectorOfVectorsOfWakes->push_back(*dummyVectorOfWakes);
+				}
 
-				} // End of loop over generations in current frame.
-
-				  // Store a snapshot of data.
+				// Store a snapshot of data.
 				project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->push_back(*(dummyVectorOfVectorsOfWakes));
+			}
+		}
 
-			} // End of loop through frames.
-
-		} // End of loop over surfaces.
-
-		  // Close the file.
+		// Close the file.
 		fclose(fp);
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Wake Panel History has been read successfully!!!");
-
-
-	} // End of Wake Panel file exists.
-
-} // End of readMyWakePanelHistoryFromFile
+	}
+}
 
 void ITIO::readMyBeamNodeHistoryFromFile(char * filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside readMyBeamNodeHistoryFromFile.");
 
 	// Create file path name string.
-
 	// Create a std:string from filenameWithPath.
 	std::string fileNameWithPathString(filenameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".BNH".
 	newfileNameWithPathString.append(".BNH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
-
 	int iii = ITIO::doesFileExist(newfileNameWithPathString.c_str());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "doesFileExist return value: %i", iii);
 
 	if (iii)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Beam Node History file found!!!");
 
 		// Open the file for reading.
@@ -1247,9 +1038,8 @@ void ITIO::readMyBeamNodeHistoryFromFile(char * filenameWithPath)
 		int ktemp, gtemp, itemp;
 		float x, y, z, wx, wy, wz, m;
 
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop over the surfaces.
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop over the surfaces.
 		{
-
 			// Create an empty vector of vectors.
 			std::vector < std::vector <ITBeamNode*> > *dummyVectorOfVectors = new std::vector < std::vector <ITBeamNode*> >;
 
@@ -1259,14 +1049,12 @@ void ITIO::readMyBeamNodeHistoryFromFile(char * filenameWithPath)
 			std::vector <ITBeamNode*> *dummyVector1 = new std::vector <ITBeamNode*>;
 			project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->push_back(*(dummyVector1));
 
-			for (int n = 0; n<noOfFrames; n++) // Loop over the frames. Note that the data file only contains wake panels for frame 1 and beyond.
+			for (int n = 0; n < noOfFrames; n++) // Loop over the frames. Note that the data file only contains wake panels for frame 1 and beyond.
 			{
-
 				std::vector <ITBeamNode*> *dummyVectorOfNodes = new std::vector <ITBeamNode*>;
 
-				for (int i = 0; i<project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++) // Loop along the beam. Note that different beams may have different numbers of nodes.
+				for (int i = 0; i < project->get_MySurfaces()->at(k)->get_NoOfInterpolatedPointsU() - 1; i++) // Loop along the beam. Note that different beams may have different numbers of nodes.
 				{
-
 					fscanf(fp, " %i %i %i %f %f %f %f %f %f %f", &ktemp, &gtemp, &itemp,
 						&x,
 						&y,
@@ -1287,58 +1075,42 @@ void ITIO::readMyBeamNodeHistoryFromFile(char * filenameWithPath)
 
 					// Store the Beam Node object in the vector.
 					dummyVectorOfNodes->push_back(currentNode);
-
-				} // End of loop along the beam.
-
+				}
 				dummyVectorOfVectors->push_back(*dummyVectorOfNodes);
-
-			} // End of loop through frames.
-
-			  // Store data.
+			}
+			
+			// Store data.
 			project->get_MySurfaces()->at(k)->get_MyBeam()->set_MyNodeHistory(dummyVectorOfVectors);
+		}
 
-		} // End of loop over surfaces.
-
-		  // Close the file.
+		// Close the file.
 		fclose(fp);
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Beam Node History has been read successfully!!!");
-
-
-	} // End of if Beam Node History file exists.
-
-} // End of readMyBeamNodeHistoryFromFile
-
+	}
+}
 
 void ITIO::readMyOutputDataHistoryFromFile(char * filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside readMyOutputDataHistoryFromFile.");
 
 	// Create file path name string.
-
 	// Create a std:string from filenameWithPath.
 	std::string fileNameWithPathString(filenameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".ODH".
 	newfileNameWithPathString.append(".ODH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	int iii = ITIO::doesFileExist(newfileNameWithPathString.c_str());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "doesFileExist return value: %i", iii);
 
 	if (iii)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Output Data History file found!!!");
 
 		// Open the file for reading.
@@ -1356,64 +1128,47 @@ void ITIO::readMyOutputDataHistoryFromFile(char * filenameWithPath)
 		int ktemp, ntemp;
 		float x, y, z;
 
-
 		// Read the data into vector of vectors.
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
-			for (int n = 0; n<noOfFrames; n++)
+			for (int n = 0; n < noOfFrames; n++)
 			{
 				fscanf(fp, "  %i %i %f %f %f", &ktemp, &ntemp, &x, &y, &z);
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "ktemp: %i ntemp: %i, x: %f, y: %f, z: %f", ktemp, ntemp, x, y, z);
 
 				ITPoint *p = new ITPoint(x, y, z);
 				project->get_MySurfaces()->at(k)->get_MyForceHistory()->push_back(p);
+			}
+		}
 
-			} // End of loop over frames.
-
-		} // End of loop over surfaces.
-
-		  // Close the file.
+		// Close the file.
 		fclose(fp);
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Output Data History has been read successfully!!!");
-
-	} // End of if file exists.
-
-
-} // End of readMyOutputDataHistoryFromFile.
+	}
+}
 
 void ITIO::readMyControlPointDeflectionHistoryFromFile(char * filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside readMyControlPointDeflectionHistoryFromFile.");
 
-
 	// Create file path name string.
-
 	// Create a std:string from filenameWithPath.
 	std::string fileNameWithPathString(filenameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".CPH".
 	newfileNameWithPathString.append(".CPH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
-
-
 	int iii = ITIO::doesFileExist(newfileNameWithPathString.c_str());
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "doesFileExist return value: %i", iii);
 
 	if (iii)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Control Point Deformation History file found!!!");
 
 		// Open the file for reading.
@@ -1430,29 +1185,24 @@ void ITIO::readMyControlPointDeflectionHistoryFromFile(char * filenameWithPath)
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "noOfFrames: %i, noOfRows: %i, noOfCols: %i, headerString: %s", noOfFrames, noOfRows, noOfCols, headerString);
 
-
 		int ktemp, ntemp, itemp, jtemp;
 		float x, y, z, vx, vy, vz;
 
 		// Read the data into vector of vectors.
-		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
-			for (int n = 0; n<noOfFrames; n++)
+			for (int n = 0; n < noOfFrames; n++)
 			{
-
 				std::vector < std::vector <ITPoint*> > *dummyVectorOfVectorsOfControlPointDeflections = new std::vector < std::vector <ITPoint*> >;
 
-				for (int i = 0; i<noOfRows; i++)
+				for (int i = 0; i < noOfRows; i++)
 				{
-
 					std::vector <ITPoint*> *dummyVectorOfControlPointDeflections = new std::vector <ITPoint*>;
 
-					for (int j = 0; j<noOfCols; j++)
+					for (int j = 0; j < noOfCols; j++)
 					{
-
 						fscanf(fp, "  %i %i %i %i %f %f %f %f %f %f", &ktemp, &ntemp, &itemp, &jtemp, &x, &y, &z, &vx, &vy, &vz);
-
-						//						project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ktemp: %i ntemp: %i, itemp: %i, jtemp: %i, x: %f, y: %f, z: %f", ktemp, ntemp, itemp, jtemp, x, y, z);
+						// project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ktemp: %i ntemp: %i, itemp: %i, jtemp: %i, x: %f, y: %f, z: %f", ktemp, ntemp, itemp, jtemp, x, y, z);
 
 						// Create an ITPoint object and initialize its instance variables.
 						ITPoint* p = new ITPoint(x, y, z);
@@ -1463,39 +1213,24 @@ void ITIO::readMyControlPointDeflectionHistoryFromFile(char * filenameWithPath)
 						// Store the pressure value from the JSON array.
 						dummyVectorOfControlPointDeflections->push_back(p);
 
-					} // End of loop over columns.
+					}
 
 					dummyVectorOfVectorsOfControlPointDeflections->push_back(*dummyVectorOfControlPointDeflections);
-
-				} // End of loop over rows.
-
-				  // Store a snapshot of data for this frame.
+				}
+				// Store a snapshot of data for this frame.
 				project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->push_back(*(dummyVectorOfVectorsOfControlPointDeflections));
-
-			} // End of loop over frames.
-
-		} // End of loop over surfaces.
-
-
-		  // Close the file.
+			}
+		}
+		
+		// Close the file.
 		fclose(fp);
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "============= Control Point Deformation History has been read successfully!!!");
-
-
-	} // End of if Control Point Deflection History file found.
-
-
-
-
-} // End of readMyControlPointDeflectionHistoryFromFile
-
+	}
+}
 
 void ITIO::readJSONBeamNodes(char *filenameWithPath)
 {
-
 	// The interpolated points and the ITPanels have been instanciated, so we can set beam node data.
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Start readJSONBeamNodes. Filename: %s", filenameWithPath);
 
 	FILE* fp = fopen(filenameWithPath, "r"); // non-Windows use "r"
@@ -1504,13 +1239,11 @@ void ITIO::readJSONBeamNodes(char *filenameWithPath)
 	Document d;
 
 	ParseResult ok = d.ParseStream(is);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "End %i", ok);
 
 	if (!ok)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "RapidJSON Parse error = %s", d.GetParseError());
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Error(offset %u)", (unsigned)d.GetErrorOffset());
 	}
 
@@ -1522,18 +1255,15 @@ void ITIO::readJSONBeamNodes(char *filenameWithPath)
 	assert(d.HasMember("ITSurfaces"));
 
 	// Loop through the surfaces and instanciate ITSurface objects.
-	for (int k = 0; k<d["ITSurfaces"].Size(); k++)
+	for (int k = 0; k < d["ITSurfaces"].Size(); k++)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Checking beam nodes for ITSurface: %i", k);
 
 		// Loop over control surfaces for the current ITSurface.
 		if (d["ITSurfaces"][k].HasMember("Beam"))
 		{
-
-			for (int n = 0; n<d["ITSurfaces"][k]["Beam"]["Beam Nodes"].Size(); n++)
+			for (int n = 0; n < d["ITSurfaces"][k]["Beam"]["Beam Nodes"].Size(); n++)
 			{
-
 				int index = d["ITSurfaces"][k]["Beam"]["Beam Nodes"][n]["Index"].GetInt();
 				float x = (float)(d["ITSurfaces"][k]["Beam"]["Beam Nodes"][n]["x"].GetDouble());
 				float y = (float)(d["ITSurfaces"][k]["Beam"]["Beam Nodes"][n]["y"].GetDouble());
@@ -1549,17 +1279,14 @@ void ITIO::readJSONBeamNodes(char *filenameWithPath)
 				node->set_Mass(m);
 
 				node->set_MassPerUnitLength(m / 1.4);
-
 				node->set_E(E);
 
 				node->set_Ix(Ix);
 				node->set_Iz(Iz);
 
 				project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->push_back(node);
-
-			} // End of loop over nodes.
-
-		} // End of if node data is present in the file for this surface.
+			}
+		}
 		else
 		{
 			// Beam data for this surface was not present.
@@ -1573,122 +1300,8 @@ void ITIO::readJSONBeamNodes(char *filenameWithPath)
 				w->on_actionEuler_Bernoulli_triggered();
 			}
 		}
-
-	} // End of loop over surfaces.
-
-
-} // End of readJSONBeamNodes.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}
+}
 
 void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 {
@@ -1739,8 +1352,6 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 
 	// Put objectGeneralData into objectITProjectlData
 	objectITProjectData.AddMember("General Data", objectGeneralData, allocator);
-
-
 
 	//  ==================================================================
 	// FlowitCudaUnsteady data.
@@ -1799,7 +1410,6 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 
 	objectFlowitCudaUnsteadyData.AddMember("VelocityFieldDisplayFactor", project->get_VelocityFieldDisplayFactor(), allocator);
 
-
 	// This tortured code is for backwards compatibility of data files with OS X code.
 	if (project->get_IsSurfaceHierarchy())
 	{
@@ -1832,7 +1442,6 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 		objectFlowitCudaUnsteadyData.AddMember("IsActiveControlSurfaces", 0, allocator);
 	}
 
-
 	// Put objectFlowitCudaUnsteadyData into objectITProjectlData
 	objectITProjectData.AddMember("FlowitCudaUnsteady Data", objectFlowitCudaUnsteadyData, allocator);
 
@@ -1844,7 +1453,6 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 
 	// Put objectDesignPropertiesData into objectITProjectlData
 	objectITProjectData.AddMember("Design Properties", objectDesignPropertiesData, allocator);
-
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "2");
 
@@ -1861,7 +1469,6 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 	// Open the file for writing (don't append).
 	myfile.open(fileNameWithPath, std::ofstream::out);
 
-
 	//Convert JSON document to string
 	StringBuffer buffer;
 	PrettyWriter<StringBuffer> writer(buffer);
@@ -1870,14 +1477,11 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "4");
 
-
 	// Write the char* to the file.
 	myfile << output;
 
 	// Close the file.
 	myfile.close();
-
-
 
 	if (project->get_VelocityFieldDataHistory()->at(1).size() > 0)
 	{
@@ -1916,14 +1520,10 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyProjectToFile. Project has been written.");
 
-} // End of writeMyProjectToFile.
-
-
-
+}
 
 void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside writeMyITSurfacesToFile.");
 
 	// must pass an allocator when the object may need to allocate memory
@@ -1932,16 +1532,14 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 	// Now set up a JSON array to contain the surfaces and add it to the project root.
 	rapidjson::Value surfaceArray(rapidjson::kArrayType);
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop through all the surfaces in the v_s vector, adding data to the surfaceArray.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through all the surfaces in the v_s vector, adding data to the surfaceArray.
 	{
-
 		ITSurface *currentSurface = project->get_MySurfaces()->at(k);
 
 		// Create the JSON object of the current Surface.
 		rapidjson::Value currentSurfaceData(rapidjson::kObjectType);
 
 		rapidjson::Value currentSurfaceProperties(rapidjson::kObjectType);
-
 
 		Value key("Name", d->GetAllocator()); // copy string name
 		char nameStr[10];
@@ -1984,8 +1582,6 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 
 		currentSurfaceProperties.AddMember("ParentSurfaceIndex", currentSurface->get_ParentSurfaceIndex(), allocator);
 
-
-
 		// This tortured code is for backwards compatibility of data files with OS X code.
 		if (currentSurface->get_IsPistolesiPanelOffset())
 		{
@@ -2000,12 +1596,8 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 
 		currentSurfaceProperties.AddMember("FuselageRadius", currentSurface->get_FuselageRadius(), allocator);
 
-
-
 		// Add the properties to the surface object.
 		currentSurfaceData.AddMember("Properties", currentSurfaceProperties, allocator);
-
-
 
 		// Write control point data.
 		// We need to make sure the surface is back at the base location (and undeformed geometry).
@@ -2015,17 +1607,14 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 		rapidjson::Value controlPointsArray(rapidjson::kArrayType);
 
 		// Fill the array.
-		for (int i = 0; i<NO_OF_ROWS; i++)
+		for (int i = 0; i < NO_OF_ROWS; i++)
 		{
-			for (int j = 0; j<NO_OF_COLS; j++)
+			for (int j = 0; j < NO_OF_COLS; j++)
 			{
 				// Create the JSON char* of the current ITPoint.
 				currentSurface->get_MyControlPoints()->at(i).at(j)->serializeMeAsJSONObject(k, i, j, &controlPointsArray, d);
-
-				// Add ITPoint to main ITPoints array.
 			}
 		}
-
 
 		// Add the control points array to the surface object.
 		currentSurfaceData.AddMember("Control Points", controlPointsArray, allocator);
@@ -2042,43 +1631,34 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 		// Add the rotation curve object to the surface object.
 		currentSurfaceData.AddMember("Trajectory Rotation Curve", rotationCurveObject, allocator);
 
-
 		// Serialize the control surfaces.
 		rapidjson::Value controlSurfacesArray(rapidjson::kArrayType);
 		writeCurrentSurfaceControlSurfaces(k, &controlSurfacesArray, d);
 		// Add the control surfaces object to the surface object.
 		currentSurfaceData.AddMember("Control Surfaces", controlSurfacesArray, allocator);
 
-
 		// Finally add ITSurface to main array.
 		surfaceArray.PushBack(currentSurfaceData, d->GetAllocator());
-
-	} // End of k loop over surfaces.
-
-	  // Add the surface array to the document.
+	}
+	
+	// Add the surface array to the document.
 	d->AddMember("ITSurfaces", surfaceArray, allocator);
-
-} // End of writeMyITSurfacesToFile.
-
+}
 
 void ITIO::writeMyVelocityFieldHistoryToFile(char *fileNameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyVelocityFieldHistoryToFile.");
 
 	// Create a std:string from fileNameWithPath.
 	std::string fileNameWithPathString(fileNameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".VFH".
 	newfileNameWithPathString.append(".VFH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Open the file.
@@ -2089,17 +1669,14 @@ void ITIO::writeMyVelocityFieldHistoryToFile(char *fileNameWithPath)
 	fprintf(fp, "%i, %i, %i\n", project->get_VelocityFieldDataHistory()->size(), project->get_VelocityFieldDataHistory()->at(1).size(), project->get_VelocityFieldDataHistory()->at(1).at(0).size()); // n, i, j.
 	fprintf(fp, "n,i,j,X,Y,Z,VX,VY,VZ\n");
 
-
 	// Loop through the frames.
-	for (int n = 0; n<project->get_VelocityFieldDataHistory()->size(); n++)
+	for (int n = 0; n < project->get_VelocityFieldDataHistory()->size(); n++)
 	{
-
 		// Loop through the rows of velocity vector ITPoint objects.
-		for (int i = 0; i<project->get_VelocityFieldDataHistory()->at(n).size(); i++)
+		for (int i = 0; i < project->get_VelocityFieldDataHistory()->at(n).size(); i++)
 		{
-
 			// Loop through columns of velocity vector ITPoint objects.
-			for (int j = 0; j<project->get_VelocityFieldDataHistory()->at(n).at(i).size(); j++)
+			for (int j = 0; j < project->get_VelocityFieldDataHistory()->at(n).at(i).size(); j++)
 			{
 				fprintf(fp, "%i %i %i %f %f %f %f %f %f\n", n, i, j, project->get_VelocityFieldDataHistory()->at(n).at(i).at(j)->get_X(),
 					project->get_VelocityFieldDataHistory()->at(n).at(i).at(j)->get_Y(),
@@ -2109,10 +1686,8 @@ void ITIO::writeMyVelocityFieldHistoryToFile(char *fileNameWithPath)
 					project->get_VelocityFieldDataHistory()->at(n).at(i).at(j)->get_VZ());
 
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "%i, %i, %i", n, i, j);
-
 			}
 		}
-
 	}
 
 	// Flush the file writing.
@@ -2122,27 +1697,22 @@ void ITIO::writeMyVelocityFieldHistoryToFile(char *fileNameWithPath)
 	fclose(fp);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "writeMyVelocityFieldHistoryToFile finished successfully.");
-
-} // End of writeMyVelocityFieldHistoryToFile.
+}
 
 void ITIO::writeMyPressureHistoryToFile(char *fileNameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyPressureHistoryToFile.");
 
 	// Create a std:string from fileNameWithPath.
 	std::string fileNameWithPathString(fileNameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".PDH".
 	newfileNameWithPathString.append(".PDH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Open the file.
@@ -2153,56 +1723,43 @@ void ITIO::writeMyPressureHistoryToFile(char *fileNameWithPath)
 	fprintf(fp, "%i, %i, %i\n", project->get_MySurfaces()->at(0)->get_MyPressureHistory()->size(), project->get_MySurfaces()->at(0)->get_MyPressureHistory()->at(0).size(), project->get_MySurfaces()->at(0)->get_MyPressureHistory()->at(0).at(0).size()); // n, i, j.
 	fprintf(fp, "k,n,i,j,p\n");
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int n = 0; n<project->get_MySurfaces()->at(k)->get_MyPressureHistory()->size(); n++)
+		for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyPressureHistory()->size(); n++)
 		{
-
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(n).size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(n).size(); i++)
 			{
-
-				for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(n).at(i).size(); j++)
+				for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(n).at(i).size(); j++)
 				{
-
 					fprintf(fp, "%i %i %i %i %f\n", k, n, i, j, project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(n).at(i).at(j));
-
-				} // End of loop over columns.
-
-			} // End of loop over rows.
-
-		} // End of loop over frames.
-
-	} // End of loop over surfaces.
-
-	  // Flush the file writing.
+				}
+			}
+		}
+	}
+	
+	// Flush the file writing.
 	fflush(fp);
 
 	// Close the file.
 	fclose(fp);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "writeMyPressureHistoryToFile finished successfully.");
-
-} // End of writeMyPressureHistoryToFile.
-
+}
 
 void ITIO::writeMyWakePanelHistoryToFile(char *fileNameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyWakePanelHistoryToFile.");
 
 	// Create a std:string from fileNameWithPath.
 	std::string fileNameWithPathString(fileNameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".WPH".
 	newfileNameWithPathString.append(".WPH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Open the file.
@@ -2212,7 +1769,6 @@ void ITIO::writeMyWakePanelHistoryToFile(char *fileNameWithPath)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Stuff 3: %i",
 		project->get_MySurfaces()->at(0)->get_MyWakePanelHistory()->size());
 
-
 	// Write header.
 	fprintf(fp, "%i, %i, %i\n", project->get_MySurfaces()->at(0)->get_MyWakePanelHistory()->size(),
 		project->get_MySurfaces()->at(0)->get_MyWakePanelHistory()->at(1).size(),
@@ -2220,16 +1776,14 @@ void ITIO::writeMyWakePanelHistoryToFile(char *fileNameWithPath)
 	fprintf(fp, "k,n,g,i,vorticity,bl,br,tr,tl,midpt,normal\n");
 
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop over surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop over surfaces.
 	{
-		for (int n = 0; n<project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->size(); n++) // Loop over frames. Note that the first frame has no wake panels and is empty.
+		for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->size(); n++) // Loop over frames. Note that the first frame has no wake panels and is empty.
 		{
-			for (int g = 0; g<project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(n).size(); g++) // Loop over generations.
+			for (int g = 0; g < project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(n).size(); g++) // Loop over generations.
 			{
-
-				for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(n).at(g).size(); i++) // Loop down the trailing edges.
+				for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(n).at(g).size(); i++) // Loop down the trailing edges.
 				{
-
 					ITWakePanel *currentWakePanel = project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(n).at(g).at(i);
 
 					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "currentWakePanel vorticity: %f, %f", currentWakePanel->get_MyVorticity(),
@@ -2255,43 +1809,34 @@ void ITIO::writeMyWakePanelHistoryToFile(char *fileNameWithPath)
 						currentWakePanel->get_Normal()->get_Y(),
 						currentWakePanel->get_Normal()->get_Z()
 					);
-
-				} // End of loop down the trailing edges.
-
-			} // End of loop over generations.
-
-		} // End of loop over frames.
-
-	} // End of loop over surfaces.
-
-	  // Flush the file writing.
+				}
+			}
+		}
+	}
+	
+	// Flush the file writing.
 	fflush(fp);
 
 	// Close the file.
 	fclose(fp);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "writeMyWakeHistoryToFile finished successfully.");
-
-} // End of writeMyWakeHistoryToFile.
+}
 
 void ITIO::writeMyVorticityHistoryToFile(char *fileNameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyVorticityHistoryToFile.");
 
 	// Create a std:string from fileNameWithPath.
 	std::string fileNameWithPathString(fileNameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".PDH".
 	newfileNameWithPathString.append(".VDH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Open the file.
@@ -2302,40 +1847,31 @@ void ITIO::writeMyVorticityHistoryToFile(char *fileNameWithPath)
 	fprintf(fp, "%i, %i, %i\n", project->get_MySurfaces()->at(0)->get_MyVorticityHistory()->size(), project->get_MySurfaces()->at(0)->get_MyVorticityHistory()->at(0).size(), project->get_MySurfaces()->at(0)->get_MyVorticityHistory()->at(0).at(0).size()); // n, i, j.
 	fprintf(fp, "k,n,i,j,p\n");
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int n = 0; n<project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->size(); n++)
+		for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->size(); n++)
 		{
-
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(n).size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(n).size(); i++)
 			{
-
-				for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(n).at(i).size(); j++)
+				for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(n).at(i).size(); j++)
 				{
-
 					fprintf(fp, "%i %i %i %i %f\n", k, n, i, j, project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(n).at(i).at(j));
-
-				} // End of loop over columns.
-
-			} // End of loop over rows.
-
-		} // End of loop over frames.
-
-	} // End of loop over surfaces.
-
-	  // Flush the file writing.
+				}
+			}
+		}
+	}
+	
+	// Flush the file writing.
 	fflush(fp);
 
 	// Close the file.
 	fclose(fp);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "writeMyVorticityHistoryToFile finished successfully.");
-
-} // End of writeMyPressureHistoryToFile.
+}
 
 void ITIO::writeMyBeamNodeHistoryToFile(char *fileNameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyBeamNodeHistoryToFile.");
 
 	// Create a std:string from fileNameWithPath.
@@ -2361,16 +1897,13 @@ void ITIO::writeMyBeamNodeHistoryToFile(char *fileNameWithPath)
 	fprintf(fp, "%i, %i, %i\n", project->get_MySurfaces()->size(), project->get_MySurfaces()->at(0)->get_MyBeam()->get_MyNodeHistory()->size(), project->get_MySurfaces()->at(0)->get_MyBeam()->get_MyNodeHistory()->at(0).size()); // n, i.
 	fprintf(fp, "k,g,i,x,y,z,wx,wy,wz,m\n");
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int g = 0; g<project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->size(); g++)
+		for (int g = 0; g < project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->size(); g++)
 		{
-
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->at(g).size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->at(g).size(); i++)
 			{
-
 				ITBeamNode *currentNode = project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->at(g).at(i);
-
 
 				fprintf(fp, "%i %i %i %f %f %f %f %f %f %f\n", k, g, i,
 					currentNode->get_X(),
@@ -2381,96 +1914,76 @@ void ITIO::writeMyBeamNodeHistoryToFile(char *fileNameWithPath)
 					currentNode->get_W()->get_Z(),
 					currentNode->get_Mass()
 				);
-
-
-			} // End of loop over rows.
-
-		} // End of loop over frames.
-
-	} // End of loop over surfaces.
-
-	  // Flush the file writing.
+			}
+		}
+	}
+	
+	// Flush the file writing.
 	fflush(fp);
 
 	// Close the file.
 	fclose(fp);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "writeMyBeamNodeHistoryToFile finished successfully.");
-
-} // End of writeMyBeamNodeHistoryToFile.
+}
 
 void ITIO::writeMyOutputDataHistoryToFile(char *fileNameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyOutputDataHistoryToFile.");
 
 	// Create a std:string from fileNameWithPath.
 	std::string fileNameWithPathString(fileNameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".ODH".
 	newfileNameWithPathString.append(".ODH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Open the file.
 	FILE *fp;
 	fp = fopen(newfileNameWithPathString.c_str(), "w");
 
-
 	// Write header.
 	fprintf(fp, "%i\n", project->get_MySurfaces()->at(0)->get_MyForceHistory()->size()); // n.
 	fprintf(fp, "k,f,X,Y,Z\n");
 
-
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++) // Loop over surfaces.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop over surfaces.
 	{
-		for (int n = 0; n<project->get_MySurfaces()->at(k)->get_MyForceHistory()->size(); n++) // Loop over frames. Note that the first frame has no wake panels and is empty.
+		for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyForceHistory()->size(); n++) // Loop over frames. Note that the first frame has no wake panels and is empty.
 		{
 			fprintf(fp, "%i %i %f %f %f\n", k, n, project->get_MySurfaces()->at(k)->get_MyForceHistory()->at(n)->get_X(),
 				project->get_MySurfaces()->at(k)->get_MyForceHistory()->at(n)->get_Y(),
 				project->get_MySurfaces()->at(k)->get_MyForceHistory()->at(n)->get_Z());
+		}
+	}
 
-		} // End of loop over Frames.
-
-	} // End of loop over surfaces
-
-
-	  // Flush the file writing.
+	// Flush the file writing.
 	fflush(fp);
-
 
 	// Close the file.
 	fclose(fp);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "writeMyOutputDataHistoryToFile finished successfully.");
-
-} // End of writeMyOutputDataHistoryToFile
+}
 
 void ITIO::writeMyControlPointDeflectionHistoryToFile(char *fileNameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyControlPointDeflectionHistoryToFile.");
 
 	// Create a std:string from fileNameWithPath.
 	std::string fileNameWithPathString(fileNameWithPath);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "fileNameWithPathString: %s", fileNameWithPathString);
 
 	// Remove extension.
 	std::string newfileNameWithPathString = fileNameWithPathString.substr(0, fileNameWithPathString.find("."));
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Append ".CPH".
 	newfileNameWithPathString.append(".CPH");
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "newfileNameWithPathString: %s", newfileNameWithPathString);
 
 	// Open the file.
@@ -2481,82 +1994,36 @@ void ITIO::writeMyControlPointDeflectionHistoryToFile(char *fileNameWithPath)
 	fprintf(fp, "%i, %i, %i\n", project->get_MySurfaces()->at(0)->get_MyControlPointDeflectionHistory()->size(), project->get_MySurfaces()->at(0)->get_MyControlPointDeflectionHistory()->at(0).size(), project->get_MySurfaces()->at(0)->get_MyControlPointDeflectionHistory()->at(0).at(0).size()); // n, i, j.
 	fprintf(fp, "k,n,i,j,wx,wy,wz,wvx,wvy,wvz\n");
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int n = 0; n<project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->size(); n++)
+		for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->size(); n++)
 		{
-
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).size(); i++)
 			{
-
-				for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).size(); j++)
+				for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).size(); j++)
 				{
-
 					fprintf(fp, "%i %i %i %i %f %f %f %f %f %f\n", k, n, i, j, project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).at(j)->get_X(),
 						project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).at(j)->get_Y(),
 						project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).at(j)->get_Z(),
 						project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).at(j)->get_VX(),
 						project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).at(j)->get_VY(),
 						project->get_MySurfaces()->at(k)->get_MyControlPointDeflectionHistory()->at(n).at(i).at(j)->get_VZ());
-
-				} // End of loop over columns.
-
-			} // End of loop over rows.
-
-		} // End of loop over frames.
-
-	} // End of loop over surfaces.
-
-	  // Flush the file writing.
+				}
+			}
+		}
+	}
+	
+	// Flush the file writing.
 	fflush(fp);
 
 	// Close the file.
 	fclose(fp);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "writeMyControlPointDeflectionHistoryToFile finished successfully.");
-
-} // vEnd of writeMyControlPointDeflectionHistoryToFile.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *trajectoryObject, rapidjson::Document *d)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceTranslationTrajectory");
 
 	// Get a pointer to the current surface curve array.
@@ -2566,7 +2033,7 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 	rapidjson::Value controlPointsArray(rapidjson::kArrayType);
 
 	// Count through the segments.
-	for (int i = 0; i<currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+	for (int i = 0; i < currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 	{
 		// Get the translation coordinates.
 		float x = currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
@@ -2576,8 +2043,8 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 		// Create a new ITPointTrajectory point to do the serialization.
 		ITPointTrajectory *tp = new ITPointTrajectory(x, y, z);
 
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceTranslationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
-
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceTranslationTrajectory. KeyFrame: %i", 
+			currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
 
 		tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
 
@@ -2597,8 +2064,8 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 	// Create a new ITPointTrajectory point to do the serialization.
 	ITPointTrajectory *tp = new ITPointTrajectory(x, y, z);
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceTranslationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_StartKeyFrame());
-
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceTranslationTrajectory. KeyFrame: %i", 
+		currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_StartKeyFrame());
 
 	tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
 
@@ -2608,34 +2075,20 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 	// Delete temporary objects.
 	delete tp;
 
-
 	// Add the control points array to the curveObject.
 	trajectoryObject->AddMember("Control Points", controlPointsArray, d->GetAllocator());
-
-} // End of writeCurrentSurfaceTranslationTrajectory.
-
-
-
-
-
-
-
-
-
-
+}
 
 void ITIO::writeCurrentSurfaceControlSurfaces(int k, rapidjson::Value *controlSurfacesArray, rapidjson::Document *d)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceControlSurfaces ================================== index: %i", k);
 
 	// Get a pointer to the current surface.
 	ITSurface* currentSurface = project->get_MySurfaces()->at(k);
 
 	// Count through the segments.
-	for (int i = 0; i<currentSurface->get_MyControlSurfaces()->size(); i++)
+	for (int i = 0; i < currentSurface->get_MyControlSurfaces()->size(); i++)
 	{
-
 		ITControlSurface *cs = currentSurface->get_MyControlSurfaces()->at(i);
 
 		rapidjson::Value currentControlSurfaceObject(rapidjson::kObjectType);
@@ -2643,47 +2096,30 @@ void ITIO::writeCurrentSurfaceControlSurfaces(int k, rapidjson::Value *controlSu
 
 		rapidjson::Value currentControlSurfacePanelArray(rapidjson::kArrayType);
 
-		for (int j = 0; j<cs->get_MyITPanels()->size(); j++)
+		for (int j = 0; j < cs->get_MyITPanels()->size(); j++)
 		{
-
 			rapidjson::Value currentPanel(rapidjson::kObjectType);
 			currentPanel.AddMember("row", cs->get_MyITPanels()->at(j)->get_I(), d->GetAllocator());
 			currentPanel.AddMember("col", cs->get_MyITPanels()->at(j)->get_J(), d->GetAllocator());
 			currentControlSurfacePanelArray.PushBack(currentPanel, d->GetAllocator());
-
-		} // End of loop over cs panels
-
-		  // Push the currentControlSurfacePanelArray into the currentControlSurfaceObject.
+		}
+		
+		// Push the currentControlSurfacePanelArray into the currentControlSurfaceObject.
 		currentControlSurfaceObject.AddMember("Panels", currentControlSurfacePanelArray, d->GetAllocator());
-
 
 		// Push the currentControlSurfaceObject into the controlSurfaceArray.
 		controlSurfacesArray->PushBack(currentControlSurfaceObject, d->GetAllocator());
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceControlSurfaces ================================== control surface index: %i", i);
-
-	} // End of loop over control surfaces of the k-th control surface
-
-	  // Add the controlSurfaceArray to the controlSurfacesObject.
-
-
-
-} // End of writeCurrentSurfaceControlSurfaces
-
-
-
-
-
+	}
+}
 
 void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajectoryObject, rapidjson::Document *d)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceRotationTrajectory");
 
 	// Get a pointer to the current surface curve array.
 	ITSurface* currentSurface = project->get_MySurfaces()->at(k);
-
-
 
 	// Serialize centre of rotation point.
 	rapidjson::Value pointObject(rapidjson::kObjectType);
@@ -2695,17 +2131,11 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 	// Add the properties to the point node.
 	trajectoryObject->AddMember("Centre of Rotation", pointObject, d->GetAllocator());
 
-
-
-
-
-
-
 	// Set up a JSON array to contain the control points.
 	rapidjson::Value controlPointsArray(rapidjson::kArrayType);
 
 	// Count through the segments.
-	for (int i = 0; i<currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+	for (int i = 0; i < currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 	{
 		// Get the translation coordinates.
 		float x = currentSurface->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
@@ -2716,7 +2146,6 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 		ITPointTrajectory *tp = new ITPointTrajectory(x, y, z);
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceRotationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
-
 
 		tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
 
@@ -2738,7 +2167,6 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceRotationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_StartKeyFrame());
 
-
 	tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
 
 	// Write the point data to the controlPointsArray.
@@ -2747,8 +2175,6 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 	// Delete temporary objects.
 	delete tp;
 
-
 	// Add the control points array to the curveObject.
 	trajectoryObject->AddMember("Control Points", controlPointsArray, d->GetAllocator());
-
-} // End of writeCurrentSurfaceRotationTrajectory.
+}

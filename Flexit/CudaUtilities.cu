@@ -59,7 +59,7 @@ void RunCubeKernel(vector<float>& data, vector<float>& result)
 
 	// Launch kernel: 1 block, 96 threads 
 	// Important: Do not exceed number of threads returned by the device query, 1024 on my computer. 
-	cubeKernel << <1, MaxSize >> >(r, d);
+	cubeKernel << <1, MaxSize >> > (r, d);
 
 	// Copy back to the host 
 	cudaMemcpy(&result[0], r, size, cudaMemcpyDeviceToHost);
@@ -83,7 +83,7 @@ std::string InitializeDevice(int argc, char *argv[], std::string *gpuString)
 	int devCount;
 	cudaGetDeviceCount(&devCount);
 
-	for (int i=0; i<devCount; ++i)
+	for (int i = 0; i < devCount; ++i)
 	{
 		cudaDeviceProp devProp;
 		cudaGetDeviceProperties(&devProp, i);
@@ -130,14 +130,14 @@ std::string InitializeDevice(int argc, char *argv[], std::string *gpuString)
 		s10 << "Maximum threads per block: " << devProp.maxThreadsPerBlock << std::endl;
 		outputString.append(s10.str());
 
-		for (int j=0; j<3; ++j)
+		for (int j = 0; j < 3; ++j)
 		{
 			std::ostringstream s11;
 			s11 << "Maximum dimension " << j << " of block: " << devProp.maxThreadsDim[j] << std::endl;
 			outputString.append(s11.str());
 		}
 
-		for (int j=0; j<3; ++j)
+		for (int j = 0; j < 3; ++j)
 		{
 			std::ostringstream s12;
 			s12 << "Maximum dimension " << j << " of grid: " << devProp.maxGridSize[j] << std::endl;
@@ -167,8 +167,6 @@ std::string InitializeDevice(int argc, char *argv[], std::string *gpuString)
 		std::ostringstream s18;
 		s18 << "Kernel execution timeout: " << (devProp.kernelExecTimeoutEnabled ? "Yes" : "No") << std::endl << std::endl;
 		outputString.append(s18.str());
-
-
 	}
 
 	return outputString;

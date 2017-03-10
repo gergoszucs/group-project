@@ -34,7 +34,6 @@ __host__ __device__ void kernelCalcFiniteSvensonAt(
 	float *dvz // Returned variables; the cartesian components of the velocity induced at the object panel by the current finite vortex on the subject panel.
 );
 
-
 __global__ void kernelFunctionPredictVelocityAtPoint(
 	const float *px,
 	const float *py,

@@ -1,13 +1,13 @@
 #pragma once
 
-// System includes.
 #include <vector>
 
 class ITPhysics
 {
 public:
-	ITPhysics(void);
-	~ITPhysics(void);
+
+	ITPhysics(void) {};
+	~ITPhysics(void) {};
 
 	static void playOutStep();
 	static void playOutFlexit();
@@ -40,5 +40,4 @@ private:
 	static void calcVelocityFieldCuda(int t);
 	static void StoreDataForReplay();
 	static void ITPhysics::calcInducedVelocityAtEdgeMidPointCuda(int k, int i, int j, int t, float x, float y, float z, float *vx, float *vy, float *vz);
-
 };

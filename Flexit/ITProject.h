@@ -1,13 +1,11 @@
 #pragma once
 
-// Forward declarations.
 class ITSurface;
 class ITPoint;
 class ITGust;
 
 class ITProject
 {
-
 
 protected:
 
@@ -79,8 +77,6 @@ public:
 	void printDebug(const char *FILE, int LINE, const char *FUNC, int level, const char * format, ...);
 	bool custom_isnan(double var);
 
-
-
 	// Accessors for ITProject instance variables.
 	int get_DebugLevel();
 	void set_DebugLevel(int d);
@@ -117,8 +113,6 @@ public:
 
 	float get_RankineCoreRadius();
 	void set_RankineCoreRadius(float r);
-
-
 
 	std::string get_VelocityFieldConstantPlane();
 	void set_VelocityFieldConstantPlane(std::string c);
@@ -160,10 +154,8 @@ public:
 	float get_Rho();
 	void set_Rho(float r);
 
-
 	float get_FramesPerSecond();
 	void set_FramesPerSecond(float f);
-
 
 	// Display factors.
 	float get_PressureDisplayFactor();
@@ -206,6 +198,4 @@ public:
 
 	std::vector <double> *get_B();
 	void set_B(std::vector <double> *b);
-
 };
-

@@ -8,15 +8,11 @@ class MyEBWidget : public QGLWidget
 
 public:
 	explicit MyEBWidget(QWidget *parent = 0);
-	~MyEBWidget(void);
+	~MyEBWidget(void) {};
 
 	void plot2D();
 	void drawSpanDeformationDistributions();
 	void drawMy2DAxes(char *yLabel);
-
-signals:
-
-	public slots :
 
 protected:
 
@@ -28,8 +24,6 @@ protected:
 private:
 
 	// Drawing parameters.
-
 	int myWidth;
 	int myHeight;
-
 };

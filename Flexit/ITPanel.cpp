@@ -1,4 +1,3 @@
-// Dominique's includes
 #include "global.h"
 #include "ITPanel.h"
 #include "ITPoint.h"
@@ -8,10 +7,8 @@
 
 ITPanel::ITPanel(ITPoint* bottomLeft, ITPoint* bottomRight, ITPoint* topRight, ITPoint* topLeft, ITSurface* s, int typeOfPanel)
 {
-
 	// Set my surface
 	set_MyITSurface(s);
-
 
 	// Compute panel geometry.
 	// Instanciate the panel corner points with pointers to supplied objects.
@@ -115,7 +112,6 @@ ITPanel::ITPanel(ITPoint* bottomLeft, ITPoint* bottomRight, ITPoint* topRight, I
 
 	// Set default as NOT belonging to a control surface.
 	set_IsControlSurface(false);
-
 }
 
 ITPanel::~ITPanel(void)
@@ -135,23 +131,19 @@ ITPanel::~ITPanel(void)
 
 	// Delete my vortices.
 	int noOfVortices = get_MyVortices()->size();
-	for (int i = 0; i<noOfVortices; i++)
+	for (int i = 0; i < noOfVortices; i++)
 	{
 		delete get_MyVortices()->at(i);
 	}
 
 	get_MyVortices()->clear();
 	delete _MyVortices;
-
 }
-
-
 
 // Worker methods.
 void ITPanel::computeDiagonals()
 {
 	// Compute Diagonals 
-
 	// Leading diagonal is top left to bottom right "\".	
 	ITPoint *leadingDiagonal = new ITPoint(
 		get_BottomRightPoint()->get_X() - get_TopLeftPoint()->get_X(),
@@ -167,12 +159,10 @@ void ITPanel::computeDiagonals()
 		get_BottomLeftPoint()->get_Z() - get_TopRightPoint()->get_Z());
 
 	set_TrailingDiagonal(trailingDiagonal);
-
 }
 
 void ITPanel::computeMidPoint()
 {
-
 	// Compute panel middle point.
 	float leadDiagMidPtX = get_TopLeftPoint()->get_X() + get_LeadingDiagonal()->get_X() / 2.0f;
 	float leadDiagMidPtY = get_TopLeftPoint()->get_Y() + get_LeadingDiagonal()->get_Y() / 2.0f;
@@ -185,27 +175,19 @@ void ITPanel::computeMidPoint()
 	get_MidPoint()->set_X((leadDiagMidPtX + trailDiagMidPtX) / 2.0f);
 	get_MidPoint()->set_Y((leadDiagMidPtY + trailDiagMidPtY) / 2.0f);
 	get_MidPoint()->set_Z((leadDiagMidPtZ + trailDiagMidPtZ) / 2.0f);
-
 }
-
 
 void ITPanel::computeColocationPoint()
 {
-
 	get_ColocationPoint()->set_X(get_MidPoint()->get_X());
 	get_ColocationPoint()->set_Y(get_MidPoint()->get_Y());
 	get_ColocationPoint()->set_Z(get_MidPoint()->get_Z());
-
-} // End of computeColocationPoint.
-
-
-
+}
 
 void ITPanel::computeNormal()
 {
 	// Compute the unit normal using cross product of the diagonals.
 	// This way the normals are directed to Leeward.
-
 	float dxu = get_LeadingDiagonal()->get_X();
 	float dyu = get_LeadingDiagonal()->get_Y();
 	float dzu = get_LeadingDiagonal()->get_Z();
@@ -225,7 +207,6 @@ void ITPanel::computeNormal()
 	get_Normal()->normalize();
 }
 
-
 void ITPanel::computeArea()
 {
 	// Compute the area of the panel as the cross product of the left side and the bottom side.
@@ -242,7 +223,6 @@ void ITPanel::computeArea()
 	float az = xu*yv - yu*xv;
 
 	set_Area(sqrt(ax*ax + ay*ay + az*az)); // Always positive.
-
 }
 
 void ITPanel::instanciateMyVortices()
@@ -264,25 +244,13 @@ void ITPanel::instanciateMyVortices()
 	get_MyVortices()->push_back(v2);
 	get_MyVortices()->push_back(v3);
 	get_MyVortices()->push_back(v4);
-
-}	// End of instanciateVortices.
-
-
-
-
-
-
-
+}
 
 void ITPanel::calculateMyTrajectoryVelocity(int k)
 {
-
 	// Input parameter k is the index of the parent surface of this ITPanel object.
-
 	// Find the velocity of the mid point of the panel at the current FrameNumber.
-
 	// Start by finding the position of the mid point of the panel at the previous frame and at the current frame and taking the difference.
-
 	// Create a convenient pointer to the coordinates of the first control point.
 	// This is the "datum" point of the parent surface.
 	ITPoint * cp = project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(0).at(0);
@@ -317,7 +285,8 @@ void ITPanel::calculateMyTrajectoryVelocity(int k)
 	nowBaseMidPoint->set_Y(project->get_MyBaseSurfaces()->at(k)->get_MyPanels()->at(get_I()).at(get_J())->get_MidPoint()->get_Y());
 	nowBaseMidPoint->set_Z(project->get_MyBaseSurfaces()->at(k)->get_MyPanels()->at(get_I()).at(get_J())->get_MidPoint()->get_Z());
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i, now base mid-point X: %f", k, project->get_MyBaseSurfaces()->at(k)->get_MyPanels()->at(get_I()).at(get_J())->get_MidPoint()->get_X());
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i, now base mid-point X: %f", k,
+		project->get_MyBaseSurfaces()->at(k)->get_MyPanels()->at(get_I()).at(get_J())->get_MidPoint()->get_X());
 
 	// Calculate the position of this panel temporary mid point propagated to this frame.
 	nowBaseMidPoint->propagateMeWithMorphForTrajectorySpeed(cp,
@@ -330,37 +299,33 @@ void ITPanel::calculateMyTrajectoryVelocity(int k)
 		k,
 		FrameNumber);
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i, now X: %f, previous X: %f, get_I: %i, get_J: %i, CurrentTranslationPoint()->get_X(): %f, PreviousTranslationPoint()->get_X(): %f", k, nowBaseMidPoint->get_X(), previousBaseMidPoint->get_X(), get_I(), get_J(), get_MyITSurface()->get_MyCurrentTranslationPoint()->get_X(), get_MyITSurface()->get_MyPreviousTranslationPoint()->get_X());
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12,
+		"k: %i, now X: %f, previous X: %f, get_I: %i, get_J: %i, CurrentTranslationPoint()->get_X(): %f, PreviousTranslationPoint()->get_X(): %f",
+		k, nowBaseMidPoint->get_X(), previousBaseMidPoint->get_X(), get_I(), get_J(), get_MyITSurface()->get_MyCurrentTranslationPoint()->get_X(),
+		get_MyITSurface()->get_MyPreviousTranslationPoint()->get_X());
 
 	// Subtract previous position from current position.
 	float deltaX = nowBaseMidPoint->get_X() - previousBaseMidPoint->get_X();
 	float deltaY = nowBaseMidPoint->get_Y() - previousBaseMidPoint->get_Y();
 	float deltaZ = nowBaseMidPoint->get_Z() - previousBaseMidPoint->get_Z();
 
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i, deltaX: %f, deltaY: %f, deltaZ: %f", k, deltaX, deltaY, deltaZ);
-
 
 	// Multiply by frames per second to get velocity in metres per seconds.
 	get_MyMidPointEarthVelocity()->set_X(deltaX*project->get_FramesPerSecond());
 	get_MyMidPointEarthVelocity()->set_Y(deltaY*project->get_FramesPerSecond());
 	get_MyMidPointEarthVelocity()->set_Z(deltaZ*project->get_FramesPerSecond());
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i, earth v: %f, %f, %f", k, get_MyMidPointEarthVelocity()->get_X(), get_MyMidPointEarthVelocity()->get_Y(), get_MyMidPointEarthVelocity()->get_Z());
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "k: %i, earth v: %f, %f, %f", k, get_MyMidPointEarthVelocity()->get_X(),
+		get_MyMidPointEarthVelocity()->get_Y(), get_MyMidPointEarthVelocity()->get_Z());
 
 	// FIXME: We need to add deflection velocities here. W->get_VZ().
-
 
 	// Delete temporary objects.
 	delete previousBaseMidPoint;
 	delete nowBaseMidPoint;
+}
 
-} // End of calculateMyTrajectoryVelocity.
-
-
-
-
-  // Accessors.
 ITSurface *ITPanel::get_MyITSurface() { return _MyITSurface; }
 void ITPanel::set_MyITSurface(ITSurface *s) { _MyITSurface = s; }
 
@@ -376,10 +341,8 @@ void ITPanel::set_TopLeftPoint(ITPoint *p) { _topLeftPoint = p; }
 ITPoint *ITPanel::get_TopRightPoint() { return _topRightPoint; }
 void ITPanel::set_TopRightPoint(ITPoint *p) { _topRightPoint = p; }
 
-
 std::vector <ITVortex*> *ITPanel::get_MyVortices() { return _MyVortices; }
 void ITPanel::set_MyVortices(std::vector <ITVortex*> *v) { _MyVortices = v; }
-
 
 ITPoint *ITPanel::get_LeadingDiagonal() { return _leadingDiagonal; }
 void ITPanel::set_LeadingDiagonal(ITPoint *p) { _leadingDiagonal = p; }

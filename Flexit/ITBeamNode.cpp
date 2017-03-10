@@ -14,23 +14,18 @@ ITBeamNode::ITBeamNode(float x, float y, float z) : ITPoint(x, y, z)
 	_q = new ITPoint(0.0, 0.0, 0.0);
 
 	_Mass = 0.0;
-
 	_MassPerUnitLength = 0.0;
-
 	_RotationAngle = 0;
 }
-
 
 ITBeamNode::~ITBeamNode(void)
 {
 	//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside destructor. ITBeamNode being destroyed.");
-
 	delete _W;
 	delete _Wnext;
 	delete _Wlast;
 	delete _q;
 }
-
 
 // Accessors
 ITPoint *ITBeamNode::get_W() { return _W; }
@@ -62,5 +57,3 @@ void ITBeamNode::set_Iz(float i) { _Iz = i; }
 
 float ITBeamNode::get_RotationAngle() { return _RotationAngle; }
 void ITBeamNode::set_RotationAngle(float r) { _RotationAngle = r; }
-
-

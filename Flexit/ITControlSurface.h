@@ -1,17 +1,11 @@
-// Forward declarations.
 class ITPanel;
 
 class ITControlSurface
 {
-
-private:
-
-
 protected:
 
 	float _DeflectionAngle;
 	std::vector <ITPanel*> *_MyITPanels;
-
 	std::vector <float> *_MyDeflectionHistory;
 
 public:
@@ -19,8 +13,6 @@ public:
 	// Constructors.
 	ITControlSurface(void);
 	~ITControlSurface(void);
-
-	// Worker methods.
 
 	// Accessors.
 	float get_DeflectionAngle();
@@ -31,5 +23,4 @@ public:
 
 	std::vector <float> *get_MyDeflectionHistory();
 	void set_MyDeflectionHistory(std::vector <float> *myDeflectionHistory);
-
 };

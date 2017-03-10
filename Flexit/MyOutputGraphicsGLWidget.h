@@ -9,7 +9,7 @@ class MyOutputGraphicsGLWidget : public QGLWidget
 
 public:
 	MyOutputGraphicsGLWidget(QWidget *parent);
-	~MyOutputGraphicsGLWidget();
+	~MyOutputGraphicsGLWidget() {};
 
 	void drawSpanForceDistributions();
 	void plot2D();
@@ -18,19 +18,12 @@ public:
 	void drawCoefficientHistories();
 	void drawMy2DAxes(char *yLabel);
 
-signals:
-
-	public slots :
-
-private:
-
 protected:
 
 	void initializeGL();
 	void setViewOrtho();
 	void paintGL();
 	void resizeGL(int width, int height);
-
 };
 
 #endif // MYOUTPUTGRAPHICSGLWIDGET_H

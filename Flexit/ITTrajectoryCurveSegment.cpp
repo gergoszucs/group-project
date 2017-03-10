@@ -1,4 +1,3 @@
-// Dom's includes.
 #include "ITTrajectoryCurveSegment.h"
 #include "ITPointTrajectory.h"
 #include "global.h"
@@ -14,9 +13,7 @@ ITTrajectoryCurveSegment::ITTrajectoryCurveSegment(void)
 
 	_ArcLengthIncrements = new std::vector <float>;
 	_ArcLengthCummulates = new std::vector <float>;
-
 }
-
 
 ITTrajectoryCurveSegment::~ITTrajectoryCurveSegment(void)
 {
@@ -64,7 +61,6 @@ ITPoint *ITTrajectoryCurveSegment::evaluatePointAtParameterValue(float s)
   // compute a parameter value for a given distance along the curve.
 void ITTrajectoryCurveSegment::calculateData()
 {
-
 	// Empty arc length vectors.
 	if (!get_ArcLengthIncrements()->empty())
 	{
@@ -74,8 +70,6 @@ void ITTrajectoryCurveSegment::calculateData()
 	{
 		get_ArcLengthCummulates()->clear();
 	}
-
-
 
 	// Loop over the interpolation points. The loop is actually executed NoOfStrides+1 times.
 	float s = 0.0f; // The parameter value runs over the interval from 0 to 1.
@@ -116,7 +110,6 @@ void ITTrajectoryCurveSegment::calculateData()
 
 float ITTrajectoryCurveSegment::calculateParameterForDistance(float D)
 {
-
 	// Loop around the segment length cummulate vector until we find an
 	// cummulated length just larger than the distance D.
 	int j;
@@ -149,10 +142,8 @@ float ITTrajectoryCurveSegment::calculateParameterForDistance(float D)
 	float s = (float)(j) / (float)(get_NoOfStrides());
 
 	return s;
+}
 
-} // End of calculateParameterForDistance.
-
-  // Accessors.
 ITPointTrajectory *ITTrajectoryCurveSegment::get_P0_p() { return _P0_p; }
 void ITTrajectoryCurveSegment::set_P0_p(ITPointTrajectory *p) { _P0_p = p; }
 

@@ -1,12 +1,7 @@
 #pragma once
-// Forward declaration.
 
 class ITGust
 {
-
-private:
-
-
 protected:
 
 	float _X0;
@@ -19,7 +14,7 @@ public:
 
 	// Constructors.
 	ITGust(float x0, float y0, float z0, float SD, float maxSpeed);
-	~ITGust(void);
+	~ITGust(void) {};
 
 	// Worker methods.
 	void computeVelocityAtPoint(float x, float y, float z, float *vx, float *vy, float *vz);
@@ -39,5 +34,4 @@ public:
 
 	float get_MaxSpeed();
 	void set_MaxSpeed(float s);
-
 };

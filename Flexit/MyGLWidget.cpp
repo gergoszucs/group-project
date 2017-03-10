@@ -1,10 +1,5 @@
 #include "MyGLWidget.h"
-
 #include <QtOpenGL>
-
-// Reference: http://www.bogotobogo.com/Qt/Qt5_OpenGL_QGLWidget.php
-
-// Dom's includes.
 #include "global.h"
 #include "ITProject.h"
 #include "ITSurface.h"
@@ -14,27 +9,17 @@
 #include "ITWakePanel.h"
 #include "ITVortex.h"
 #include "ITBeam.h"
-//#include "ITBeamElement.h"
 #include "ITBeamNode.h"
 #include "ITGust.h"
 
-MyGLWidget::MyGLWidget(QWidget *parent)
-	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
+MyGLWidget::MyGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
 	// Initialize drawing parameters.
 	xRot = 0;
 	yRot = 0;
 	zRot = 0;
-
 	//setFocusPolicy(Qt::StrongFocus);
-
 }
-
-
-MyGLWidget::~MyGLWidget(void)
-{
-}
-
 
 void MyGLWidget::initializeGL()
 {
@@ -55,9 +40,7 @@ void MyGLWidget::initializeGL()
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glEnable(GL_MULTISAMPLE);
-
 }
-
 
 void MyGLWidget::paintGL()
 {
@@ -66,7 +49,6 @@ void MyGLWidget::paintGL()
 	glTranslatef(0.0, 0.0, -10.0);
 
 	// 20160510: Ordering of these rotation has been changed to give more intuitive rotation in response to mouse movement.
-
 	if (drawRotateZVertical)
 	{
 		// Z vertical.  (Checked)
@@ -90,12 +72,8 @@ void MyGLWidget::paintGL()
 
 	}
 
-
 	draw();
-
-} // End of paintGL.
-
-
+}
 
 void MyGLWidget::resizeGL(int width, int height)
 {
@@ -124,15 +102,11 @@ void MyGLWidget::setViewOrtho(int width, int height)
 		-50000.0,
 		50000.0);
 
-
 	glMatrixMode(GL_MODELVIEW);
 }
 
-
-
 void MyGLWidget::keyPressEvent(QKeyEvent * event)
 {
-
 	if (event->key() == Qt::Key_Up)
 	{
 		glPanCentreY = glPanCentreY + 1.0;
@@ -155,8 +129,7 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
 
 	// Force redraw.
 	update();
-
-} // End of keyPressEvent.
+}
 
 void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
@@ -189,16 +162,12 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
 
 	// Redraw everything.
 	updateGL();
-
-} // End of mouseMoveEvent.
-
-
+}
 
 void MyGLWidget::mousePressEvent(QMouseEvent *event)
 {
 	lastPos = event->pos();
 }
-
 
 void MyGLWidget::setStandardXView()
 {
@@ -217,11 +186,7 @@ void MyGLWidget::setStandardXView()
 
 	// Redraw everything.
 	updateGL();
-
-} // End of setStandardXView.
-
-
-
+}
 
 void MyGLWidget::setStandardYView()
 {
@@ -240,11 +205,7 @@ void MyGLWidget::setStandardYView()
 
 	// Redraw everything.
 	updateGL();
-
-} // End of setStandardYView.
-
-
-
+}
 
 void MyGLWidget::setStandardZView()
 {
@@ -263,11 +224,7 @@ void MyGLWidget::setStandardZView()
 
 	// Redraw everything.
 	updateGL();
-
-} // End of setStandardZView.
-
-
-
+}
 
 void MyGLWidget::drawSphere(double r, int lats, int longs)
 {
@@ -285,6 +242,7 @@ void MyGLWidget::drawSphere(double r, int lats, int longs)
 		double zr1 = cos(lat1);
 
 		glBegin(GL_QUAD_STRIP);
+
 		for (j = 0; j <= longs; j++)
 		{
 			double lng = 2 * M_PI * (double)(j - 1) / longs;
@@ -296,19 +254,13 @@ void MyGLWidget::drawSphere(double r, int lats, int longs)
 			glNormal3f(x * zr1, y * zr1, z1);
 			glVertex3f(x * zr1 * r, y * zr1 * r, z1 * r);
 		}
+
 		glEnd();
 	}
-
-} // End of drawSphere.
-
-
-
-
-
+}
 
 void MyGLWidget::draw()
 {
-
 	if (IsDataLoaded)
 	{
 		if (IsReplay)
@@ -320,7 +272,7 @@ void MyGLWidget::draw()
 			if (drawControlPoints)
 			{
 				drawMyControlPointsNet();
-//				drawMyDeformedControlPointsNet();
+				// drawMyDeformedControlPointsNet();
 			}
 			if (drawInterpolatedPoints)
 			{
@@ -352,11 +304,11 @@ void MyGLWidget::draw()
 			}
 			if (drawBeamNodes)
 			{
-//				drawMyBeamNodeHistory();
+				// drawMyBeamNodeHistory();
 			}
 			if (drawVelocityField)
 			{
-//				drawMyVelocityFieldHistory();
+				// drawMyVelocityFieldHistory();
 			}
 			if (drawNormals)
 			{
@@ -370,8 +322,7 @@ void MyGLWidget::draw()
 			{
 				drawMyGust();
 			}
-
-		} // End of if IsReplay.
+		}
 		else
 		{
 			if (drawAxes)
@@ -386,13 +337,10 @@ void MyGLWidget::draw()
 			{
 				drawMyAnnotations();
 			}
-
-
-
 			if (drawControlPoints)
 			{
 				drawMyControlPointsNet();
-//				drawMyDeformedControlPointsNet();
+				// drawMyDeformedControlPointsNet();
 			}
 			if (drawInterpolatedPoints)
 			{
@@ -430,40 +378,35 @@ void MyGLWidget::draw()
 			{
 				drawMyGust();
 			}
-
-
-
-
 			if (IsModeEulerBernoulli)
 			{
 				if (drawBeamElements)
 				{
-//					drawMyBeamElements();
+					// drawMyBeamElements();
 				}
 				if (drawBeamNodes)
 				{
-//					drawMyBeamNodes();
+					// drawMyBeamNodes();
 				}
 				if (drawBeamGhostNodes)
 				{
-//					drawMyBeamGhostNodes();
+					// drawMyBeamGhostNodes();
 				}
 				if (drawBeamLoadVectors)
 				{
-//					drawMyBeamLoadVectors();
+					// drawMyBeamLoadVectors();
 				}
 				if (drawBeamGhostElements)
 				{
-//					drawMyBeamGhostElements();
-//					drawMyBeamDeflectedGhostElements();
+					// drawMyBeamGhostElements();
+					// drawMyBeamDeflectedGhostElements();
 				}
 				if (drawBeamDeflectedNodes)
 				{
-//					drawMyBeamDeflectedNodes();
-//					drawMyBeamDeflectedGhostNodes();
+					// drawMyBeamDeflectedNodes();
+					// drawMyBeamDeflectedGhostNodes();
 				}
 			}
-
 
 			if ((drawTranslateViewWithSurface) && (!drawTranslationCompleteSemaphore))
 			{
@@ -479,12 +422,9 @@ void MyGLWidget::draw()
 
 				drawTranslationCompleteSemaphore = true;
 			}
-		} // End of !IsReplay
+		}
 	}
-
-} // End of draw.
-
-
+}
 
 void MyGLWidget::drawMyAxes()
 {
@@ -513,63 +453,46 @@ void MyGLWidget::drawMyAxes()
 	renderText(30.0, 0.0, 0.0, QString("x-axis"));
 	renderText(0.0, 30.0, 0.0, QString("y-axis"));
 	renderText(0.0, 0.0, 30.0, QString("z-axis"));
-
-} // End of drawMyAxes.
-
-
-
-
+}
 
 void MyGLWidget::drawMyControlPointsNet()
 {
-
 	glColor3f(1.0f, 1.0f, 1.0f);
 
 	// Curves of constant u.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Do the plotting.
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
 
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
 			{
-
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Z());
-
 			}
 
 			glEnd();
-
 		}
 
 		// Curves of constant v.
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
 
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); j++)
 			{
-
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(j).at(i)->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(j).at(i)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(j).at(i)->get_Z());
-
 			}
 
 			glEnd();
-
 		}
-
-	} // End of k loop.
-
-
-}  // End of drawMyControlPointsNet.
-
+	}
+}
 
 void MyGLWidget::drawMyInterpolatedPointsNet()
 {
@@ -578,40 +501,38 @@ void MyGLWidget::drawMyInterpolatedPointsNet()
 	glLineWidth(0.1f);
 
 	// Draw each surface.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// First the curves of constant u
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).size(); j++)
 			{
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(i).at(j)->get_Z());
 			}
+
 			glEnd();
 		}
 		// Next the curves of constant v
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(0).size(); i++) // i counts columns.
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(0).size(); i++) // i counts columns.
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); j++) // j counts rows.
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->size(); j++) // j counts rows.
 			{
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(j).at(i)->get_Z());
 			}
+
 			glEnd();
 		}
-
-	} // End of k loop.
+	}
 
 	glLineWidth(1.0f);
-
-} // End of drawMyInterpolatedPointsNet.
-
+}
 
 void MyGLWidget::drawMyUVLMPanels()
 {
@@ -619,12 +540,11 @@ void MyGLWidget::drawMyUVLMPanels()
 	glColor3f(1.0f, 1.0f, 0.0f);
 
 	// Draw each surface.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
 				ITPanel *p = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j);
 
@@ -660,34 +580,26 @@ void MyGLWidget::drawMyUVLMPanels()
 				}
 			}
 		}
-
-	} // End of k loop.
-
-} // End of drawMyUVLMPanels.
-
-
+	}
+}
 
 void MyGLWidget::drawMyWakeVortices()
 {
-
 	// Actually do the drawing.
 	glColor3f(1.0f, 1.0f, 0.0f);
 	glLineWidth(0.1);
 
 	float xOffset = 0.0;
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyWakePanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyWakePanels()->size(); i++)
 		{
-
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).size(); j++)
 			{
-
 				ITWakePanel* currentWakePanel = project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(i).at(j);
 
-				for (int t = 0; t<currentWakePanel->get_MyVortices()->size(); t++)
+				for (int t = 0; t < currentWakePanel->get_MyVortices()->size(); t++)
 				{
-
 					glBegin(GL_LINES);
 					glVertex3f(currentWakePanel->get_MyVortices()->at(t)->get_StartPoint()->get_X() + xOffset,
 						currentWakePanel->get_MyVortices()->at(t)->get_StartPoint()->get_Y(),
@@ -696,42 +608,31 @@ void MyGLWidget::drawMyWakeVortices()
 						currentWakePanel->get_MyVortices()->at(t)->get_EndPoint()->get_Y(),
 						currentWakePanel->get_MyVortices()->at(t)->get_EndPoint()->get_Z());
 					glEnd();
+				}
+			}
+		}
+	}
 
-				} // end of t loop.
-
-			} // End of j loop.
-
-		} // End og i loop.
-
-	} // End of k loop.
-
-	glLineWidth(1.0f); // Reset the line thickness.
-
-} // End of drawMyWakeVortices
-
-
+	glLineWidth(1.0f);
+}
 
 void MyGLWidget::drawMyBoundVortices()
 {
-
 	// Actually do the drawing.
 	glColor3f(0.0f, 1.0f, 0.5f);
 	glLineWidth(0.1f);
 
 	float xOffset = 0.0;
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
-
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
-
 				ITPanel* currentPanel = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j);
 
-				for (int t = 0; t<currentPanel->get_MyVortices()->size(); t++)
+				for (int t = 0; t < currentPanel->get_MyVortices()->size(); t++)
 				{
-
 					glBegin(GL_LINES);
 					glVertex3f(currentPanel->get_MyVortices()->at(t)->get_StartPoint()->get_X() + xOffset,
 						currentPanel->get_MyVortices()->at(t)->get_StartPoint()->get_Y(),
@@ -740,23 +641,16 @@ void MyGLWidget::drawMyBoundVortices()
 						currentPanel->get_MyVortices()->at(t)->get_EndPoint()->get_Y(),
 						currentPanel->get_MyVortices()->at(t)->get_EndPoint()->get_Z());
 					glEnd();
+				}
+			}
+		}
+	}
 
-				} // end of t loop.
-
-			} // End of j loop.
-
-		} // End og i loop.
-
-	} // End of k loop.
-
-	glLineWidth(1.0f); // Reset the line thickness.
-
-} // End of drawMyBoundVortices
-
+	glLineWidth(1.0f);
+}
 
 void MyGLWidget::drawMyNormals()
 {
-
 	float factor = 1.0;
 
 	// Set the colour to yellow.
@@ -764,12 +658,11 @@ void MyGLWidget::drawMyNormals()
 	glLineWidth(0.1f);
 
 	// Draw each surface.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
 				ITPanel *p = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j);
 
@@ -783,24 +676,15 @@ void MyGLWidget::drawMyNormals()
 					p->get_MidPoint()->get_Z() + factor * p->get_Normal()->get_Z());
 
 				glEnd();
-
-
-
 			}
 		}
 	}
 
 	glLineWidth(1.0f);
-
-} // End of drawMyNormals.
-
-
-
-
+}
 
 void MyGLWidget::drowMyVelocityField()
 {
-
 	// Draw a box around the field.
 	float minx = project->get_VelocityFieldMinx();
 	float maxx = project->get_VelocityFieldMaxx();
@@ -849,15 +733,13 @@ void MyGLWidget::drowMyVelocityField()
 	float scaleFactor = project->get_VelocityFieldDisplayFactor();
 
 	// Actually draw the data.
-	for (int i = 0; i<project->get_VelocityFieldData()->size(); i++)
+	for (int i = 0; i < project->get_VelocityFieldData()->size(); i++)
 	{
-
-		for (int j = 0; j<project->get_VelocityFieldData()->at(i).size(); j++)
+		for (int j = 0; j < project->get_VelocityFieldData()->at(i).size(); j++)
 		{
 			// Draw a single vector (just the y and z components).
 
 			ITPoint *v = project->get_VelocityFieldData()->at(i).at(j);
-
 			glBegin(GL_LINES);
 
 			glVertex3f(v->get_X(), v->get_Y(), v->get_Z());
@@ -867,30 +749,23 @@ void MyGLWidget::drowMyVelocityField()
 				v->get_Z() + scaleFactor*v->get_VZ());
 
 			glEnd();
-
-		} // End of j loop.
-
-	} // End of i loop.
-
-
-	  // Now draw colour quads.
+		}
+	}
+	
+	// Now draw colour quads.
 	float sideLength = (project->get_VelocityFieldMaxy() - project->get_VelocityFieldMiny()) / project->get_VelocityFieldNy();
 	float halfSideLength = sideLength / 2.0;
 
-
-	for (int i = 0; i<project->get_VelocityFieldData()->size(); i++)
+	for (int i = 0; i < project->get_VelocityFieldData()->size(); i++)
 	{
-
-		for (int j = 0; j<project->get_VelocityFieldData()->at(i).size(); j++)
+		for (int j = 0; j < project->get_VelocityFieldData()->at(i).size(); j++)
 		{
 			// Draw a quad with colour proportional to magnitude.
-
 			ITPoint *v = project->get_VelocityFieldData()->at(i).at(j);
 
 			float upness = v->get_VZ();
 			if (fabs(upness) > 0.1)
 			{
-
 				float r = 0.0;
 				float b = 0.0;
 
@@ -915,21 +790,14 @@ void MyGLWidget::drowMyVelocityField()
 				glEnd();
 			}
 
-
-
-		} // End of j loop.
-
-	} // End of i loop.
+		}
+	}
 
 	glLineWidth(1.0f);
-
-} // End of drawMyVelocityField.
-
-
+}
 
 void MyGLWidget::drawMyGust()
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside drawMyGust");
 
 	// Set the colour to blue.
@@ -939,16 +807,14 @@ void MyGLWidget::drawMyGust()
 	// Draw a grid of gust velocities.
 	float sizeFactor = 3.0;
 
-	for (int k = -10; k<10; k++)
+	for (int k = -10; k < 10; k++)
 	{
-
-		for (int i = -10; i<10; i++)
+		for (int i = -10; i < 10; i++)
 		{
-
 			// Draw line.
 			glBegin(GL_LINE_STRIP);
 
-			for (int j = -10; j<10; j++)
+			for (int j = -10; j < 10; j++)
 			{
 				// Define the point.
 				float x = project->get_MyGust()->get_X0() + i*sizeFactor;
@@ -961,64 +827,47 @@ void MyGLWidget::drawMyGust()
 				float vz;
 
 				project->get_MyGust()->computeVelocityAtPoint(x, y, z, &vx, &vy, &vz);
+				// project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "z: %f, vz: %f", z, vz);
+				// glVertex3f(x, y, z);
 
-				//				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "z: %f, vz: %f", z, vz);
-
-
-				//				glVertex3f(x, y, z);
-
-				glVertex3f(x + vx,
-					y + vy,
-					z + vz);
-
-
+				glVertex3f(x + vx, y + vy, z + vz);
 			}
 
 			glEnd();
 		}
 	}
+
 	glLineWidth(1.0f);
-
-} // End of drawMyGust.
-
-
-
-
-
-
+}
 
 void MyGLWidget::drawMyPressureDistributionNet()
 {
-
 	// Draw each surface.
 	float factor = project->get_PressureDisplayFactor(); // The factor needs to be positive so that the pressure net is rendered on the leeward side of the surface.
 
 	glColor3f(1.0f, 0.0f, 0.0f); // Red.
 	glLineWidth(0.1f);
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		// Lines in the u direction.
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
-
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_DeltaPressure()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_DeltaPressure()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Z() + factor*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_DeltaPressure()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z());
 			}
 			glEnd();
 		}
-
-
 
 		// Lines in the v direction.
-		for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
+		for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 			{
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_DeltaPressure()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_DeltaPressure()*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
@@ -1026,19 +875,13 @@ void MyGLWidget::drawMyPressureDistributionNet()
 			}
 			glEnd();
 		}
-
 	}
 
 	glLineWidth(1.0f);
-
-} // End of drawMyPressureDistributionNet.
-
-
-
+}
 
 void MyGLWidget::drawMyVorticitiesNet()
 {
-
 	float factor = project->get_VorticityDisplayFactor();
 
 	// Set the colour.
@@ -1047,56 +890,48 @@ void MyGLWidget::drawMyVorticitiesNet()
 
 	// Draw net.
 	// Loop over surface.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
 				ITPanel *p = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j);
 
 				glVertex3f(p->get_MidPoint()->get_X() + factor * p->get_MyVorticity() * p->get_Normal()->get_X(),
 					p->get_MidPoint()->get_Y() + factor * p->get_MyVorticity() * p->get_Normal()->get_Y(),
 					p->get_MidPoint()->get_Z() + factor * p->get_MyVorticity() * p->get_Normal()->get_Z());
+			}
 
-			} // End of j loop.
 			glEnd();
+		}
 
-		} // End of i loop.
-
-		for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
+		for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 			{
 				ITPanel *p = project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j);
 
 				glVertex3f(p->get_MidPoint()->get_X() + factor * p->get_MyVorticity() * p->get_Normal()->get_X(),
 					p->get_MidPoint()->get_Y() + factor * p->get_MyVorticity() * p->get_Normal()->get_Y(),
 					p->get_MidPoint()->get_Z() + factor * p->get_MyVorticity() * p->get_Normal()->get_Z());
+			}
 
-			} // End of j loop.
 			glEnd();
-
-		} // End of i loop.
-
-
-	} // End of k loop.
+		}
+	}
 
 	glLineWidth(1.0f);
-
-} // End of drawMyVorticities.
-
+}
 
 void MyGLWidget::drawMyAnnotations()
 {
-
 	// Draw each surface number.
 	glColor3f(1.0f, 1.0f, 1.0f); // White
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		ITPoint *p = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).at(0);
 		renderText(p->get_X(), p->get_Y(), p->get_Z(), QString::number(k));
@@ -1109,37 +944,31 @@ void MyGLWidget::drawMyAnnotations()
 		{
 			glColor3f(1.0f, 1.0f, 1.0f); // White
 
-			for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 			{
-				for (int g = 0; g<project->get_MySurfaces()->at(k)->get_MyWakePanels()->size(); g++)
+				for (int g = 0; g < project->get_MySurfaces()->at(k)->get_MyWakePanels()->size(); g++)
 				{
 					ITWakePanel *p = project->get_MySurfaces()->at(k)->get_MyWakePanels()->at(g).at(0);
 					renderText(p->get_BottomLeftPoint()->get_X(), p->get_BottomLeftPoint()->get_Y(), p->get_BottomLeftPoint()->get_Z(), QString::number(g));
 				}
 			}
 		}
-	} // End of IsReplay.
-
-}// End of drawMyAnnotations.
-
-
-
+	}
+}
 
 void MyGLWidget::drawMyTracks()
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside drawMyTracks.");
 
 	glColor3f(1.0f, 0.0f, 0.0f); // Red.
 	glLineWidth(0.1f);
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		glBegin(GL_LINE_STRIP);
 
 		// Loop through the frames for the first corner control point.
-		for (int n = 0; n<FrameNumber; n++)
+		for (int n = 0; n < FrameNumber; n++)
 		{
 			ITPoint *translationPoint = new ITPoint(0.0, 0.0, 0.0);
 			ITPoint *rotationPoint = new ITPoint(0.0, 0.0, 0.0);
@@ -1162,19 +991,13 @@ void MyGLWidget::drawMyTracks()
 			delete translationPoint;
 			delete rotationPoint;
 			delete currentPoint;
-
-
 		}
 
 		glEnd();
-
-
-
-
 		glBegin(GL_LINE_STRIP);
 
 		// Loop through the frames for the second corner control point.
-		for (int n = 0; n<FrameNumber; n++)
+		for (int n = 0; n < FrameNumber; n++)
 		{
 			ITPoint *translationPoint = new ITPoint(0.0, 0.0, 0.0);
 			ITPoint *rotationPoint = new ITPoint(0.0, 0.0, 0.0);
@@ -1195,83 +1018,25 @@ void MyGLWidget::drawMyTracks()
 			delete translationPoint;
 			delete rotationPoint;
 			delete currentPoint;
-
-
 		}
 
 		glEnd();
-
-
 	}
 
 	glLineWidth(1.0f);
-
-} // End of drawMyTracks.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 void MyGLWidget::drawMyWakePanelHistory()
 {
-
 	glColor3f(1.0f, 1.0f, 0.0f);
 	glLineWidth(0.1f);
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(FrameNumber).size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(FrameNumber).size(); i++)
 		{
-
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(FrameNumber).at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(FrameNumber).at(i).size(); j++)
 			{
-
 				ITWakePanel* currentWakePanel = project->get_MySurfaces()->at(k)->get_MyWakePanelHistory()->at(FrameNumber).at(i).at(j);
 
 				glBegin(GL_LINES);
@@ -1305,57 +1070,42 @@ void MyGLWidget::drawMyWakePanelHistory()
 					currentWakePanel->get_BottomLeftPoint()->get_Z());
 
 				glEnd();
-
-
-			} // End of j loop.
-
-		} // End og i loop.
-
-	} // End of k loop.
-
-	  // Reset line width.
+			}
+		}
+	}
+	
+	// Reset line width.
 	glLineWidth(1.0f);
-
-} // End of drawMyWakePanelHistory.
-
-
-
-
-
-
-
+}
 
 void MyGLWidget::drawMyPressureHistory()
 {
-
 	glColor3f(1.0f, 0.0f, 0.0f); // Red.
 	glLineWidth(0.1f);
 
 	float factor = project->get_PressureDisplayFactor(); // The factor needs to be positive so that the pressure net is rendered on the leeward side of the surface.
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Lines in the u direction.
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
 					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Z() + factor*project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z());
 			}
+
 			glEnd();
 		}
-
-
 
 		// Lines in the v direction.
-		for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
+		for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 			{
 				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
 					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->get_MyPressureHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
@@ -1363,12 +1113,10 @@ void MyGLWidget::drawMyPressureHistory()
 			}
 			glEnd();
 		}
-
 	}
 
 	glLineWidth(1.0f);
-
-} // End of drawMyPressureHistory.
+}
 
 void MyGLWidget::drawMyVorticityHistory()
 {
@@ -1379,40 +1127,43 @@ void MyGLWidget::drawMyVorticityHistory()
 
 	float factor = project->get_VorticityDisplayFactor(); // The factor needs to be positive so that the vorticity net is rendered on the leeward side of the surface.
 
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		// Lines in the u direction.
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).size(); j++)
 			{
-				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
-					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
-					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Z() + factor*project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z());
+				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->
+					at(k)->get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
+					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->
+					get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
+					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Z() + factor*project->get_MySurfaces()->at(k)->
+					get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z());
 			}
+
 			glEnd();
 		}
-
-
 
 		// Lines in the v direction.
-		for (int j = 0; j<project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
+		for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyPanels()->at(0).size(); j++)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
+			for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyPanels()->size(); i++)
 			{
-				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
-					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
-					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Z() + factor*project->get_MySurfaces()->at(k)->get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z());
+				glVertex3f(project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_X() + factor*project->get_MySurfaces()->at(k)->
+					get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_X(),
+					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Y() + factor*project->get_MySurfaces()->at(k)->
+					get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Y(),
+					project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_MidPoint()->get_Z() + factor*project->get_MySurfaces()->at(k)->
+					get_MyVorticityHistory()->at(FrameNumber).at(i).at(j)*project->get_MySurfaces()->at(k)->get_MyPanels()->at(i).at(j)->get_Normal()->get_Z());
 			}
+
 			glEnd();
 		}
-
 	}
-} // End of drawMyVorticityHistory.
-
-
+}
 
 void MyGLWidget::drawMyBeamNodeHistory()
 {
@@ -1420,56 +1171,48 @@ void MyGLWidget::drawMyBeamNodeHistory()
 
 	glColor3f(1.0f, 1.0f, 1.0f); // White.
 
-								 // Check if there is data to plot.
-								 // Note that if IsModeEulerBernoulli was false during the simulation, then the node history data will contain unpropagated and relaxed geometry.
-
-								 // Draw spheres and text.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	// Check if there is data to plot.
+	// Note that if IsModeEulerBernoulli was false during the simulation, then the node history data will contain unpropagated and relaxed geometry.
+	// Draw spheres and text.
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
 		{
 			ITBeamNode* n = project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->at(FrameNumber).at(i);
 
 			glTranslatef(n->get_X(), n->get_Y(), n->get_Z());
 
-
 			float diameter = 40.0*n->get_Mass();
+
 			if (diameter > 0.2)
 			{
 				diameter = 0.2;
 			}
 
 			drawSphere(diameter, 15, 15);
-
 			glTranslatef(-n->get_X(), -n->get_Y(), -n->get_Z());
-
 			renderText(n->get_X(), n->get_Y(), n->get_Z(), QString::number(i));
 		}
-
 	}
 
 	// Draw relaxed elements.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Loop around the nodes.
 		glBegin(GL_LINE_STRIP);
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
 		{
 			ITBeamNode* n = project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->at(FrameNumber).at(i);
-
 			glVertex3f(n->get_X(), n->get_Y(), n->get_Z());
-
 		}
-		glEnd();
 
+		glEnd();
 	}
 
 	// Draw deformed nodes.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
 		{
 			ITBeamNode* n = project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->at(FrameNumber).at(i);
 
@@ -1482,48 +1225,32 @@ void MyGLWidget::drawMyBeamNodeHistory()
 			}
 
 			drawSphere(diameter, 15, 15);
-
 			glTranslatef(-n->get_W()->get_X(), -n->get_W()->get_Y(), -n->get_W()->get_Z());
-
 		}
-
 	}
 
 	// Draw deformed elements.
-	for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Loop around the nodes.
 		glBegin(GL_LINE_STRIP);
-		for (int i = 0; i<project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyBeamNodes()->size(); i++)
 		{
 			ITBeamNode* n = project->get_MySurfaces()->at(k)->get_MyBeam()->get_MyNodeHistory()->at(FrameNumber).at(i);
 
 			glVertex3f(n->get_X() + n->get_W()->get_X(),
 				n->get_Y() + n->get_W()->get_Y(),
 				n->get_Z() + n->get_W()->get_Z());
-
 		}
+
 		glEnd();
-
 	}
-
-
-} // End of drawMyBeamNodeHistory.
-
-
-
+}
 
 void MyGLWidget::drawMyVelocityFieldHistory()
 {
-
-
-
 	if (project->get_IsDoVelocityField())
 	{
-
-
-
 		// Draw a box around the field.
 		float minx = project->get_VelocityFieldMinx();
 		float maxx = project->get_VelocityFieldMaxx();
@@ -1568,21 +1295,16 @@ void MyGLWidget::drawMyVelocityFieldHistory()
 		glVertex3f(minx, maxy, minz);
 		glEnd();
 
-
 		float factor = project->get_VelocityFieldDisplayFactor();
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside drawMyVelocityFieldHistory i: %i", project->get_VelocityFieldDataHistory()->at(FrameNumber).size());
-
 		glColor3f(1.0f, 1.0f, 1.0f);
 
-		for (int i = 0; i<project->get_VelocityFieldDataHistory()->at(FrameNumber).size(); i++)
+		for (int i = 0; i < project->get_VelocityFieldDataHistory()->at(FrameNumber).size(); i++)
 		{
-
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside drawMyVelocityFieldHistory i: %i,   j: %i", i, project->get_VelocityFieldDataHistory()->at(FrameNumber).at(i).size());
 
-			for (int j = 0; j<project->get_VelocityFieldDataHistory()->at(FrameNumber).at(i).size(); j++)
+			for (int j = 0; j < project->get_VelocityFieldDataHistory()->at(FrameNumber).at(i).size(); j++)
 			{
-
 				ITPoint *v = project->get_VelocityFieldDataHistory()->at(FrameNumber).at(i).at(j);
 
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside drawMyVelocityFieldHistory   x: %f, y: %f, z:%f, ... vy: %f, vz: %f", v->get_X(), v->get_Y(), v->get_Z(), v->get_VY(), v->get_VZ());
@@ -1593,34 +1315,26 @@ void MyGLWidget::drawMyVelocityFieldHistory()
 					v->get_Y() + factor * v->get_VY(),
 					v->get_Z() + factor * v->get_VZ());
 				glEnd();
-
 			}
 		}
-
 
 		// Now draw colour quads.
 		float sideLength = (project->get_VelocityFieldMaxy() - project->get_VelocityFieldMiny()) / project->get_VelocityFieldNy();
 		float halfSideLength = sideLength / 2.0;
 
-		for (int i = 0; i<project->get_VelocityFieldDataHistory()->at(FrameNumber).size(); i++)
+		for (int i = 0; i < project->get_VelocityFieldDataHistory()->at(FrameNumber).size(); i++)
 		{
-
-			for (int j = 0; j<project->get_VelocityFieldDataHistory()->at(FrameNumber).at(i).size(); j++)
+			for (int j = 0; j < project->get_VelocityFieldDataHistory()->at(FrameNumber).at(i).size(); j++)
 			{
 				// Draw a quad with colour proportional to magnitude.
-
 				ITPoint *v = project->get_VelocityFieldDataHistory()->at(FrameNumber).at(i).at(j);
-
-
 
 				float upness = v->get_VZ();
 
-				//				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "upness: %f", upness);
-
+				//project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "upness: %f", upness);
 
 				if (fabs(upness) > 0.1)
 				{
-
 					float r = 0.0;
 					float b = 0.0;
 
@@ -1644,23 +1358,7 @@ void MyGLWidget::drawMyVelocityFieldHistory()
 					glVertex3f(v->get_X(), v->get_Y() - halfSideLength, v->get_Z() + halfSideLength);
 					glEnd();
 				}
-
-			} // End of j loop.
-
-		} // End of i loop.
-
-
-
-
-
-
-
-
-
-	} // End of get_IsDoVelocityField().
-
-} // End of drawMyVelocityFieldHistory.
-
-
-
-
+			}
+		}
+	} 
+}

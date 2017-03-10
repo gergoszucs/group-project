@@ -8,15 +8,11 @@ class MyGLWidget : public QGLWidget
 
 public:
 	explicit MyGLWidget(QWidget *parent = 0);
-	~MyGLWidget(void);
+	~MyGLWidget(void) {};
 
 	void setStandardXView();
 	void setStandardYView();
 	void setStandardZView();
-
-signals:
-
-	public slots :
 
 protected:
 

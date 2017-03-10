@@ -6,11 +6,10 @@ using namespace rapidjson;
 
 class ITIO
 {
-
 public:
 
-	ITIO(void);
-	~ITIO(void);
+	ITIO(void) {};
+	~ITIO(void) {};
 
 	static void readJSONInputFile(char *filename); // Class method.
 	static void readMyITProjectFromJSONObject(Document& d, char * filenameWithPath); // Class method.
@@ -46,5 +45,4 @@ private:
 	static void writeMyControlPointDeflectionHistoryToFile(char *fileNameWithPath);
 
 	static bool doesFileExist(const char *filename);
-
 };

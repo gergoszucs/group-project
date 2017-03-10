@@ -1,4 +1,3 @@
-// Dom's includes.
 #include "global.h"
 #include "ITWakePanel.h"
 #include "ITPoint.h"
@@ -13,13 +12,5 @@ ITWakePanel::ITWakePanel(ITPoint* bottomLeft, ITPoint* bottomRight, ITPoint* top
 	// If typeOfPanel is 0 then we are dealing with a bound panel and 1 when dealing with a wake panel.
 }
 
-ITWakePanel::~ITWakePanel(void)
-{
-
-
-}
-
-
-// Accessors.
 int ITWakePanel::get_F() { return _f; }
 void ITWakePanel::set_F(int f) { _f = f; }

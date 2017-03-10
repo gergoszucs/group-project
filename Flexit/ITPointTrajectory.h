@@ -1,6 +1,6 @@
 #pragma once
-#include "ITPoint.h"
 
+#include "ITPoint.h"
 #include "rapidjson/document.h" // https://github.com/miloyip/rapidjson
 
 class ITPointTrajectory : public ITPoint
@@ -23,6 +23,4 @@ public:
 	// Accessors
 	int get_KeyFrame();
 	void set_KeyFrame(int i);
-
 };
-

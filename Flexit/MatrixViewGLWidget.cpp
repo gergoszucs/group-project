@@ -1,22 +1,12 @@
 #include <QtWidgets>
 #include <QtOpenGL>
-
-// Dom's includes.
 #include "MatrixViewGLWidget.h"
 #include "global.h"
 #include "ITProject.h"
 
-
 MatrixViewGLWidget::MatrixViewGLWidget(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
-{
+{}
 
-
-}
-
-
-MatrixViewGLWidget::~MatrixViewGLWidget(void)
-{
-}
 
 void MatrixViewGLWidget::freeDisplayMatrix()
 {
@@ -24,7 +14,6 @@ void MatrixViewGLWidget::freeDisplayMatrix()
 	if (displayMatrix) free(displayMatrix);
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside freeDisplayMatrix. displayMatrix has been freed.");
-
 }
 
 void MatrixViewGLWidget::initializeGL()
@@ -37,7 +26,6 @@ void MatrixViewGLWidget::initializeGL()
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
 }
-
 
 void MatrixViewGLWidget::paintGL()
 {
@@ -64,7 +52,6 @@ void MatrixViewGLWidget::resizeGL(int width, int height)
 
 void MatrixViewGLWidget::draw()
 {
-
 	drawMyAxes();
 
 	if (IsDataLoaded)
@@ -90,10 +77,8 @@ void MatrixViewGLWidget::draw()
 		glDisable(GL_TEXTURE_2D);
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Texture has been drawn");
-
 	}
 }
-
 
 void MatrixViewGLWidget::drawMyAxes()
 {
@@ -117,7 +102,6 @@ void MatrixViewGLWidget::drawMyAxes()
 	glVertex3f(0.0f, 0.0f, 0.0f);
 	glVertex3f(0.0f, 0.0f, 30.0f);
 	glEnd();
-
 }
 
 void MatrixViewGLWidget::updateMyDisplay()
@@ -125,18 +109,16 @@ void MatrixViewGLWidget::updateMyDisplay()
 	update();
 }
 
-
 void MatrixViewGLWidget::updateDisplayMatrix()
 {
-
 	// Find the maximum value.
 	int noOfPanels = project->get_A()->size();
 
 	float maxA = 0.0;
 
-	for (int i = 0; i<noOfPanels; i++)
+	for (int i = 0; i < noOfPanels; i++)
 	{
-		for (int j = 0; j<noOfPanels; j++)
+		for (int j = 0; j < noOfPanels; j++)
 		{
 			if (project->get_A()->at(i).at(j) > maxA)
 			{
@@ -145,11 +127,9 @@ void MatrixViewGLWidget::updateDisplayMatrix()
 		}
 	}
 
-
-
-	for (int i = 0; i<noOfPanels; i++)
+	for (int i = 0; i < noOfPanels; i++)
 	{
-		for (int j = 0; j<noOfPanels; j++)
+		for (int j = 0; j < noOfPanels; j++)
 		{
 			float currentA = fabs(project->get_A()->at(i).at(j));
 			float currentValue = 255 * currentA / maxA;
@@ -173,22 +153,15 @@ void MatrixViewGLWidget::updateDisplayMatrix()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 	//           target        level  intFormat                             border  format    type               pixels.
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, noOfPanels, noOfPanels, 0, GL_RGBA, GL_UNSIGNED_BYTE, displayMatrix);
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Texture has been bound.");
-
 
 	// Replace the texture with the data from the latest display matrix and redisplay.
 	glBindTexture(GL_TEXTURE_2D, texName);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, noOfPanels, noOfPanels, GL_RGBA, GL_UNSIGNED_BYTE, displayMatrix);
-
-	// Display the texture.
-//	update();
-
-
 }
-
 
 void MatrixViewGLWidget::populateDisplayMatrix(int noOfPanels)
 {
@@ -196,13 +169,11 @@ void MatrixViewGLWidget::populateDisplayMatrix(int noOfPanels)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside populateDisplayMatrix");
 
 	// Allocate memory for displayMatrix.
-
-
 	displayMatrix = (GLubyte*)malloc(noOfPanels * noOfPanels * 4 * sizeof(GLubyte));
 
-	for (int i = 0; i<noOfPanels; i++)
+	for (int i = 0; i < noOfPanels; i++)
 	{
-		for (int j = 0; j<noOfPanels; j++)
+		for (int j = 0; j < noOfPanels; j++)
 		{
 			int c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
 
