@@ -1,15 +1,11 @@
 #include "moveit.h"
 #include <QtWidgets/QApplication>
-
-// Dom's includes
 #include "global.h"
 
 // My app was not linking to cudart.lib. Adding cudart.lib to 
 // Properties > Configuration Properties > Linker > Input > Additional Dependencies
 // solves the problem. See
 // https://devtalk.nvidia.com/default/topic/415244/error-lnk2019-unresolved-external-symbol/
-
-
 // vs2012 Qt solution created using:
 // https://codeyarns.com/2013/12/13/how-to-create-qt-applications-using-visual-studio/
 // Add to SVN:
@@ -85,7 +81,6 @@ bool drawNormals = true;
 
 int main(int argc, char *argv[])
 {
-
 	// Instanciate an ITproject object.
 	project = new ITProject();
 	project->set_DebugLevel(5);
@@ -104,7 +99,6 @@ int main(int argc, char *argv[])
 
 	if (MY_RUN_MODE == MYGUI)
 	{
-
 		MY_EDIT_MODE = NONE;
 		MY_WIDGET_CONTROL = NO;
 
@@ -116,9 +110,8 @@ int main(int argc, char *argv[])
 		w->statusBar()->showMessage(QObject::tr("Ready"));
 
 		// Set the main window icon.
-		QIcon icon("myappicon.ico"); 
+		QIcon icon("myappicon.ico");
 		w->setWindowIcon(icon);
-
 
 		w->show();
 		return a.exec();

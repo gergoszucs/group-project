@@ -1,15 +1,9 @@
-// System includes.
 #include <fstream> // std::ifstream
-
-
-
 #include "rapidjson/document.h" // will include "rapidjson/rapidjson.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/filereadstream.h"
-
-// Dom's includes.
 #include "ITIO.h"
 #include "global.h"
 #include "ITProject.h"
@@ -21,20 +15,8 @@
 
 using namespace rapidjson;
 
-ITIO::ITIO(void)
-{
-}
-
-
-ITIO::~ITIO(void)
-{
-}
-
-
-
 void ITIO::readJSONInputFile(char *filenameWithPath)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Start");
 
 	FILE* fp = fopen(filenameWithPath, "r"); // non-Windows use "r"
@@ -49,7 +31,6 @@ void ITIO::readJSONInputFile(char *filenameWithPath)
 	if (!ok)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "RapidJSON Parse error = %s", d.GetParseError());
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Error(offset %u)", (unsigned)d.GetErrorOffset());
 	}
 
@@ -62,118 +43,108 @@ void ITIO::readJSONInputFile(char *filenameWithPath)
 	// Now go through and read the control points.
 	readMyITPointsFromFile(d, filenameWithPath);
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface data read successfully.");
-
-} // End of readJSONInputFile.
-
-
+}
 
 void ITIO::readMyITProjectFromJSONObject(Document& d, char * filenameWithPath)
 {
-
 	assert(d.IsObject());
 	assert(d.HasMember("ITProject Data"));
-
 
 	// Read ITProject data.
 	const Value& p = d["ITProject Data"]["General Data"];
 
-	project->set_ProgramName( p["ProgramName"].GetString() );
+	project->set_ProgramName(p["ProgramName"].GetString());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ProgramName = %s", project->get_ProgramName().c_str());
 
-	project->set_ProgramNameWithPath( p["ProgramNameWithPath"].GetString() );
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__,2, "ProgramNameWithPath = %s", project->get_ProgramNameWithPath().c_str());
+	project->set_ProgramNameWithPath(p["ProgramNameWithPath"].GetString());
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ProgramNameWithPath = %s", project->get_ProgramNameWithPath().c_str());
 
-	project->set_FileName( p["FileName"].GetString() );
+	project->set_FileName(p["FileName"].GetString());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "FileName = %s", project->get_FileName().c_str());
 
-	project->set_FileNameWithPath( p["FileNameWithPath"].GetString() );
+	project->set_FileNameWithPath(p["FileNameWithPath"].GetString());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "FileNameWithPath = %s", project->get_FileNameWithPath().c_str());
-
 
 	// Read FlowitCudaUnsteady data.
 	const Value& pp = d["ITProject Data"]["FlowitCudaUnsteady Data"];
 
-	project->set_MaxPropagationGeneration( pp["MaxPropagationGeneration"].GetInt() );
+	project->set_MaxPropagationGeneration(pp["MaxPropagationGeneration"].GetInt());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "MaxPropagationGeneration = %i", project->get_MaxPropagationGeneration());
 
-	project->set_IsConstantSpeedTrajectories( pp["IsConstantSpeedTrajectories"].GetInt() );
+	project->set_IsConstantSpeedTrajectories(pp["IsConstantSpeedTrajectories"].GetInt());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsConstantSpeedTrajectories = %i", project->get_IsConstantSpeedTrajectories());
 
-	project->set_FlowitPressureEps( d["ITProject Data"]["FlowitCudaUnsteady Data"]["FlowitPressureEps"].GetDouble() );
+	project->set_FlowitPressureEps(d["ITProject Data"]["FlowitCudaUnsteady Data"]["FlowitPressureEps"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "FlowitPressureEps = %f", project->get_FlowitPressureEps());
 
-	project->set_IsDoVelocityField(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsDoVelocityField"].GetInt() );
+	project->set_IsDoVelocityField(d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsDoVelocityField"].GetInt());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsDoVelocityField = %i", project->get_IsDoVelocityField());
 
-	project->set_RankineAlgorithm(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["RankineAlgorithm"].GetString() );
+	project->set_RankineAlgorithm(d["ITProject Data"]["FlowitCudaUnsteady Data"]["RankineAlgorithm"].GetString());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "RankineAlgorithm = %s", project->get_RankineAlgorithm().c_str());
 
-	project->set_RankineCoreRadius(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["RankineCoreRadius"].GetDouble() );
+	project->set_RankineCoreRadius(d["ITProject Data"]["FlowitCudaUnsteady Data"]["RankineCoreRadius"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "RankineCoreRadius = %f", project->get_RankineCoreRadius());
 
 	// Velocity Field parameters.
-	project->set_VelocityFieldConstantPlane(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldConstantPlane"].GetString() );
+	project->set_VelocityFieldConstantPlane(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldConstantPlane"].GetString());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldConstantPlane = %s", project->get_VelocityFieldConstantPlane().c_str());
 
-	project->set_VelocityFieldNx(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldNx"].GetInt() );
+	project->set_VelocityFieldNx(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldNx"].GetInt());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldNx = %i", project->get_VelocityFieldNx());
 
-	project->set_VelocityFieldNy(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldNy"].GetInt() );
+	project->set_VelocityFieldNy(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldNy"].GetInt());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldNy = %i", project->get_VelocityFieldNy());
 
-	project->set_VelocityFieldNz(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldNz"].GetInt() );
+	project->set_VelocityFieldNz(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldNz"].GetInt());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldNz = %i", project->get_VelocityFieldNz());
 
-	project->set_VelocityFieldMinx(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMinx"].GetDouble() );
+	project->set_VelocityFieldMinx(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMinx"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldMinx = %f", project->get_VelocityFieldMinx());
 
-	project->set_VelocityFieldMiny(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMiny"].GetDouble() );
+	project->set_VelocityFieldMiny(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMiny"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldMiny = %f", project->get_VelocityFieldMiny());
 
-	project->set_VelocityFieldMinz(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMinz"].GetDouble() );
+	project->set_VelocityFieldMinz(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMinz"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldMinz = %f", project->get_VelocityFieldMinz());
 
-	project->set_VelocityFieldMaxx(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMaxx"].GetDouble() );
+	project->set_VelocityFieldMaxx(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMaxx"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldMaxx = %f", project->get_VelocityFieldMaxx());
 
-	project->set_VelocityFieldMaxy(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMaxy"].GetDouble() );
+	project->set_VelocityFieldMaxy(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMaxy"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldMaxy = %f", project->get_VelocityFieldMaxy());
 
-	project->set_VelocityFieldMaxz(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMaxz"].GetDouble() );
+	project->set_VelocityFieldMaxz(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldMaxz"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldMaxz = %f", project->get_VelocityFieldMaxz());
 
-
 	// Physical constants.
-	project->set_Rho(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["Rho"].GetDouble() );
+	project->set_Rho(d["ITProject Data"]["FlowitCudaUnsteady Data"]["Rho"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Rho = %f", project->get_Rho());
 
-	project->set_FramesPerSecond(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["FramesPerSecond"].GetDouble() );
+	project->set_FramesPerSecond(d["ITProject Data"]["FlowitCudaUnsteady Data"]["FramesPerSecond"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "FramesPerSecond = %f", project->get_FramesPerSecond());
 
-
-
-
 	// Pressure Display Factors.
-	project->set_PressureDisplayFactor(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["PressureDisplayFactor"].GetDouble() );
+	project->set_PressureDisplayFactor(d["ITProject Data"]["FlowitCudaUnsteady Data"]["PressureDisplayFactor"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "PressureDisplayFactor = %f", project->get_PressureDisplayFactor());
 
 	// Vorticity Display Factors.
-	project->set_VorticityDisplayFactor(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VorticityDisplayFactor"].GetDouble() );
+	project->set_VorticityDisplayFactor(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VorticityDisplayFactor"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VorticityDisplayFactor = %f", project->get_VorticityDisplayFactor());
 
 	// Velocity Field Display Factor.
-	project->set_VelocityFieldDisplayFactor(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldDisplayFactor"].GetDouble() );
+	project->set_VelocityFieldDisplayFactor(d["ITProject Data"]["FlowitCudaUnsteady Data"]["VelocityFieldDisplayFactor"].GetDouble());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "VelocityFieldDisplayFactor = %f", project->get_VelocityFieldDisplayFactor());
 
 	// Surface Hierarchy.
-	project->set_IsSurfaceHierarchy(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsSurfaceHierarchy"].GetInt() );
+	project->set_IsSurfaceHierarchy(d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsSurfaceHierarchy"].GetInt());
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsSurfaceHierarchy = %i", project->get_IsSurfaceHierarchy());
 
 	// IsGust
 	// Because of the HasMember call, this parameter is optional, and need not be present in the json file.
 	if (d["ITProject Data"]["FlowitCudaUnsteady Data"].HasMember("IsGust"))
 	{
-		project->set_IsGust(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsGust"].GetInt() );
+		project->set_IsGust(d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsGust"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsGust = %i", project->get_IsGust());
 	}
 	else
@@ -185,7 +156,7 @@ void ITIO::readMyITProjectFromJSONObject(Document& d, char * filenameWithPath)
 	// Because of the HasMember call, this parameter is optional, and need not be present in the json file.
 	if (d["ITProject Data"]["FlowitCudaUnsteady Data"].HasMember("ReplayDeltaTMSecs"))
 	{
-		project->set_ReplayDeltaTMSecs(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["ReplayDeltaTMSecs"].GetDouble() );
+		project->set_ReplayDeltaTMSecs(d["ITProject Data"]["FlowitCudaUnsteady Data"]["ReplayDeltaTMSecs"].GetDouble());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ReplayDeltaTMSecs = %i", project->get_ReplayDeltaTMSecs());
 	}
 	else
@@ -197,87 +168,79 @@ void ITIO::readMyITProjectFromJSONObject(Document& d, char * filenameWithPath)
 	// Because of the HasMember call, this parameter is optional, and need not be present in the json file.
 	if (d["ITProject Data"]["FlowitCudaUnsteady Data"].HasMember("IsActiveControlSurfaces"))
 	{
-		project->set_IsActiveControlSurfaces(  d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsActiveControlSurfaces"].GetInt() );
+		project->set_IsActiveControlSurfaces(d["ITProject Data"]["FlowitCudaUnsteady Data"]["IsActiveControlSurfaces"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsActiveControlSurfaces = %i", project->get_IsActiveControlSurfaces());
 	}
 	else
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "========================================================= IsActiveControlSurfaces NOT FOUND");
 	}
-
-
 } // End of readMyITProjectFromJSONObject.
-
-
-
 
 void ITIO::readMyITPointsFromFile(Document& d, char * filenameWithPath)
 {
-
 	assert(d.IsObject());
 	assert(d.HasMember("ITSurfaces"));
 
 	// Loop through the surfaces and instanciate ITSurface objects.
-	for (int k = 0 ; k < d["ITSurfaces"].Size() ; k++) 
-	{		
+	for (int k = 0; k < d["ITSurfaces"].Size(); k++)
+	{
 		// Create a new surface object.
-		ITSurface *s = new ITSurface(); 		
-		ITSurface *bs = new ITSurface(); 		
+		ITSurface *s = new ITSurface();
+		ITSurface *bs = new ITSurface();
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ITSurface %i created successfully.", k);
 
-		s->set_NoOfInterpolatedPointsU( d["ITSurfaces"][k]["Properties"]["Number of rows of interpolated points"].GetInt() );
-		bs->set_NoOfInterpolatedPointsU( d["ITSurfaces"][k]["Properties"]["Number of rows of interpolated points"].GetInt() );
+		s->set_NoOfInterpolatedPointsU(d["ITSurfaces"][k]["Properties"]["Number of rows of interpolated points"].GetInt());
+		bs->set_NoOfInterpolatedPointsU(d["ITSurfaces"][k]["Properties"]["Number of rows of interpolated points"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "NoOfInterpolatedPointsU = %i", s->get_NoOfInterpolatedPointsU());
 
-		s->set_NoOfInterpolatedPointsV( d["ITSurfaces"][k]["Properties"]["Number of cols of interpolated points"].GetInt() );
-		bs->set_NoOfInterpolatedPointsV( d["ITSurfaces"][k]["Properties"]["Number of cols of interpolated points"].GetInt() );
+		s->set_NoOfInterpolatedPointsV(d["ITSurfaces"][k]["Properties"]["Number of cols of interpolated points"].GetInt());
+		bs->set_NoOfInterpolatedPointsV(d["ITSurfaces"][k]["Properties"]["Number of cols of interpolated points"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "NoOfInterpolatedPointsV = %i", s->get_NoOfInterpolatedPointsV());
 
 		// Read morphing variables.
-		s->set_IsMorph( d["ITSurfaces"][k]["Properties"]["IsMorph"].GetInt() );
-		bs->set_IsMorph( d["ITSurfaces"][k]["Properties"]["IsMorph"].GetInt() );
+		s->set_IsMorph(d["ITSurfaces"][k]["Properties"]["IsMorph"].GetInt());
+		bs->set_IsMorph(d["ITSurfaces"][k]["Properties"]["IsMorph"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsMorph = %i", s->get_IsMorph());
 
-		s->set_MorphStartFrame( d["ITSurfaces"][k]["Properties"]["MorphStartFrame"].GetInt() );
-		bs->set_MorphStartFrame( d["ITSurfaces"][k]["Properties"]["MorphStartFrame"].GetInt() );
+		s->set_MorphStartFrame(d["ITSurfaces"][k]["Properties"]["MorphStartFrame"].GetInt());
+		bs->set_MorphStartFrame(d["ITSurfaces"][k]["Properties"]["MorphStartFrame"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "MorphStartFrame = %i", s->get_MorphStartFrame());
 
-		s->set_MorphEndFrame( d["ITSurfaces"][k]["Properties"]["MorphEndFrame"].GetInt() );
-		bs->set_MorphEndFrame( d["ITSurfaces"][k]["Properties"]["MorphEndFrame"].GetInt() );
+		s->set_MorphEndFrame(d["ITSurfaces"][k]["Properties"]["MorphEndFrame"].GetInt());
+		bs->set_MorphEndFrame(d["ITSurfaces"][k]["Properties"]["MorphEndFrame"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "MorphEndFrame = %i", s->get_MorphEndFrame());
 
-		s->set_MorphType(d["ITSurfaces"][k]["Properties"]["MorphType"].GetString() );
-		bs->set_MorphType(d["ITSurfaces"][k]["Properties"]["MorphType"].GetString() );
+		s->set_MorphType(d["ITSurfaces"][k]["Properties"]["MorphType"].GetString());
+		bs->set_MorphType(d["ITSurfaces"][k]["Properties"]["MorphType"].GetString());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "MorphType = %s", s->get_MorphType().c_str());
 
-
 		// Decide whether or not this surface sheds a wake.
-		s->set_IsWake( d["ITSurfaces"][k]["Properties"]["IsWake"].GetInt() );
-		bs->set_IsWake( d["ITSurfaces"][k]["Properties"]["IsWake"].GetInt() );
+		s->set_IsWake(d["ITSurfaces"][k]["Properties"]["IsWake"].GetInt());
+		bs->set_IsWake(d["ITSurfaces"][k]["Properties"]["IsWake"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsWake = %i", s->get_IsWake());
 
 		// Decide whether or not this surface should have offset panels.
-		s->set_IsPistolesiPanelOffset( d["ITSurfaces"][k]["Properties"]["IsPistolesiPanelOffset"].GetInt() );
-		bs->set_IsPistolesiPanelOffset( d["ITSurfaces"][k]["Properties"]["IsPistolesiPanelOffset"].GetInt() );
+		s->set_IsPistolesiPanelOffset(d["ITSurfaces"][k]["Properties"]["IsPistolesiPanelOffset"].GetInt());
+		bs->set_IsPistolesiPanelOffset(d["ITSurfaces"][k]["Properties"]["IsPistolesiPanelOffset"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "IsPistolesiPanelOffset = %i", s->get_IsPistolesiPanelOffset());
 
 		// Define the offset fraction.
-		s->set_PistolesiPanelOffsetFraction( d["ITSurfaces"][k]["Properties"]["PistolesiPanelOffsetFraction"].GetDouble() );
-		bs->set_PistolesiPanelOffsetFraction( d["ITSurfaces"][k]["Properties"]["PistolesiPanelOffsetFraction"].GetDouble() );
+		s->set_PistolesiPanelOffsetFraction(d["ITSurfaces"][k]["Properties"]["PistolesiPanelOffsetFraction"].GetDouble());
+		bs->set_PistolesiPanelOffsetFraction(d["ITSurfaces"][k]["Properties"]["PistolesiPanelOffsetFraction"].GetDouble());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "PistolesiPanelOffsetFraction = %f", s->get_PistolesiPanelOffsetFraction());
 
-		
 		// Save the surface parent index (used when project IsSurfaceHierarchy is true).
-		s->set_ParentSurfaceIndex( d["ITSurfaces"][k]["Properties"]["ParentSurfaceIndex"].GetInt() );
-		bs->set_ParentSurfaceIndex( d["ITSurfaces"][k]["Properties"]["ParentSurfaceIndex"].GetInt() );
+		s->set_ParentSurfaceIndex(d["ITSurfaces"][k]["Properties"]["ParentSurfaceIndex"].GetInt());
+		bs->set_ParentSurfaceIndex(d["ITSurfaces"][k]["Properties"]["ParentSurfaceIndex"].GetInt());
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ParentSurfaceIndexWake = %i", s->get_ParentSurfaceIndex());
 
 		// Fuselage radius.
 		// Because of the HasMember call, this parameter is optional, and need not be present in the json file.
 		if (d["ITSurfaces"][k]["Properties"].HasMember("FuselageRadius"))
 		{
-			s->set_FuselageRadius(  d["ITSurfaces"][k]["Properties"]["FuselageRadius"].GetDouble() );
-			bs->set_FuselageRadius(  d["ITSurfaces"][k]["Properties"]["FuselageRadius"].GetDouble() );
+			s->set_FuselageRadius(d["ITSurfaces"][k]["Properties"]["FuselageRadius"].GetDouble());
+			bs->set_FuselageRadius(d["ITSurfaces"][k]["Properties"]["FuselageRadius"].GetDouble());
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "FuselageRadius = %f", s->get_FuselageRadius());
 		}
 		else
@@ -285,15 +248,11 @@ void ITIO::readMyITPointsFromFile(Document& d, char * filenameWithPath)
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "========================================================= FuselageRadius NOT FOUND");
 		}
 
-
-
-
 		// Push the surface into the vector.
 		project->get_MySurfaces()->push_back(s);
 
 		// Push the surface into the vector.
 		project->get_MyBaseSurfaces()->push_back(bs);
-
 
 		// Read the control points from the JSON document and initialise the control points for MySurfaces and MyBaseSurfaces.
 		createControlPointsFromJSONObject(d, filenameWithPath, k);
@@ -302,15 +261,11 @@ void ITIO::readMyITPointsFromFile(Document& d, char * filenameWithPath)
 
 		// Create the new trajectory curves from the JSON data (20160408).
 		createTrajectoryCurvesFromJSON(d, k);
-
-	} // End of loop over surfaces.
-
-} // End of readMyITPointsFromFile.
-
+	}
+}
 
 void ITIO::createControlPointsFromJSONObject(Document& d, char * filenameWithPath, int k)
-{		
-
+{
 	//Find the number of rows and columns of control points in the k-th surface.
 	int noOfRows = d["ITSurfaces"][k]["Properties"]["Number of rows of control points"].GetInt();
 	int noOfCols = d["ITSurfaces"][k]["Properties"]["Number of cols of control points"].GetInt();
@@ -322,24 +277,23 @@ void ITIO::createControlPointsFromJSONObject(Document& d, char * filenameWithPat
 	int noOfIntRows = d["ITSurfaces"][k]["Properties"]["Number of rows of interpolated points"].GetInt();
 	int noOfIntCols = d["ITSurfaces"][k]["Properties"]["Number of cols of interpolated points"].GetInt();
 
-	project->get_MySurfaces()->at(k)->set_NoOfInterpolatedPointsU( noOfIntRows );
-	project->get_MySurfaces()->at(k)->set_NoOfInterpolatedPointsV( noOfIntCols );
+	project->get_MySurfaces()->at(k)->set_NoOfInterpolatedPointsU(noOfIntRows);
+	project->get_MySurfaces()->at(k)->set_NoOfInterpolatedPointsV(noOfIntCols);
 
 	int counter = 0;
-	for (int i=0; i<noOfRows; i++)
+	for (int i = 0; i < noOfRows; i++)
 	{
 		std::vector <ITControlPoint *> v_dummy;
 		std::vector <ITControlPoint *> v_base_dummy;
 
-		for (int j=0; j<noOfCols; j++)
+		for (int j = 0; j < noOfCols; j++)
 		{
-
 			float x = d["ITSurfaces"][k]["Control Points"][counter]["Properties"]["x"].GetDouble();
 			float y = d["ITSurfaces"][k]["Control Points"][counter]["Properties"]["y"].GetDouble();
 			float z = d["ITSurfaces"][k]["Control Points"][counter]["Properties"]["z"].GetDouble();
 
-			ITControlPoint* p = new ITControlPoint(x,y,z);
-			ITControlPoint* pbase = new ITControlPoint(x,y,z);
+			ITControlPoint* p = new ITControlPoint(x, y, z);
+			ITControlPoint* pbase = new ITControlPoint(x, y, z);
 
 			p->set_K(k);
 			p->set_I(i);
@@ -353,26 +307,20 @@ void ITIO::createControlPointsFromJSONObject(Document& d, char * filenameWithPat
 			v_base_dummy.push_back(pbase);
 
 			counter++;
-
-		} // End of loop over columns of control points.
+		}
 
 		project->get_MySurfaces()->at(k)->get_MyControlPoints()->push_back(v_dummy);
 		project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->push_back(v_base_dummy);
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "No of rows in vector of vectors of control points = %i", project->get_MySurfaces()->at(k)->get_MyControlPoints()->size());
-
-
-	} // End of loop over rows of control points
-
-} // End of createControlPointsFromJSONObject.
-
+	}
+}
 
 void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Reading from createTrajectoryCurvesFromJSON");
 
 	// Do translations.
-
 	const Value& translationCurveControlPoints = d["ITSurfaces"][k]["Trajectory Translation Curve"]["Control Points"];
 
 	// Instanciate the ITTrajectoryCurve curves.
@@ -384,9 +332,8 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
 	// Note that the ordinal of each segment end point is stored in the x instance variable of the ITPoint object.
 	int i = 0;
-	for (Value::ConstValueIterator itr = translationCurveControlPoints.Begin(); itr != translationCurveControlPoints.End()-1; ++itr)
+	for (Value::ConstValueIterator itr = translationCurveControlPoints.Begin(); itr != translationCurveControlPoints.End() - 1; ++itr)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "translation segment %i", i);
 
 		float p0x = (float)translationCurveControlPoints[i]["Properties"]["x"].GetDouble();
@@ -395,11 +342,11 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 
 		int keyFrame0 = (float)translationCurveControlPoints[i]["Properties"]["KeyFrame"].GetInt();
 
-		float p1x = (float)translationCurveControlPoints[i+1]["Properties"]["x"].GetDouble();
-		float p1y = (float)translationCurveControlPoints[i+1]["Properties"]["y"].GetDouble();
-		float p1z = (float)translationCurveControlPoints[i+1]["Properties"]["z"].GetDouble();
+		float p1x = (float)translationCurveControlPoints[i + 1]["Properties"]["x"].GetDouble();
+		float p1y = (float)translationCurveControlPoints[i + 1]["Properties"]["y"].GetDouble();
+		float p1z = (float)translationCurveControlPoints[i + 1]["Properties"]["z"].GetDouble();
 
-		int keyFrame1 = (float)translationCurveControlPoints[i+1]["Properties"]["KeyFrame"].GetInt();
+		int keyFrame1 = (float)translationCurveControlPoints[i + 1]["Properties"]["KeyFrame"].GetInt();
 
 		// x.
 		ITTrajectoryCurveSegment *sx = new ITTrajectoryCurveSegment();
@@ -468,9 +415,7 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cy);
 	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cz);
 
-
 	// Do rotations.
-
 	const Value& rotationCurveControlPoints = d["ITSurfaces"][k]["Trajectory Rotation Curve"]["Control Points"];
 
 	// Instanciate the ITTrajectoryCurve curves.
@@ -481,9 +426,8 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	// Loop over the rotation curve JSON data to create the ITTrajectoryCurveSegments 
 	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
 	i = 0;
-	for (Value::ConstValueIterator itr = rotationCurveControlPoints.Begin(); itr != rotationCurveControlPoints.End()-1; ++itr)
+	for (Value::ConstValueIterator itr = rotationCurveControlPoints.Begin(); itr != rotationCurveControlPoints.End() - 1; ++itr)
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "rotation segment %i", i);
 
 		float p0r = (float)rotationCurveControlPoints[i]["Properties"]["x"].GetDouble();
@@ -492,11 +436,11 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 
 		int keyFrame0 = (float)rotationCurveControlPoints[i]["Properties"]["KeyFrame"].GetInt();
 
-		float p1r = (float)rotationCurveControlPoints[i+1]["Properties"]["x"].GetDouble();
-		float p1p = (float)rotationCurveControlPoints[i+1]["Properties"]["y"].GetDouble();
-		float p1y = (float)rotationCurveControlPoints[i+1]["Properties"]["z"].GetDouble();
+		float p1r = (float)rotationCurveControlPoints[i + 1]["Properties"]["x"].GetDouble();
+		float p1p = (float)rotationCurveControlPoints[i + 1]["Properties"]["y"].GetDouble();
+		float p1y = (float)rotationCurveControlPoints[i + 1]["Properties"]["z"].GetDouble();
 
-		int keyFrame1 = (float)rotationCurveControlPoints[i+1]["Properties"]["KeyFrame"].GetInt();
+		int keyFrame1 = (float)rotationCurveControlPoints[i + 1]["Properties"]["KeyFrame"].GetInt();
 
 		// roll.
 		ITTrajectoryCurveSegment *sr = new ITTrajectoryCurveSegment();
@@ -565,36 +509,31 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cp);
 	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cyaw);
 
-
-    // Read the centre of rotation point.
+	// Read the centre of rotation point.
 	float rotX = (float)d["ITSurfaces"][k]["Trajectory Rotation Curve"]["Centre of Rotation"]["x"].GetDouble();
 	float rotY = (float)d["ITSurfaces"][k]["Trajectory Rotation Curve"]["Centre of Rotation"]["y"].GetDouble();
 	float rotZ = (float)d["ITSurfaces"][k]["Trajectory Rotation Curve"]["Centre of Rotation"]["z"].GetDouble();
-        
-    project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_X(rotX);
-    project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(rotY);
-    project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(rotZ);
 
-    //project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_X(rotX);
-    //project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(rotY);
-    //project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(rotZ);
+	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_X(rotX);
+	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(rotY);
+	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(rotZ);
 
+	//project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_X(rotX);
+	//project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(rotY);
+	//project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(rotZ);
 
 	// Finally update the project maxKeyFrame instance variable.
 	// Set it to the end key frame of the last segment of the z trajectory of the last surface.
-	project->set_MaxKeyFrame( project->get_MySurfaces()->back()->get_MyTrajectoryCurves()->back()->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
+	project->set_MaxKeyFrame(project->get_MySurfaces()->back()->get_MyTrajectoryCurves()->back()->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Max key frame: %i", project->get_MaxKeyFrame());
-
-} // End of createTrajectoryCurvesFromJSON.
-
-
+}
 
 void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside writeMyProjectToFile. fileName: %s", fileNameWithPath);
 
-    std::ofstream myfile;
+	std::ofstream myfile;
 
 	rapidjson::Document d; // Null
 	d.SetObject();
@@ -640,17 +579,12 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 	// Put objectGeneralData into objectITProjectlData
 	objectITProjectData.AddMember("General Data", objectGeneralData, allocator);
 
-		
-
 	// Design properties. ==============================================================
 	rapidjson::Value objectDesignPropertiesData(rapidjson::kObjectType);
 	objectDesignPropertiesData.AddMember("Number of Surfaces", project->get_MySurfaces()->size(), allocator);
-		
+
 	// Put objectDesignPropertiesData into objectITProjectlData
 	objectITProjectData.AddMember("Design Properties", objectDesignPropertiesData, allocator);
-
-
-
 
 	// FlowitCudaUnsteady data. ==================================================================
 	rapidjson::Value objectFlowitCudaUnsteadyData(rapidjson::kObjectType);
@@ -704,9 +638,8 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 	objectFlowitCudaUnsteadyData.AddMember("FramesPerSecond", project->get_FramesPerSecond(), allocator);
 	objectFlowitCudaUnsteadyData.AddMember("PressureDisplayFactor", project->get_PressureDisplayFactor(), allocator);
 	objectFlowitCudaUnsteadyData.AddMember("VorticityDisplayFactor", project->get_VorticityDisplayFactor(), allocator);
-		
-	objectFlowitCudaUnsteadyData.AddMember("VelocityFieldDisplayFactor", project->get_VelocityFieldDisplayFactor(), allocator);
 
+	objectFlowitCudaUnsteadyData.AddMember("VelocityFieldDisplayFactor", project->get_VelocityFieldDisplayFactor(), allocator);
 
 	// This tortured code is for backwards compatibility of data files with OS X code.
 	if (project->get_IsSurfaceHierarchy())
@@ -717,7 +650,7 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 	{
 		objectFlowitCudaUnsteadyData.AddMember("IsSurfaceHierarchy", 0, allocator);
 	}
-		
+
 	// IsGust
 	// This tortured code is for backwards compatibility of data files with OS X code.
 	if (project->get_IsGust())
@@ -743,43 +676,14 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 	// Put objectFlowitCudaUnsteadyData into objectITProjectlData
 	objectITProjectData.AddMember("FlowitCudaUnsteady Data", objectFlowitCudaUnsteadyData, allocator);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	// Put objectITProjectData into the document.
 	d.AddMember("ITProject Data", objectITProjectData, allocator);
 
 	// Actually construct the ITSurfaces JSON data. =======================================================
-	ITIO::writeMyITSurfacesToFile(&d); 
+	ITIO::writeMyITSurfacesToFile(&d);
 
-    // Open the file for writing (don't append).
-    myfile.open(fileNameWithPath, std::ofstream::out);
-
+	// Open the file for writing (don't append).
+	myfile.open(fileNameWithPath, std::ofstream::out);
 
 	//Convert JSON document to string
 	StringBuffer buffer;
@@ -789,40 +693,33 @@ void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "4");
 
-
 	// Write the char* to the file.
 	myfile << output;
 
-    // Close the file.
-    myfile.close();
-
+	// Close the file.
+	myfile.close();
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyProjectToFile. Project has been written.");
-
-} // End of writeMyProjectToFile.
-
+}
 
 void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeMyITSurfacesToFile.");
 
 	// must pass an allocator when the object may need to allocate memory
 	rapidjson::Document::AllocatorType& allocator = d->GetAllocator();
 
-    // Now set up a JSON array to contain the surfaces and add it to the project root.
+	// Now set up a JSON array to contain the surfaces and add it to the project root.
 	rapidjson::Value surfaceArray(rapidjson::kArrayType);
-    
-    for (int k=0; k<project->get_MySurfaces()->size(); k++) // Loop through all the surfaces in the v_s vector, adding data to the surfaceArray.
-    {
 
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++) // Loop through all the surfaces in the v_s vector, adding data to the surfaceArray.
+	{
 		ITSurface *currentSurface = project->get_MySurfaces()->at(k);
 
-        // Create the JSON object of the current Surface.
+		// Create the JSON object of the current Surface.
 		rapidjson::Value currentSurfaceData(rapidjson::kObjectType);
-            
-		rapidjson::Value currentSurfaceProperties(rapidjson::kObjectType);
 
+		rapidjson::Value currentSurfaceProperties(rapidjson::kObjectType);
 
 		Value key("Name", d->GetAllocator()); // copy string name
 		char nameStr[10];
@@ -836,9 +733,6 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 		currentSurfaceProperties.AddMember("Number of cols of control points", NO_OF_COLS, allocator);
 		currentSurfaceProperties.AddMember("Number of rows of interpolated points", currentSurface->get_NoOfInterpolatedPointsU(), allocator);
 		currentSurfaceProperties.AddMember("Number of cols of interpolated points", currentSurface->get_NoOfInterpolatedPointsV(), allocator);
-
-
-
 
 		// This tortured code is for backwards compatibility of data files with OS X code.
 		if (currentSurface->get_IsWake())
@@ -867,8 +761,6 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 		currentSurfaceProperties.AddMember(key1, Value(currentSurface->get_MorphType().c_str(), allocator).Move(), d->GetAllocator());
 
 		currentSurfaceProperties.AddMember("ParentSurfaceIndex", currentSurface->get_ParentSurfaceIndex(), allocator);
-		
-
 
 		// This tortured code is for backwards compatibility of data files with OS X code.
 		if (currentSurface->get_IsPistolesiPanelOffset())
@@ -881,24 +773,10 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 		}
 
 		currentSurfaceProperties.AddMember("PistolesiPanelOffsetFraction", currentSurface->get_PistolesiPanelOffsetFraction(), allocator);
-	
 		currentSurfaceProperties.AddMember("FuselageRadius", currentSurface->get_FuselageRadius(), allocator);
-
-
-
-
-
-
-
-
-
-
-
 
 		// Add the properties to the surface object.
 		currentSurfaceData.AddMember("Properties", currentSurfaceProperties, allocator);
-
-
 
 		// Write control point data.
 		// We need to make sure the surface is back at the base location (and undeformed geometry).
@@ -908,21 +786,17 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 		rapidjson::Value controlPointsArray(rapidjson::kArrayType);
 
 		// Fill the array.
-		for (int i=0; i<NO_OF_ROWS; i++)
+		for (int i = 0; i < NO_OF_ROWS; i++)
 		{
-			for (int j=0; j<NO_OF_COLS; j++)
+			for (int j = 0; j < NO_OF_COLS; j++)
 			{
 				// Create the JSON char* of the current ITPoint.
 				currentSurface->get_MyControlPoints()->at(i).at(j)->serializeMeAsJSONObject(k, i, j, &controlPointsArray, d);
-                
-				// Add ITPoint to main ITPoints array.
 			}
 		}
 
-
 		// Add the control points array to the surface object.
 		currentSurfaceData.AddMember("Control Points", controlPointsArray, allocator);
-
 
 		// Serialize the translation trajectory curve.
 		rapidjson::Value translationCurveObject(rapidjson::kObjectType);
@@ -935,33 +809,28 @@ void ITIO::writeMyITSurfacesToFile(rapidjson::Document* d)
 		// Add the rotation curve object to the surface object.
 		currentSurfaceData.AddMember("Trajectory Rotation Curve", rotationCurveObject, allocator);
 
-
-        // Finally add ITSurface to main array.
+		// Finally add ITSurface to main array.
 		surfaceArray.PushBack(currentSurfaceData, d->GetAllocator());
-
-	} // End of k loop over surfaces.
+	}
 
 	// Add the surface array to the document.
 	d->AddMember("ITSurfaces", surfaceArray, allocator);
-
-} // End of writeMyITSurfacesToFile.
-
+}
 
 void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *trajectoryObject, rapidjson::Document *d)
 {
-
-    project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceTranslationTrajectory");
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceTranslationTrajectory");
 
 	// Get a pointer to the current surface curve array.
 	ITSurface* currentSurface = project->get_MySurfaces()->at(k);
 
-    // Set up a JSON array to contain the control points.
+	// Set up a JSON array to contain the control points.
 	rapidjson::Value controlPointsArray(rapidjson::kArrayType);
 
 	// Count through the segments.
-	for (int i=0; i<currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+	for (int i = 0; i < currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 	{
-        // Get the translation coordinates.
+		// Get the translation coordinates.
 		float x = currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
 		float y = currentSurface->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
 		float z = currentSurface->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
@@ -972,7 +841,7 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceTranslationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
 
 
-		tp->set_KeyFrame( currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame() );
+		tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
 
 		// Write the point data to the controlPointsArray.
 		tp->serializeMeAsJSONObject(k, i, 0, &controlPointsArray, d);
@@ -982,7 +851,7 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 	}
 
 	// Serialize the final point in the trajectory.
-    // Get the translation coordinates.
+	// Get the translation coordinates.
 	float x = currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_P1_p()->get_X();
 	float y = currentSurface->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->back()->get_P1_p()->get_X();
 	float z = currentSurface->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->back()->get_P1_p()->get_X();
@@ -990,10 +859,10 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 	// Create a new ITPointTrajectory point to do the serialization.
 	ITPointTrajectory *tp = new ITPointTrajectory(x, y, z);
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceTranslationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_StartKeyFrame());
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceTranslationTrajectory. KeyFrame: %i", 
+		currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_StartKeyFrame());
 
-
-	tp->set_KeyFrame( currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame() );
+	tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
 
 	// Write the point data to the controlPointsArray.
 	tp->serializeMeAsJSONObject(k, currentSurface->get_MyTrajectoryCurves()->size() + 1, 0, &controlPointsArray, d);
@@ -1001,22 +870,16 @@ void ITIO::writeCurrentSurfaceTranslationTrajectory(int k, rapidjson::Value *tra
 	// Delete temporary objects.
 	delete tp;
 
-
 	// Add the control points array to the curveObject.
 	trajectoryObject->AddMember("Control Points", controlPointsArray, d->GetAllocator());
-
-} // End of writeCurrentSurfaceTranslationTrajectory.
-
+}
 
 void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajectoryObject, rapidjson::Document *d)
 {
-
-    project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceRotationTrajectory");
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside ITIO::writeCurrentSurfaceRotationTrajectory");
 
 	// Get a pointer to the current surface curve array.
 	ITSurface* currentSurface = project->get_MySurfaces()->at(k);
-
-
 
 	// Serialize centre of rotation point.
 	rapidjson::Value pointObject(rapidjson::kObjectType);
@@ -1028,19 +891,13 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 	// Add the properties to the point node.
 	trajectoryObject->AddMember("Centre of Rotation", pointObject, d->GetAllocator());
 
-
-
-
-
-
-
-    // Set up a JSON array to contain the control points.
+	// Set up a JSON array to contain the control points.
 	rapidjson::Value controlPointsArray(rapidjson::kArrayType);
 
 	// Count through the segments.
-	for (int i=0; i<currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+	for (int i = 0; i < currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 	{
-        // Get the translation coordinates.
+		// Get the translation coordinates.
 		float x = currentSurface->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
 		float y = currentSurface->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
 		float z = currentSurface->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(i)->get_P0_p()->get_X();
@@ -1050,8 +907,7 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceRotationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
 
-
-		tp->set_KeyFrame( currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame() );
+		tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i)->get_StartKeyFrame());
 
 		// Write the point data to the controlPointsArray.
 		tp->serializeMeAsJSONObject(k, i, 0, &controlPointsArray, d);
@@ -1061,7 +917,7 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 	}
 
 	// Serialize the final point in the trajectory.
-    // Get the translation coordinates.
+	// Get the translation coordinates.
 	float x = currentSurface->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->back()->get_P1_p()->get_X();
 	float y = currentSurface->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->back()->get_P1_p()->get_X();
 	float z = currentSurface->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->back()->get_P1_p()->get_X();
@@ -1071,8 +927,7 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside writeCurrentSurfaceRotationTrajectory. KeyFrame: %i", currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_StartKeyFrame());
 
-
-	tp->set_KeyFrame( currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame() );
+	tp->set_KeyFrame(currentSurface->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
 
 	// Write the point data to the controlPointsArray.
 	tp->serializeMeAsJSONObject(k, currentSurface->get_MyTrajectoryCurves()->size() + 1, 0, &controlPointsArray, d);
@@ -1080,8 +935,6 @@ void ITIO::writeCurrentSurfaceRotationTrajectory(int k, rapidjson::Value *trajec
 	// Delete temporary objects.
 	delete tp;
 
-
 	// Add the control points array to the curveObject.
 	trajectoryObject->AddMember("Control Points", controlPointsArray, d->GetAllocator());
-
-} // End of writeCurrentSurfaceRotationTrajectory.
+}

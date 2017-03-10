@@ -1,21 +1,15 @@
 #pragma once
 
-// System includes.
 #include <vector>
 #include <Eigen/Dense>
 #include "rapidjson/document.h" // https://github.com/miloyip/rapidjson
 
-// Forward declarations.
 class ITPoint;
 class ITControlPoint;
 class ITTrajectoryCurve;
 
 class ITSurface
 {
-
-protected:
-
-
 private:
 
 	std::vector < std::vector <ITControlPoint*> > *_MyControlPoints; // The control points.
@@ -45,7 +39,6 @@ private:
 
 	ITPoint* _MyPreviousTranslationPoint; // The point on the translation trajectory curve corresponding to the previous FrameNumber.
 	ITPoint* _MyPreviousRotationPoint; // The point on the rotation trajectory curve corresponding to the previous FrameNumber.
-
 
 	bool _IsMorph; // Will we morph this surface?
 	int _MorphStartFrame;
@@ -137,7 +130,6 @@ public:
     ITPoint *get_MyPreviousRotationPoint();
     void set_MyPreviousRotationPoint(ITPoint* p);
 
-
 	bool get_IsMorph();
 	void set_IsMorph(bool b);
 
@@ -164,6 +156,4 @@ public:
 
 	float get_FuselageRadius();
 	void set_FuselageRadius(float f);
-
-
 };

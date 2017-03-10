@@ -20,16 +20,16 @@ extern QString DataFileNameWithPath;
 extern QString DataFileName;
 
 // Program mode flags.
-enum RUN_MODES_ENUM {MYGUI, MYBATCH};
+enum RUN_MODES_ENUM { MYGUI, MYBATCH };
 extern RUN_MODES_ENUM MY_RUN_MODE; // GUI, BATCH.
 
 // Edit mode flags.
-enum EDIT_MODES_ENUM {DRAG_TRAJECTORY_POINT, NONE};
-extern EDIT_MODES_ENUM MY_EDIT_MODE; 
+enum EDIT_MODES_ENUM { DRAG_TRAJECTORY_POINT, NONE };
+extern EDIT_MODES_ENUM MY_EDIT_MODE;
 
 // Window cintrol flag.
-enum WIDGET_CONTROL_ENUM {X, Y, Z, R, P, S, NO};
-extern WIDGET_CONTROL_ENUM MY_WIDGET_CONTROL; 
+enum WIDGET_CONTROL_ENUM { X, Y, Z, R, P, S, NO };
+extern WIDGET_CONTROL_ENUM MY_WIDGET_CONTROL;
 
 // File management flags.
 extern bool UnsavedChanges;

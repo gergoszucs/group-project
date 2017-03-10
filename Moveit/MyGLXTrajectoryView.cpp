@@ -1,11 +1,6 @@
 #include "MyGLXTrajectoryView.h"
-
 #include <QtOpenGL>
 #include <GL/glu.h> // For gluUnproject.
-
-// Reference: http://www.bogotobogo.com/Qt/Qt5_OpenGL_QGLWidget.php
-
-// Dom's includes.
 #include "global.h"
 #include "ITProject.h"
 #include "ITSurface.h"
@@ -15,8 +10,7 @@
 #include "ITTrajectoryCurve.h"
 #include "ITTrajectoryCurveSegment.h"
 
-MyGLXTrajectoryView::MyGLXTrajectoryView(QWidget *parent)
-	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
+MyGLXTrajectoryView::MyGLXTrajectoryView(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
 	// Initialize drawing parameters.
 	xRot = 0;
@@ -31,18 +25,12 @@ MyGLXTrajectoryView::MyGLXTrajectoryView(QWidget *parent)
 
 }
 
-
-MyGLXTrajectoryView::~MyGLXTrajectoryView(void)
+void MyGLXTrajectoryView::keyPressEvent(QKeyEvent * event)
 {
-}
-
-void MyGLXTrajectoryView::keyPressEvent( QKeyEvent * event )
-{
-
 	float factor = 0.0;
 
 	// Check for fine movement.
-	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true) 
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 	{
 		// Fine movement.
 		factor = 0.05;
@@ -53,19 +41,19 @@ void MyGLXTrajectoryView::keyPressEvent( QKeyEvent * event )
 		factor = 1.0;
 	}
 
-	if( event->key() == Qt::Key_Up )
+	if (event->key() == Qt::Key_Up)
 	{
 		glXPanCentreY = glXPanCentreY + factor;
 	}
-	else if( event->key() == Qt::Key_Down )
+	else if (event->key() == Qt::Key_Down)
 	{
 		glXPanCentreY = glXPanCentreY - factor;
 	}
-	else if( event->key() == Qt::Key_Left )
+	else if (event->key() == Qt::Key_Left)
 	{
 		glXPanCentreX = glXPanCentreX - factor;
 	}
-	else if( event->key() == Qt::Key_Right )
+	else if (event->key() == Qt::Key_Right)
 	{
 		glXPanCentreX = glXPanCentreX + factor;
 	}
@@ -75,15 +63,10 @@ void MyGLXTrajectoryView::keyPressEvent( QKeyEvent * event )
 
 	// Force redraw.
 	update();
-
-
-
-
-} // End keyPressEvent.
+}
 
 void MyGLXTrajectoryView::mouseMoveEvent(QMouseEvent *event)
 {
-
 	// Check for shift key press for zoom.
 	if (event->modifiers() & Qt::ShiftModifier)
 	{
@@ -96,7 +79,7 @@ void MyGLXTrajectoryView::mouseMoveEvent(QMouseEvent *event)
 			float factor = 0.0;
 
 			// Check for fine movement.
-			if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true) 
+			if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 			{
 				// Fine movement.
 				factor = 0.05;
@@ -114,21 +97,18 @@ void MyGLXTrajectoryView::mouseMoveEvent(QMouseEvent *event)
 			glXViewHalfExtent = glXViewHalfExtent + dy;
 
 			lastPos = event->pos();
-
 		} // End of if (MY_WIDGET_CONTROL == X)
 	}
-	else if(!(event->modifiers())) // Just clicking without modifiers.
+	else if (!(event->modifiers())) // Just clicking without modifiers.
 	{
-
 		if (MY_EDIT_MODE == DRAG_TRAJECTORY_POINT)
 		{
-
 			GLint viewport[4];
 			GLdouble modelview[16];
 			GLdouble projection[16];
-			glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-			glGetDoublev( GL_PROJECTION_MATRIX, projection );
-			glGetIntegerv( GL_VIEWPORT, viewport );
+			glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+			glGetDoublev(GL_PROJECTION_MATRIX, projection);
+			glGetIntegerv(GL_VIEWPORT, viewport);
 
 			const int x = event->x();
 			const int y = viewport[3] - event->y();
@@ -143,8 +123,8 @@ void MyGLXTrajectoryView::mouseMoveEvent(QMouseEvent *event)
 			GLdouble old_posX, old_posY, old_posZ;
 			GLint result;
 
-			result = gluUnProject( xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
-			result = gluUnProject( x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
+			result = gluUnProject(xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
+			result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
 
 			// Drag the Focus points
 			dragFocusPoints(posX, posY, old_posX, old_posY);
@@ -153,10 +133,8 @@ void MyGLXTrajectoryView::mouseMoveEvent(QMouseEvent *event)
 			lastPos = event->pos();
 
 			UnsavedChanges = true;
-
-		} // End of if (MY_EDIT_MODE == DRAG_TRAJECTORY_POINT)
-
-	} // End of else if(!(event->modifiers()))
+		}
+	}
 
 	// Adjust viewport view.
 	setViewOrtho(myWidth, myHeight);
@@ -164,19 +142,15 @@ void MyGLXTrajectoryView::mouseMoveEvent(QMouseEvent *event)
 	// Redraw everything.
 	this->update();
 
-//	updateGL();
-
+	//	updateGL();
 	// Redraw other views.
-//	w->updateAllTabs();
-
-} // End of mouseMoveEvent.
-
+	//	w->updateAllTabs();
+}
 
 void MyGLXTrajectoryView::dragFocusPoints(float posX, float posY, float old_posX, float old_posY)
 {
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		int n = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->size();
 
 		if (n == 0)
@@ -187,54 +161,43 @@ void MyGLXTrajectoryView::dragFocusPoints(float posX, float posY, float old_posX
 		int noOfSegments = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size();
 
 		// Loop over focus end points.
-		for (int t=0; t<n; t++)
+		for (int t = 0; t < n; t++)
 		{
-
 			int index = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->at(t);
 			ITPointTrajectory *p1 = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(index)->get_P1_p();
 
-			p1->set_X( p1->get_X() + posY - old_posY );
+			p1->set_X(p1->get_X() + posY - old_posY);
 
 			// Check if we need to update the initial point of the next segment too.
 			// Only do this if we are not at the last segment.
 			if (index < noOfSegments - 1)
 			{
-				ITPointTrajectory *p0 = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(index+1)->get_P0_p();
-				p0->set_X( p0->get_X() + posY - old_posY );
+				ITPointTrajectory *p0 = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(index + 1)->get_P0_p();
+				p0->set_X(p0->get_X() + posY - old_posY);
 			}
 
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "New point: %f", p1->get_X());
-
-		} // End of n loop.
+		}
 
 		// Update curve.
 		project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->computeMySegmentEndTangentVectors();
-
-	} // End of k loop
-
-} // End of dragFocusPoints.
+	}
+}
 
 void MyGLXTrajectoryView::mouseReleaseEvent(QMouseEvent *releaseEvent)
 {
-
 	if (MY_EDIT_MODE == DRAG_TRAJECTORY_POINT)
 	{
-
 		// Empty all focus index vectors.
-		for (int k=0; k<project->get_MySurfaces()->size(); k++)
+		for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 		{
-
 			int n = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->size();
-			for (int t=0; t<n; t++)
+			for (int t = 0; t < n; t++)
 			{
 				project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->pop_back();
-
-			} // End of t loop.
-
-		} // End of k loop.
-
-	} // End of if DRAG_TRAJECTORY_POINT
-
+			}
+		}
+	}
 
 	// Release control.
 	if (MY_WIDGET_CONTROL == X)
@@ -251,56 +214,46 @@ void MyGLXTrajectoryView::mouseReleaseEvent(QMouseEvent *releaseEvent)
 
 	// Redraw other views.
 	w->updateAllTabs();
-
-} // End of mouseReleaseEvent
+}
 
 void MyGLXTrajectoryView::mousePressEvent(QMouseEvent *event)
 {
-	
 	lastPos = event->pos();
 
-	if(!(event->modifiers())) // Just clicking without modifiers.
+	if (!(event->modifiers())) // Just clicking without modifiers.
 	{
-
 		set_EditValue(0.0);
 
 		if (MY_EDIT_MODE == DRAG_TRAJECTORY_POINT)
 		{
 			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		} // End of if DRAG_TRAJECTORY_POINT
-
-	} // End if(!(event->modifiers())).
+		}
+	}
 	else
 	{
 		// Some modifier was pressed, so we need to take the "conn".
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Checking MY_WIDGET_CONTROL enum.");
 
-			if (MY_WIDGET_CONTROL == NO)
-			{
-				// The semaphore is free, so we lock it.
-				MY_WIDGET_CONTROL = X;
-			}
-			else
-			{
-				// Someone else has control.
-			}
+		if (MY_WIDGET_CONTROL == NO)
+		{
+			// The semaphore is free, so we lock it.
+			MY_WIDGET_CONTROL = X;
+		}
+		else
+		{
+			// Someone else has control.
+		}
 	}
-
-} // End of mousePressEvent.
-
-
-
-
+}
 
 void MyGLXTrajectoryView::AssignFocusPoint(QMouseEvent *event)
 {
-
 	GLint viewport[4];
 	GLdouble modelview[16];
 	GLdouble projection[16];
-	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-	glGetDoublev( GL_PROJECTION_MATRIX, projection );
-	glGetIntegerv( GL_VIEWPORT, viewport );
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
 
 	const int x = event->x();
 	const int y = viewport[3] - event->y();
@@ -309,33 +262,26 @@ void MyGLXTrajectoryView::AssignFocusPoint(QMouseEvent *event)
 
 	GLdouble posX, posY, posZ;
 	GLint result;
-	result = gluUnProject( x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
-    
+	result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
+
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "3D point with POS: %f, %f, %f", posX, posY, posZ);
-	
+
 	// Find the vertex that is closest.
 	int i, k;
 	findTrajectoryPointIndicesNearMouse(posX, posY, posZ, &k, &i);
 
-
-	if ( (k>-1) && (i>-1) )
+	if ((k > -1) && (i > -1))
 	{
-
 		if (MY_EDIT_MODE == DRAG_TRAJECTORY_POINT)
 		{
 			// We have found a control point, so add it to the focus vector.
 			project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->push_back(i);
 		}
-
-	} // End of if ( (k>-1) && (i>-1) && (j>-1) )
+	}
 
 	// Redraw everything.
 	updateGL();
-
-} // End of AssignFocusPoint.
-
-
-
+}
 
 void  MyGLXTrajectoryView::findTrajectoryPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI)
 {
@@ -344,9 +290,9 @@ void  MyGLXTrajectoryView::findTrajectoryPointIndicesNearMouse(double posX, doub
 	*targetI = -1;
 	*targetK = -1;
 
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 		{
 			ITTrajectoryCurveSegment* currentSegment = (ITTrajectoryCurveSegment*)(project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i));
 
@@ -355,7 +301,7 @@ void  MyGLXTrajectoryView::findTrajectoryPointIndicesNearMouse(double posX, doub
 			float deltaX = posX - currentSegment->get_EndKeyFrame();
 			float deltaY = posY - p->get_X();
 
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "k: %i, i: %i, maxY: %f point plot y: %f, deltaX: %f, deltaY: %f, my key frame: %i", k, i, get_MaxY(), p->get_X()*100.0/get_MaxY(), deltaX, deltaY, currentSegment->get_EndKeyFrame());
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "k: %i, i: %i, maxY: %f point plot y: %f, deltaX: %f, deltaY: %f, my key frame: %i", k, i, get_MaxY(), p->get_X()*100.0 / get_MaxY(), deltaX, deltaY, currentSegment->get_EndKeyFrame());
 
 			float distanceSquared = deltaX*deltaX + deltaY*deltaY;
 
@@ -366,18 +312,12 @@ void  MyGLXTrajectoryView::findTrajectoryPointIndicesNearMouse(double posX, doub
 				*targetI = i;
 
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "**********************************SUCCESS!!!!!");
-
 			}
-
 		}
 	}
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Indices of nearest trajectory point. k: %i, i: %i", *targetK, *targetI);
-
-} // End of findTrajectoryPointIndicesNearMouse.
-
-
-
+}
 
 void MyGLXTrajectoryView::setViewOrtho(int width, int height)
 {
@@ -386,17 +326,15 @@ void MyGLXTrajectoryView::setViewOrtho(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	glOrtho(glXPanCentreX - glXViewHalfExtent, 
-			glXPanCentreX + glXViewHalfExtent,
-			glXPanCentreY - glXViewHalfExtent / aspect, 
-			glXPanCentreY + glXViewHalfExtent / aspect, 
-			-50000.0, 
-			50000.0);
-
+	glOrtho(glXPanCentreX - glXViewHalfExtent,
+		glXPanCentreX + glXViewHalfExtent,
+		glXPanCentreY - glXViewHalfExtent / aspect,
+		glXPanCentreY + glXViewHalfExtent / aspect,
+		-50000.0,
+		50000.0);
 
 	glMatrixMode(GL_MODELVIEW);
-
-} // End of setViewOrtho.
+}
 
 void MyGLXTrajectoryView::resizeGL(int width, int height)
 {
@@ -408,7 +346,7 @@ void MyGLXTrajectoryView::resizeGL(int width, int height)
 	setViewOrtho(width, height);
 
 	draw();
-} // End of resizeGL
+}
 
 void MyGLXTrajectoryView::paintGL()
 {
@@ -424,8 +362,7 @@ void MyGLXTrajectoryView::paintGL()
 	glRotatef((float)yRot, 0.0, 0.0, 1.0);
 
 	draw();
-
-} // End of paintGL.
+}
 
 void MyGLXTrajectoryView::initializeGL()
 {
@@ -437,14 +374,12 @@ void MyGLXTrajectoryView::initializeGL()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-	glDisable(GL_CULL_FACE); // Make sure both sides of QUADS are filled.
 
+	glDisable(GL_CULL_FACE); // Make sure both sides of QUADS are filled.
 }
 
 void MyGLXTrajectoryView::draw()
 {
-
 	if (IsDataLoaded)
 	{
 		drawMyAxes();
@@ -458,8 +393,7 @@ void MyGLXTrajectoryView::draw()
 		//drawMyFocusControlPoints();
 		drawMyAnnotations();
 	}
-} // End of draw.
-
+}
 
 void MyGLXTrajectoryView::findOrdinateRange(float *minOrdinate, float *maxOrdinate)
 {
@@ -467,16 +401,12 @@ void MyGLXTrajectoryView::findOrdinateRange(float *minOrdinate, float *maxOrdina
 	*minOrdinate = 10000.0;
 
 	// Loop though all the surfaces.
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "No of curve segments: %i", project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size());
-		
-
 
 		// Loop though all the curve keyframe points to find the maximum and minimum X and Y values.
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 		{
 			ITTrajectoryCurveSegment* currentSegment = (ITTrajectoryCurveSegment*)(project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i));
 
@@ -497,21 +427,15 @@ void MyGLXTrajectoryView::findOrdinateRange(float *minOrdinate, float *maxOrdina
 			{
 				*minOrdinate = currentSegment->get_P1_p()->get_X();
 			}
-
-		} // End of loop through key points.
-
-	} // End of loop over surfaces.
-} // End of findOrdinateRange
-
-
+		}
+	}
+}
 
 void MyGLXTrajectoryView::drawMyCurveHandles(int curveIndex)
 {
-
 	float minOrdinate;
 	float maxOrdinate;
 	findOrdinateRange(&minOrdinate, &maxOrdinate);
-
 
 	float deltaOrdinate = maxOrdinate - minOrdinate;
 	int deltaKey = project->get_MaxKeyFrame();
@@ -519,13 +443,12 @@ void MyGLXTrajectoryView::drawMyCurveHandles(int curveIndex)
 	float offset = 0.1;
 
 	// Loop though all the surfaces.
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Plot the segment end tangents.
 		glColor3f(0.0, 1.0, 1.0);
 
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->size(); i++)
 		{
 			ITTrajectoryCurveSegment* currentSegment = (ITTrajectoryCurveSegment*)(project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(i));
 
@@ -537,19 +460,14 @@ void MyGLXTrajectoryView::drawMyCurveHandles(int curveIndex)
 			float plotYt = offset + currentSegment->get_P0_p()->get_X() + currentSegment->get_m0_p()->get_Y();
 			glVertex3f(plotXt, plotYt, 0.0);
 			glEnd();
-
-		} // End of loop through key points.
+		}
 
 		glColor3f(0.0, 0.0, 0.0);
-
 	}
-
-} // End of drawMyCurveHandles.
-
+}
 
 void MyGLXTrajectoryView::drawMyCurve()
 {
-
 	float minOrdinate;
 	float maxOrdinate;
 	findOrdinateRange(&minOrdinate, &maxOrdinate);
@@ -560,9 +478,8 @@ void MyGLXTrajectoryView::drawMyCurve()
 
 	// Now plot the curves.
 	// Loop though all the surfaces.
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		// Plot the curve.
 		glBegin(GL_LINE_STRIP);
 
@@ -573,7 +490,7 @@ void MyGLXTrajectoryView::drawMyCurve()
 
 		glVertex3f(plotX, plotY, 0.0);
 
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 		{
 			ITTrajectoryCurveSegment *currentSegment = (ITTrajectoryCurveSegment *)(project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i));
 
@@ -596,16 +513,15 @@ void MyGLXTrajectoryView::drawMyCurve()
 
 			renderText(plotX, plotY, 0.0, QString::number(k));
 		}
-
 	}
 
 	// Now plot the dots.
 	// Loop though all the surfaces.
-	float radius = glXViewHalfExtent/100.0;
+	float radius = glXViewHalfExtent / 100.0;
 
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-		for (int i=0; i<project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 		{
 			ITTrajectoryCurveSegment *currentSegment = (ITTrajectoryCurveSegment *)(project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i));
 
@@ -615,37 +531,22 @@ void MyGLXTrajectoryView::drawMyCurve()
 			glTranslatef(plotX, plotY, 0.0);
 			drawSphere(radius, 15, 15, 0.0, 0.0, 0.0);
 			glTranslatef(-plotX, -plotY, 0.0);
-
 		}
-
 	}
-
-} // End of drawMyCurve.
-
-
-
-
-
-
-
-
-
+}
 
 void MyGLXTrajectoryView::drawMyFocusSegments()
 {
-
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
-		for (int t=0; t<project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->size(); t++)
+		for (int t = 0; t < project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->size(); t++)
 		{
 			int index = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyFocusTrajectoryCurveSegmentIndices()->at(t);
 			ITTrajectoryCurveSegment *s = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(index);
 
-
 			glTranslatef(s->get_EndKeyFrame(), s->get_P1_p()->get_X(), 0.0);
 
-			float radius = glXViewHalfExtent/50.0;
+			float radius = glXViewHalfExtent / 50.0;
 			drawSphere(radius, 15, 15, 1.0, 0.0, 0.0);
 
 			//if (t == 0) // Only dsraw indices for the first point.
@@ -655,24 +556,16 @@ void MyGLXTrajectoryView::drawMyFocusSegments()
 			//}
 
 			glTranslatef(-s->get_EndKeyFrame(), -s->get_P1_p()->get_X(), 0.0);
-
 		}
 	}
-
-
-} // End of drawMyFocusSegments.
-
-
-
+}
 
 void MyGLXTrajectoryView::drawMyAnnotations()
 {
-
 	float aspect = (float)myWidth / (float)myHeight; // Landscape is greater than 1.
 
 	// Draw each surface.
 	glColor3f(0.0f, 0.0f, 0.0f); // Black
-
 
 	float minOrdinate;
 	float maxOrdinate;
@@ -682,17 +575,16 @@ void MyGLXTrajectoryView::drawMyAnnotations()
 	float deltaOrdinate = maxOrdinate - minOrdinate;
 	int deltaKey = project->get_MaxKeyFrame();
 
-	renderText(0.0, maxOrdinate+5.0, 0.0, "X-translation");
+	renderText(0.0, maxOrdinate + 5.0, 0.0, "X-translation");
 
 	// Render the y-axis numbers.
-	for (int n=0; n<=10; n++)
+	for (int n = 0; n <= 10; n++)
 	{
-		renderText(-5.0, minOrdinate + deltaOrdinate*n/10.0, 0.0, QString::number(minOrdinate + deltaOrdinate*n/10.0, 'f', 1 ));
+		renderText(-5.0, minOrdinate + deltaOrdinate*n / 10.0, 0.0, QString::number(minOrdinate + deltaOrdinate*n / 10.0, 'f', 1));
 	}
 
-
 	// Plot the key frame digits.
-	for (int i=0; i<project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+	for (int i = 0; i < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 	{
 		ITTrajectoryCurveSegment* currentSegment = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i);
 
@@ -700,14 +592,10 @@ void MyGLXTrajectoryView::drawMyAnnotations()
 
 		renderText((float)currentEndKeyFrame, -5, 0.0, QString(" %1").arg(QString::number(currentEndKeyFrame)));
 	}
-
-
-}// End of drawMyAnnotations.
-
+}
 
 void MyGLXTrajectoryView::drawMyAxes()
 {
-
 	float minOrdinate;
 	float maxOrdinate;
 	findOrdinateRange(&minOrdinate, &maxOrdinate);
@@ -722,7 +610,6 @@ void MyGLXTrajectoryView::drawMyAxes()
 	glVertex3f(0.0f, 0.0f, 0.0f);
 	glVertex3f((float)(project->get_MaxKeyFrame()), 0.0f, 0.0f);
 	glEnd();
-
 
 	// Draw Y axis.
 	glColor3f(0.0f, 1.0f, 0.0f);
@@ -740,10 +627,10 @@ void MyGLXTrajectoryView::drawMyAxes()
 	glLineStipple(3, 0xAAAA);
 	glColor3f(0.0, 0.0, 0.0);
 
-	for (int i=0; i<project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
+	for (int i = 0; i < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); i++)
 	{
 		glBegin(GL_LINE_STRIP);
-				
+
 		ITTrajectoryCurveSegment* currentSegment = (ITTrajectoryCurveSegment*)(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(i));
 		float plotX = currentSegment->get_EndKeyFrame();
 
@@ -756,14 +643,13 @@ void MyGLXTrajectoryView::drawMyAxes()
 	glColor3f(0.0, 0.0, 0.0);
 	glDisable(GL_LINE_STIPPLE);
 
-
 	// Draw the line y=0.
 	glEnable(GL_LINE_STIPPLE);
 	glLineStipple(3, 0xAAAA);
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_LINE_STRIP);
-				
-	float plotY = (0.0 - minOrdinate)*10.0/deltaOrdinate;
+
+	float plotY = (0.0 - minOrdinate)*10.0 / deltaOrdinate;
 
 	glVertex3f(0.0, 0, 0.0);
 	glVertex3f(project->get_MaxKeyFrame(), 0, 0.0);
@@ -771,13 +657,10 @@ void MyGLXTrajectoryView::drawMyAxes()
 	glEnd();
 	glColor3f(0.0, 0.0, 0.0);
 	glDisable(GL_LINE_STIPPLE);
-
-} // End of drawMyAxes.
-
+}
 
 void MyGLXTrajectoryView::drawMyInterpolatedCurve(int curveIndex)
 {
-
 	float minOrdinate;
 	float maxOrdinate;
 	findOrdinateRange(&minOrdinate, &maxOrdinate);
@@ -787,24 +670,22 @@ void MyGLXTrajectoryView::drawMyInterpolatedCurve(int curveIndex)
 	int deltaKey = project->get_MaxKeyFrame();
 
 	// Loop though all the surfaces.
-	for (int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
-
 		ITPoint* translationPoint = new ITPoint();
 		ITPoint* rotationPoint = new ITPoint();
 
 		// Plot the curve.
 		glColor3f(1.0, 0.0, 0.0);
 		glBegin(GL_LINE_STRIP);
-		for (int i=0; i<project->get_MaxKeyFrame(); i++)
+		for (int i = 0; i < project->get_MaxKeyFrame(); i++)
 		{
-
 			project->get_MySurfaces()->at(k)->computeTrajectoryPointsAtFrame(i, k, translationPoint, rotationPoint);
 
 			float plotX = i;
 
 			float plotYa = 0.0;
-			
+
 			if (curveIndex == 0)
 			{
 				plotYa = translationPoint->get_X();
@@ -833,70 +714,56 @@ void MyGLXTrajectoryView::drawMyInterpolatedCurve(int curveIndex)
 			float plotY = plotYa;
 
 			glVertex3f(plotX, plotY, 0.0);
-
 		}
 		glEnd();
 		glColor3f(0.0, 0.0, 0.0);
 
 		delete translationPoint;
 		delete rotationPoint;
-
-
-	} // End of loop over surface.
-
-
-} // End of drawMyInterpolatedCurve.
-
+	}
+}
 
 void MyGLXTrajectoryView::resetMyView()
 {
-
 	glXViewHalfExtent = 50.0;
 	glXPanCentreX = 40.0;
 	glXPanCentreY = 0.0;
+}
 
-} // End of resetMyView.
-
-
-void MyGLXTrajectoryView::drawSphere(double r, int lats, int longs, float R, float GG, float B) 
+void MyGLXTrajectoryView::drawSphere(double r, int lats, int longs, float R, float GG, float B)
 {
-	// Ref: http://stackoverflow.com/questions/22058111/opengl-draw-sphere-using-glvertex3f
-
 	glColor3f(R, GG, B);
 
-
-    int i, j;
-    for(i=0; i<=lats; i++) 
+	int i, j;
+	for (i = 0; i <= lats; i++)
 	{
-        double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-		double z0  = sin(lat0);
-		double zr0 =  cos(lat0);
+		double lat0 = M_PI * (-0.5 + (double)(i - 1) / lats);
+		double z0 = sin(lat0);
+		double zr0 = cos(lat0);
 
-		double lat1 = M_PI * (-0.5 + (double) i / lats);
+		double lat1 = M_PI * (-0.5 + (double)i / lats);
 		double z1 = sin(lat1);
 		double zr1 = cos(lat1);
 
 		glBegin(GL_QUAD_STRIP);
-		for(j = 0; j <= longs; j++) 
+		for (j = 0; j <= longs; j++)
 		{
-			double lng = 2 * M_PI * (double) (j - 1) / longs;
+			double lng = 2 * M_PI * (double)(j - 1) / longs;
 			double x = cos(lng);
 			double y = sin(lng);
 
-			glNormal3f(x * zr0 , y * zr0, z0);
+			glNormal3f(x * zr0, y * zr0, z0);
 			glVertex3f(x * zr0 * r, y * zr0 * r, z0 * r);
 			glNormal3f(x * zr1, y * zr1, z1);
 			glVertex3f(x * zr1 * r, y * zr1 * r, z1 * r);
-       }
-       glEnd();
-   }
-
- } // End of drawSphere.
-
+		}
+		glEnd();
+	}
+}
 
 // Accessors.
-float MyGLXTrajectoryView::get_EditValue(){ return _EditValue; }
-void MyGLXTrajectoryView::set_EditValue(float a){ _EditValue = a; }
+float MyGLXTrajectoryView::get_EditValue() { return _EditValue; }
+void MyGLXTrajectoryView::set_EditValue(float a) { _EditValue = a; }
 
-float MyGLXTrajectoryView::get_MaxY(){ return _MaxY; }
-void MyGLXTrajectoryView::set_MaxY(float y){ _MaxY = y; }
+float MyGLXTrajectoryView::get_MaxY() { return _MaxY; }
+void MyGLXTrajectoryView::set_MaxY(float y) { _MaxY = y; }

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-// Forward declarations.
 class ITTrajectoryCurveSegment;
 
 class ITTrajectoryCurve
@@ -24,5 +23,4 @@ public:
 
 	std::vector <int> *get_MyFocusTrajectoryCurveSegmentIndices();
 	void set_MyFocusTrajectoryCurveSegmentIndices(std::vector <int> *v);
-
 };

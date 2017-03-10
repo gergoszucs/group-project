@@ -4,11 +4,11 @@
 
 class MyGLGeneralTrajectoryCurveView : public QGLWidget
 {
-	    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit MyGLGeneralTrajectoryCurveView(QWidget *parent = 0);
-	~MyGLGeneralTrajectoryCurveView(void);
+	~MyGLGeneralTrajectoryCurveView(void) {};
 
 	void resetMyView();
 
@@ -35,11 +35,7 @@ public:
 	void set_MyEndOfSegment(int a);
 
 	char get_MyChar();
-	void set_MyChar( char c);
-
-signals:
-
-public slots:
+	void set_MyChar(char c);
 
 protected:
 
@@ -47,7 +43,7 @@ protected:
 	void paintGL();
 	void resizeGL(int width, int height);
 	void setViewOrtho(int width, int height);
-	void keyPressEvent( QKeyEvent * event );
+	void keyPressEvent(QKeyEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *releaseEvent);
@@ -90,5 +86,4 @@ private:
 	void dragFocusPoints(float posX, float posY, float old_posX, float old_posY);
 	void drawMyCurveHandles(int curveIndex);
 	void drawMyInterpolatedCurve(int curveIndex);
-
 };

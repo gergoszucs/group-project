@@ -2,7 +2,6 @@
 
 #include <vector>
 
-// Forward declarations.
 class ITPoint;
 class ITPointTrajectory;
 
@@ -17,8 +16,8 @@ private:
 
 	float _Tension;
 
-    int _StartKeyFrame;
-    int _EndKeyFrame;
+	int _StartKeyFrame;
+	int _EndKeyFrame;
 
 	int _NoOfStrides;
 
@@ -50,11 +49,11 @@ public:
 	float get_Tension();
 	void set_Tension(float a);
 
-    int get_StartKeyFrame();
-    void set_StartKeyFrame(int a);
-        
-    int get_EndKeyFrame();
-    void set_EndKeyFrame(int a);
+	int get_StartKeyFrame();
+	void set_StartKeyFrame(int a);
+
+	int get_EndKeyFrame();
+	void set_EndKeyFrame(int a);
 
 	int get_NoOfStrides();
 	void set_NoOfStrides(int n);
@@ -68,4 +67,3 @@ public:
 	float get_ArcLength();
 	void set_ArcLength(float l);
 };
-

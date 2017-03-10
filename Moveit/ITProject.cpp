@@ -1,9 +1,6 @@
-// Dom's includes.
 #include "global.h"
 #include "ITProject.h"
 #include "ITSurface.h"
-
-// System includes.
 #include <stdarg.h>     /* va_list, va_start, va_arg, va_end */
 #include <QDebug>       // qDebug.
 #include <time.h>		// time, localtime, strftime
@@ -14,7 +11,6 @@ using namespace rapidjson;
 ITProject::ITProject(void)
 {
 	set_DebugLevel(2);
-
 	set_MaxKeyFrame(500);
 
 	// Instanciate the (empty) vector of ITSurfaces.
@@ -48,12 +44,10 @@ ITProject::ITProject(void)
 	set_IsGust(0);
 	set_ReplayDeltaTMSecs(50);
 	set_IsActiveControlSurfaces(0);
-
 }
 
 ITProject::~ITProject(void)
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "ITProject being destroyed.");
 
 	// Delete the Surfaces.
@@ -67,8 +61,6 @@ ITProject::~ITProject(void)
 	get_MySurfaces()->clear();
 	delete _MySurfaces;
 
-
-
 	// Delete the  Base Surfaces.
 	noOfSurfaces = get_MyBaseSurfaces()->size();
 	for (int i=0; i<noOfSurfaces; i++)
@@ -78,9 +70,7 @@ ITProject::~ITProject(void)
 
 	get_MyBaseSurfaces()->clear();
 	delete _MyBaseSurfaces;
-
 }
-
 
 // Utilities.
 void ITProject::currentDateTime(char* currentTime)
@@ -99,7 +89,6 @@ void ITProject::printDebug(const char *FILE, int LINE, const char *FUNC, int lev
 
 #ifdef NDEBUG
 	// Release code.
-
 	if (MY_RUN_MODE == MYGUI)
 	{
 		// Running in release GUI mode.
@@ -132,7 +121,6 @@ void ITProject::printDebug(const char *FILE, int LINE, const char *FUNC, int lev
 			sprintf(s, "RB [%s]",  currentTime);
 
 			qDebug("RB [%s:%d:%s()]:\t%i\t%s\t%s", FILE, LINE, FUNC, level, currentTime, buffer);
-
 		}
 	}
 
@@ -153,7 +141,6 @@ void ITProject::printDebug(const char *FILE, int LINE, const char *FUNC, int lev
 			currentDateTime(currentTime);
 
 			qDebug("DG [%s:%d:%s()]:\t%i\t%s\t%s", FILE, LINE, FUNC, level, currentTime, buffer);
-
 		}
 	}
 	else
@@ -171,17 +158,12 @@ void ITProject::printDebug(const char *FILE, int LINE, const char *FUNC, int lev
 			currentDateTime(currentTime);
 
 			qDebug("DB [%s:%d:%s()]:\t%i\t%s\t%s", FILE, LINE, FUNC, level, currentTime, buffer);
-
 		}
 	}
 
 #endif // End of DEBUGGING
-
 	return;
-
-} // End of printDebug.
-
-
+}
 
 // Accessors.
 int ITProject::get_DebugLevel(){ return _debugLevel; }
@@ -202,18 +184,11 @@ void ITProject::set_FileName(std::string s){ _FileName = s; }
 std::string ITProject::get_FileNameWithPath(){ return _FileNameWithPath; }
 void ITProject::set_FileNameWithPath(std::string s){ _FileNameWithPath = s; }
 
-
-
-
-
-
 std::vector <ITSurface*> * ITProject::get_MySurfaces(){ return _MySurfaces; }
 void ITProject::set_MySurfaces(std::vector <ITSurface*> *mySurfaces){ _MySurfaces = mySurfaces; }
 
 std::vector <ITSurface*> * ITProject::get_MyBaseSurfaces(){ return _MyBaseSurfaces; }
 void ITProject::set_MyBaseSurfaces(std::vector <ITSurface*> *myBaseSurfaces){ _MyBaseSurfaces = myBaseSurfaces; }
-
-
 
 int ITProject::get_MaxPropagationGeneration(){ return _MaxPropagationGeneration; }
 void ITProject::set_MaxPropagationGeneration(int i){ _MaxPropagationGeneration = i; }
@@ -262,7 +237,6 @@ void ITProject::set_VelocityFieldMaxy(float y){ _VelocityFieldMaxy = y; }
 
 float ITProject::get_VelocityFieldMaxz(){ return _VelocityFieldMaxz; }
 void ITProject::set_VelocityFieldMaxz(float z){ _VelocityFieldMaxz = z; }
-
 
 float ITProject::get_Rho(){ return _rho; }
 void ITProject::set_Rho(float r) { _rho = r; }

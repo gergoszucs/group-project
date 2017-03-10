@@ -6,16 +6,15 @@ class ITPoint
 {
 
 private:
-
 	float _X;
 	float _Y;
-	float _Z;		
+	float _Z;
 
-    float _VX;
-    float _VY;
-    float _VZ;
+	float _VX;
+	float _VY;
+	float _VZ;
 
-    float _Mass;
+	float _Mass;
 
 	int _i; // row number.
 	int _j; // column number.
@@ -26,9 +25,8 @@ private:
 
 public:
 	ITPoint(float x, float y, float z);
-	ITPoint(void);
+	ITPoint(void) {};
 	~ITPoint(void);
-
 
 	// Utilities.
 	void normalize();
@@ -47,17 +45,17 @@ public:
 	float get_Z();
 	void set_Z(float z);
 
-    float get_VX();
-    void set_VX(float vx);
+	float get_VX();
+	void set_VX(float vx);
 
 	float get_VY();
-    void set_VY(float vy);
+	void set_VY(float vy);
 
 	float get_VZ();
-    void set_VZ(float vz);
+	void set_VZ(float vz);
 
-    float get_Mass();
-    void set_Mass(float m);
+	float get_Mass();
+	void set_Mass(float m);
 
 	int get_I();
 	void set_I(int i);
@@ -73,5 +71,4 @@ public:
 
 	float get_V();
 	void set_V(float v);
-
 };

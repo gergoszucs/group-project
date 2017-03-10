@@ -3,8 +3,6 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_moveit.h"
-
-// Stuff for http requests.
 #include <QCoreApplication>
 #include <QDebug>
 #include <QNetworkAccessManager>
@@ -19,7 +17,7 @@ class Moveit : public QMainWindow
 
 public:
 	Moveit(QWidget *parent = 0);
-	~Moveit();
+	~Moveit() {};
 
 	void appendStatusTableWidget(const QString key, const QString val);
 	void resetModeButtons();
@@ -29,7 +27,7 @@ public:
 
 	void sendHTTPRequest(QString actionKey, QString actionValue, float elapsedTimeSecs, int totalProblemSize, QString fileNameWithPath);
 
-public slots:
+	public slots:
 
 	void on_actionOpen_triggered();
 	void on_actionAnnotations_triggered();

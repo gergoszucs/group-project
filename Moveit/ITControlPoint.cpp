@@ -7,9 +7,7 @@ ITControlPoint::ITControlPoint(float x, float y, float z) : ITPoint(x, y, z)
 {
 	// Set all the initial deflections to zero.
 	_W = new ITPoint(0.0, 0.0, 0.0);
-
 }
-
 
 ITControlPoint::~ITControlPoint(void)
 {
@@ -50,9 +48,7 @@ void ITControlPoint::serializeMeAsJSONObject(int k, int i, int j, rapidjson::Val
 
 	// Finally add the point node to the array.
 	controlPointsArray->PushBack(pointObject, allocator);
-
-} // End of serializeMeAsJSONObject.
-
+}
 
 // Accessors
 ITPoint *ITControlPoint::get_W(){ return _W; }

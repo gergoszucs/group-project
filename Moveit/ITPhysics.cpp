@@ -1,7 +1,4 @@
-// System includes.
 #include <QTime> // Used in the delay function.
-
-// Dom's includes.
 #include "ITPhysics.h"
 #include "global.h"
 #include "ITProject.h"
@@ -12,20 +9,8 @@
 #include "ITTrajectoryCurveSegment.h" // Used in playOutTest.
 #include "ITPointTrajectory.h" // Used in playoutTest.
 
-
-ITPhysics::ITPhysics(void)
-{
-}
-
-
-ITPhysics::~ITPhysics(void)
-{
-}
-
-
 void ITPhysics::playOutDryRun()
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside playOutDryRun");
 
     // At the start of the dry run, we move points back to base.
@@ -39,10 +24,7 @@ void ITPhysics::playOutDryRun()
 
 	while ((FrameNumber < project->get_MaxKeyFrame()) && (IsDryRun)) // Note that we do NOT require !IsStep here. This allows us to dry run after stepping.
 	{
-
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside playOutDryRun. FrameNumber: %i", FrameNumber);
-		
-		
 		
 		if (MY_RUN_MODE == MYGUI)
 		{
@@ -60,10 +42,7 @@ void ITPhysics::playOutDryRun()
 
 		FrameNumber++;
 	}
-
-} // End of playOutDryRun.
-
-
+}
 
 void ITPhysics::delay( int millisecondsToWait )
 {
@@ -72,8 +51,7 @@ void ITPhysics::delay( int millisecondsToWait )
 	{
 		QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 	}
-} // End of delay.
-
+}
 
 void ITPhysics::PropagateSurfaceGeometry(int FrameNumber)
 {
@@ -86,6 +64,4 @@ void ITPhysics::PropagateSurfaceGeometry(int FrameNumber)
         //============================================================================================
         project->get_MySurfaces()->at(k)->propagateGeometry(k);
     }
-
-} // End of PropagateSurfaceGeometry.
-
+}

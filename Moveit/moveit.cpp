@@ -1,4 +1,3 @@
-// Dom's includes
 #include "global.h"
 #include "moveit.h"
 #include "ITIO.h"
@@ -9,39 +8,36 @@
 #include "ITTrajectoryCurveSegment.h"
 #include "ITPointTrajectory.h"
 #include "ITPhysics.h"
-
 #include <QMessageBox> // QMessageBox
 #include <QFileDialog> // QFileDialog for open data file.
 #include <QTextStream> // To display the contents of a file in the GUI.
 #include <QCloseEvent> // Used in closeEvent.
 #include <QClipboard>
 #include <intrin.h> // To use __cpuid to get the CPU processor ID. Used in actionSend_HTTP_Log_Message_triggered().
-
 #include "qjsonmodel.h" // To display the JSON data in the QTreeView tab.
 #include "qjsonitem.h"
 
-Moveit::Moveit(QWidget *parent)
-	: QMainWindow(parent)
+Moveit::Moveit(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
 
 	QIcon icon = QIcon("Resources/blackDot.png");
 
 	// Default display OpenGL axes enabled.
-	ui.actionAxes->setIcon( icon );
-	ui.actionControl_points->setIcon( icon );
-	ui.actionInterpolated_points->setIcon( icon );
-	ui.actionNormals->setIcon( icon );
-	ui.actionAnnotations->setIcon( icon );
+	ui.actionAxes->setIcon(icon);
+	ui.actionControl_points->setIcon(icon);
+	ui.actionInterpolated_points->setIcon(icon);
+	ui.actionNormals->setIcon(icon);
+	ui.actionAnnotations->setIcon(icon);
 
 	// Set up the status table view.
 	QTableWidget* my_statusTable = ui.myStatusTableWidget;
 	my_statusTable->setColumnCount(2);
 
-	my_statusTable->setHorizontalHeaderItem(0, new QTableWidgetItem( QString("Key") ));
+	my_statusTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Key")));
 	my_statusTable->setColumnWidth(0, 40);
 
-	my_statusTable->setHorizontalHeaderItem(1, new QTableWidgetItem( QString("Value") ));
+	my_statusTable->setHorizontalHeaderItem(1, new QTableWidgetItem(QString("Value")));
 	my_statusTable->setColumnWidth(1, 130);
 
 	my_statusTable->verticalHeader()->setVisible(false);
@@ -65,17 +61,9 @@ Moveit::Moveit(QWidget *parent)
 	ui.myGLGeneralTrajectoryCurveViewB->set_MyCurveIndex(5);
 	ui.myGLGeneralTrajectoryCurveViewB->set_MyChar('B');
 
-
 	// Disable the Dry-run button.
 	ui.actionDry_run->setEnabled(false);
-
 }
-
-Moveit::~Moveit()
-{
-
-}
-
 
 void Moveit::on_actionOpen_triggered()
 {
@@ -83,10 +71,8 @@ void Moveit::on_actionOpen_triggered()
 
 	if (!IsDataLoaded)
 	{
-
 		if (!UnsavedChanges)
 		{
-
 			QString d = QDir::currentPath();
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionOpen_triggered. Current path: %s", d.toStdString().c_str());
 			QString fileNameWithPath = QFileDialog::getOpenFileName(this, tr("Open File"), d.append("/Data"), tr("JSON Files (*.json *.JSON);;Text Files (*.txt);;C++ Files (*.cpp *.h)"));
@@ -94,10 +80,10 @@ void Moveit::on_actionOpen_triggered()
 			// (re-)Set the flag.
 			IsDataLoaded = false;
 
-			if (!fileNameWithPath.isEmpty()) 
+			if (!fileNameWithPath.isEmpty())
 			{
 				loadData(fileNameWithPath);
-			} // End if filename is valid.
+			}
 		}
 		else
 		{
@@ -110,15 +96,12 @@ void Moveit::on_actionOpen_triggered()
 		// There is already a file open.
 		QMessageBox::information(0, tr("Project already loaded"), tr("You have a project loaded already.\nPlease close the existing project before loading another."));
 	}
-
-} // End of on_actionOpen_triggered.
-
+}
 
 void Moveit::loadData(QString fileNameWithPath) // Gets called from on_actionOpen_triggered and on_jsonUpdateButton_clicked.
 {
-
 	QFile file(fileNameWithPath);
-	if (!file.open(QIODevice::ReadOnly)) 
+	if (!file.open(QIODevice::ReadOnly))
 	{
 		QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
 		return;
@@ -139,7 +122,6 @@ void Moveit::loadData(QString fileNameWithPath) // Gets called from on_actionOpe
 		file.close();
 		ui.fileTextEdit->setLineWrapMode(QTextEdit::NoWrap);
 
-
 		// Display json as tree.
 		QJsonModel * model = new QJsonModel;
 		ui.jsonTreeView->setModel(model);
@@ -155,16 +137,15 @@ void Moveit::loadData(QString fileNameWithPath) // Gets called from on_actionOpe
 		// Set the width of the QTreeView columns.
 		ui.jsonTreeView->header()->resizeSection(0, 300);
 
-
 		// Set the window title to the filename.
-		std::string fileNameWithPathString = std::string( latin1BAFileNameWithPathString.data() );
+		std::string fileNameWithPathString = std::string(latin1BAFileNameWithPathString.data());
 		std::string base_filename = fileNameWithPathString.substr(fileNameWithPathString.find_last_of("/\\") + 1);
-		DataFileNameWithPath = QString( fileNameWithPathString.c_str() ); // Set the global variable.
-		DataFileName = QString( base_filename.c_str() ); // Set the global variable.
+		DataFileNameWithPath = QString(fileNameWithPathString.c_str()); // Set the global variable.
+		DataFileName = QString(base_filename.c_str()); // Set the global variable.
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "base_filename: %s", base_filename.c_str());
 
-		QString text = "Moveit: " + QString( base_filename.c_str() );
+		QString text = "Moveit: " + QString(base_filename.c_str());
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "text: %s", text.toStdString().c_str());
 
@@ -174,26 +155,22 @@ void Moveit::loadData(QString fileNameWithPath) // Gets called from on_actionOpe
 		w->setWindowTitle(text);
 
 		w->statusBar()->showMessage(QObject::tr("File read successful"));
-
-	} // End if MYGUI
-
+	}
 
 	// Actually read the data and instanciate the C++ objects.
 	QByteArray latin1BAFileNameWithPathString = fileNameWithPath.toLatin1();
 	ITIO::readJSONInputFile(latin1BAFileNameWithPathString.data()); // In ITIO.cpp.
 
 	// Compute the interpolated points and the ITPanels.
-	for( int k=0; k<project->get_MySurfaces()->size(); k++)
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
 		project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
 	}
-
 
 	showSpreadsheet();
 
 	// Set the flag.
 	IsDataLoaded = true;
-
 
 	// Display a satus message.
 	appendStatusTableWidget(QString("File"), QString("Loaded"));
@@ -203,10 +180,7 @@ void Moveit::loadData(QString fileNameWithPath) // Gets called from on_actionOpe
 
 	// Finally force process events.
 	QApplication::processEvents();
-
-} // End of loadData.
-
-
+}
 
 void Moveit::on_actionDry_run_triggered()
 {
@@ -215,7 +189,6 @@ void Moveit::on_actionDry_run_triggered()
 	// Perform a dry run.
 	if (IsDataLoaded)
 	{
-
 		w->statusBar()->showMessage(QObject::tr("Dry run in progress. Please wait ..."));
 
 		// Set flags.
@@ -223,7 +196,6 @@ void Moveit::on_actionDry_run_triggered()
 
 		// Disable the Dry-run button.
 		ui.actionDry_run->setEnabled(false);
-
 
 		// Reset the frame number.
 		FrameNumber = 0;
@@ -241,7 +213,6 @@ void Moveit::on_actionDry_run_triggered()
 
 		if (FrameNumber == project->get_MaxKeyFrame())
 		{
-
 			// Display a status message.
 			appendStatusTableWidget(QString("Dry"), QString("Completed"));
 
@@ -252,36 +223,28 @@ void Moveit::on_actionDry_run_triggered()
 
 			// Enable the Dry-run button.
 			ui.actionDry_run->setEnabled(true);
-
 		}
-
 	}
 	else
 	{
 		QMessageBox::information(0, tr("No input data"), tr("Please open a data file before performing calculations."));
 	}
-
-} // End of on_actionDry_run_triggered
-
+}
 
 void Moveit::on_actionControl_points_triggered()
 {
-
 	drawControlPoints = !drawControlPoints;
 
 	if (drawControlPoints)
 	{
 		QIcon icon = QIcon("Resources/blackDot.png");
-		ui.actionControl_points->setIcon( icon );
+		ui.actionControl_points->setIcon(icon);
 	}
 	else
 	{
-		ui.actionControl_points->setIcon( QIcon() );
+		ui.actionControl_points->setIcon(QIcon());
 	}
-
-} // End of on_actionControl_points_triggered.
-
-
+}
 
 void Moveit::on_actionInterpolated_points_triggered()
 {
@@ -290,17 +253,13 @@ void Moveit::on_actionInterpolated_points_triggered()
 	if (drawInterpolatedPoints)
 	{
 		QIcon icon = QIcon("Resources/blackDot.png");
-		ui.actionInterpolated_points->setIcon( icon );
+		ui.actionInterpolated_points->setIcon(icon);
 	}
 	else
 	{
-		ui.actionInterpolated_points->setIcon( QIcon() );
+		ui.actionInterpolated_points->setIcon(QIcon());
 	}
-
-} // End of on_actionInterpolated_points_triggered
-
-
-
+}
 
 void Moveit::on_actionNormals_triggered()
 {
@@ -309,15 +268,13 @@ void Moveit::on_actionNormals_triggered()
 	if (drawNormals)
 	{
 		QIcon icon = QIcon("Resources/blackDot.png");
-		ui.actionNormals->setIcon( icon );
+		ui.actionNormals->setIcon(icon);
 	}
 	else
 	{
-		ui.actionNormals->setIcon( QIcon() );
+		ui.actionNormals->setIcon(QIcon());
 	}
-
-} // End of on_actionNormals_triggered
-
+}
 
 void Moveit::on_actionAnnotations_triggered()
 {
@@ -326,15 +283,13 @@ void Moveit::on_actionAnnotations_triggered()
 	if (drawAnnotations)
 	{
 		QIcon icon = QIcon("Resources/blackDot.png");
-		ui.actionAnnotations->setIcon( icon );
+		ui.actionAnnotations->setIcon(icon);
 	}
 	else
 	{
-		ui.actionAnnotations->setIcon( QIcon() );
+		ui.actionAnnotations->setIcon(QIcon());
 	}
-
-} // End of on_actionAnnotations_triggered
-
+}
 
 void Moveit::on_actionAxes_triggered()
 {
@@ -343,20 +298,16 @@ void Moveit::on_actionAxes_triggered()
 	if (drawAxes)
 	{
 		QIcon icon = QIcon("Resources/blackDot.png");
-		ui.actionAxes->setIcon( icon );
+		ui.actionAxes->setIcon(icon);
 	}
 	else
 	{
-		ui.actionAxes->setIcon( QIcon() );
+		ui.actionAxes->setIcon(QIcon());
 	}
-
-} // End of on_actionAxes_triggered
-
-
+}
 
 void Moveit::on_actionReset_all_views_triggered()
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionDrag_trajectory_point_triggered");
 
 	ui.myGLGeneralTrajectoryCurveViewX->resetMyView();
@@ -368,27 +319,22 @@ void Moveit::on_actionReset_all_views_triggered()
 
 	// Redraw everything (to get rid of any spheres).
 	w->updateAllTabs();
-
-
-
-} // End of on_actionReset_all_views_triggered.
+}
 
 void Moveit::on_actionDrag_trajectory_point_triggered()
 {
-
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionDrag_trajectory_point_triggered");
 
 	resetModeButtons();
 
 	if (MY_EDIT_MODE != DRAG_TRAJECTORY_POINT)
 	{
-
 		// Update the ENUM
 		MY_EDIT_MODE = DRAG_TRAJECTORY_POINT;
 
-		/// Highlight the icon.
+		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_Drag_trajectory_point_highlight.png");
-		this->ui.actionDrag_trajectory_point->setIcon( icon );
+		this->ui.actionDrag_trajectory_point->setIcon(icon);
 	}
 	else
 	{
@@ -397,19 +343,15 @@ void Moveit::on_actionDrag_trajectory_point_triggered()
 
 		// Reset the icon.
 		QIcon icon = QIcon("Resources/icon_Drag_trajectory_point.png");
-		this->ui.actionDrag_trajectory_point->setIcon( icon );
+		this->ui.actionDrag_trajectory_point->setIcon(icon);
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
-
 	}
 
 	// Finally force process events.
 	QApplication::processEvents();
-
-
-} // End of on_actionDrag_trajectory_point_triggered.
-
+}
 
 void Moveit::updateAllTabs()
 {
@@ -425,34 +367,21 @@ void Moveit::updateAllTabs()
 	ui.myGLGeneralTrajectoryCurveViewR->update();
 	ui.myGLGeneralTrajectoryCurveViewP->update();
 	ui.myGLGeneralTrajectoryCurveViewB->update();
-
-} // End of updateAllTabs.
-
-
-
-
-
-
-
-
-
+}
 
 void Moveit::showSpreadsheet()
 {
 	// Populate the output table tab.
-
 	if (MY_RUN_MODE == MYGUI)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "showSpreadsheet");
-
 		// Compute the number of columns and display column headers.============================================================================
-
 		int noOfSurfaces = project->get_MySurfaces()->size();
 		QTableWidget* my_table = ui.mySpreadsheet;
 
-		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size()+1);
+		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size() + 1);
 
-		int columnCount = 2+6*noOfSurfaces; // The column count for the FrameNumber, CL, CD, Lift and Drag for each surface.
+		int columnCount = 2 + 6 * noOfSurfaces; // The column count for the FrameNumber, CL, CD, Lift and Drag for each surface.
 
 		// Actually set the column count of the table.
 		my_table->setColumnCount(columnCount);
@@ -462,164 +391,148 @@ void Moveit::showSpreadsheet()
 		my_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Frame Number"));
 
 		int columnIndex = 2;
-		for ( int k=0; k<noOfSurfaces; k++ ) 
+		for (int k = 0; k < noOfSurfaces; k++)
 		{
-
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem( QString("X %1").arg(k) ));
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("X %1").arg(k)));
 			my_table->setColumnWidth(columnIndex, 50);
 			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem( QString("Y %1").arg(k) ));
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Y %1").arg(k)));
 			my_table->setColumnWidth(columnIndex, 50);
 			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem( QString("Z %1").arg(k) ));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem( QString("Roll %1").arg(k) ));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem( QString("Pitch %1").arg(k) ));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem( QString("Yaw %1").arg(k) ));
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Z %1").arg(k)));
 			my_table->setColumnWidth(columnIndex, 50);
 			columnIndex++;
 
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Roll %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Pitch %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Yaw %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
 		}
 
 		// Display first row (p0 of the first segments)
 		columnIndex = 0;
 
 		QTableWidgetItem* new_itemF = new QTableWidgetItem();
-		new_itemF->setText( QString::number( 0 ) );  // 
-		my_table->setItem(  0, columnIndex, new_itemF );
+		new_itemF->setText(QString::number(0));  // 
+		my_table->setItem(0, columnIndex, new_itemF);
 		columnIndex++;
 
 		int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_StartKeyFrame();
 		QTableWidgetItem* new_itemT = new QTableWidgetItem();
-		new_itemT->setText( QString::number( currentFrame ) );  // 
-		my_table->setItem(  0, columnIndex, new_itemT );
+		new_itemT->setText(QString::number(currentFrame));  // 
+		my_table->setItem(0, columnIndex, new_itemT);
 		columnIndex++;
 
-		for ( int k=0; k<noOfSurfaces; k++ ) 
+		for (int k = 0; k < noOfSurfaces; k++)
 		{
 			// X
 			ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemX = new QTableWidgetItem();
-			new_itemX->setText( QString::number( pX->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemX );
+			new_itemX->setText(QString::number(pX->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemX);
 			columnIndex++;
 			// Y
 			ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemY = new QTableWidgetItem();
-			new_itemY->setText( QString::number( pY->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemY );
+			new_itemY->setText(QString::number(pY->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemY);
 			columnIndex++;
 			// Z
 			ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemZ = new QTableWidgetItem();
-			new_itemZ->setText( QString::number( pZ->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemZ );
+			new_itemZ->setText(QString::number(pZ->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemZ);
 			columnIndex++;
 			// Roll
 			ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemR = new QTableWidgetItem();
-			new_itemR->setText( QString::number( pR->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemR );
+			new_itemR->setText(QString::number(pR->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemR);
 			columnIndex++;
 			// Pitch
 			ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemP = new QTableWidgetItem();
-			new_itemP->setText( QString::number( pP->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemP );
+			new_itemP->setText(QString::number(pP->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemP);
 			columnIndex++;
 			// Yaw
 			ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemB = new QTableWidgetItem();
-			new_itemB->setText( QString::number( pB->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemB );
+			new_itemB->setText(QString::number(pB->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemB);
 			columnIndex++;
-
 		} // End of k loop.
 
-
 		// Display data for each surface.======================================================================================
-		for ( int n=0; n<project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++ ) 
+		for (int n = 0; n < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++)
 		{
 			int columnIndex = 0;
-
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "showSpreadsheet. n = %i", n);
 
 			QTableWidgetItem* new_itemF = new QTableWidgetItem();
-			new_itemF->setText( QString::number( n+1 ) );  // 
-			my_table->setItem(  n+1, columnIndex, new_itemF );
+			new_itemF->setText(QString::number(n + 1));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemF);
 			columnIndex++;
 
 			int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_EndKeyFrame();
 			QTableWidgetItem* new_itemT = new QTableWidgetItem();
-			new_itemT->setText( QString::number( currentFrame ) );  // 
-			my_table->setItem(  n+1, columnIndex, new_itemT );
+			new_itemT->setText(QString::number(currentFrame));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemT);
 			columnIndex++;
 
-			for ( int k=0; k<noOfSurfaces; k++ ) 
+			for (int k = 0; k < noOfSurfaces; k++)
 			{
-
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "showSpreadsheet 3");
 
 				// X
 				ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemX = new QTableWidgetItem();
-				new_itemX->setText( QString::number( pX->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemX );
+				new_itemX->setText(QString::number(pX->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemX);
 				columnIndex++;
 				// Y
 				ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemY = new QTableWidgetItem();
-				new_itemY->setText( QString::number( pY->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemY );
+				new_itemY->setText(QString::number(pY->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemY);
 				columnIndex++;
 				// Z
 				ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemZ = new QTableWidgetItem();
-				new_itemZ->setText( QString::number( pZ->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemZ );
+				new_itemZ->setText(QString::number(pZ->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemZ);
 				columnIndex++;
 				// Roll
 				ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemR = new QTableWidgetItem();
-				new_itemR->setText( QString::number( pR->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemR );
+				new_itemR->setText(QString::number(pR->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemR);
 				columnIndex++;
 				// Pitch
 				ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemP = new QTableWidgetItem();
-				new_itemP->setText( QString::number( pP->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemP );
+				new_itemP->setText(QString::number(pP->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemP);
 				columnIndex++;
 				// Yaw
 				ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemB = new QTableWidgetItem();
-				new_itemB->setText( QString::number( pB->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemB );
+				new_itemB->setText(QString::number(pB->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemB);
 				columnIndex++;
-
-
-			} // End of loop over surfaces.
-
-		} // End of loop through Frames.
-
-	} // End of if GUI.
-
-} // End of showSpreadsheet.
-
-
-
-
+			}
+		}
+	}
+}
 
 void Moveit::updateSpreadsheet()
 {
 	// Update the output table tab.
-
 	if (MY_RUN_MODE == MYGUI)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet");
@@ -627,133 +540,125 @@ void Moveit::updateSpreadsheet()
 		int noOfSurfaces = project->get_MySurfaces()->size();
 		QTableWidget* my_table = ui.mySpreadsheet;
 
-		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size()+1);
+		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size() + 1);
 
 		// Display first row (p0 of the first segments)
 		int columnIndex = 0;
 
 		QTableWidgetItem* new_itemF = new QTableWidgetItem();
-		new_itemF->setText( QString::number( 0 ) );  // 
-		my_table->setItem(  0, columnIndex, new_itemF );
+		new_itemF->setText(QString::number(0));  // 
+		my_table->setItem(0, columnIndex, new_itemF);
 		columnIndex++;
 
 		int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_StartKeyFrame();
 		QTableWidgetItem* new_itemT = new QTableWidgetItem();
-		new_itemT->setText( QString::number( currentFrame ) );  // 
-		my_table->setItem(  0, columnIndex, new_itemT );
+		new_itemT->setText(QString::number(currentFrame));  // 
+		my_table->setItem(0, columnIndex, new_itemT);
 		columnIndex++;
 
-		for ( int k=0; k<noOfSurfaces; k++ ) 
+		for (int k = 0; k < noOfSurfaces; k++)
 		{
 			// X
 			ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemX = new QTableWidgetItem();
-			new_itemX->setText( QString::number( pX->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemX );
+			new_itemX->setText(QString::number(pX->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemX);
 			columnIndex++;
 			// Y
 			ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemY = new QTableWidgetItem();
-			new_itemY->setText( QString::number( pY->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemY );
+			new_itemY->setText(QString::number(pY->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemY);
 			columnIndex++;
 			// Z
 			ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemZ = new QTableWidgetItem();
-			new_itemZ->setText( QString::number( pZ->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemZ );
+			new_itemZ->setText(QString::number(pZ->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemZ);
 			columnIndex++;
 			// Roll
 			ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemR = new QTableWidgetItem();
-			new_itemR->setText( QString::number( pR->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemR );
+			new_itemR->setText(QString::number(pR->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemR);
 			columnIndex++;
 			// Pitch
 			ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemP = new QTableWidgetItem();
-			new_itemP->setText( QString::number( pP->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemP );
+			new_itemP->setText(QString::number(pP->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemP);
 			columnIndex++;
 			// Yaw
 			ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
 			QTableWidgetItem* new_itemB = new QTableWidgetItem();
-			new_itemB->setText( QString::number( pB->get_X() ) );  // 
-			my_table->setItem(  0, columnIndex, new_itemB );
+			new_itemB->setText(QString::number(pB->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemB);
 			columnIndex++;
-
-		} // End of k loop.
-
+		}
 
 		// Display data for each segment (after the first).======================================================================================
-		for ( int n=0; n<project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++ ) 
+		for (int n = 0; n < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++)
 		{
 			int columnIndex = 0;
 
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet. n = %i", n);
 
 			QTableWidgetItem* new_itemF = new QTableWidgetItem();
-			new_itemF->setText( QString::number( n+1 ) );  // 
-			my_table->setItem(  n+1, columnIndex, new_itemF );
+			new_itemF->setText(QString::number(n + 1));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemF);
 			columnIndex++;
 
 			int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_EndKeyFrame();
 			QTableWidgetItem* new_itemT = new QTableWidgetItem();
-			new_itemT->setText( QString::number( currentFrame ) );  // 
-			my_table->setItem(  n+1, columnIndex, new_itemT );
+			new_itemT->setText(QString::number(currentFrame));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemT);
 			columnIndex++;
 
 			// For the current segment, loop over each surface.
-			for ( int k=0; k<noOfSurfaces; k++ ) 
+			for (int k = 0; k < noOfSurfaces; k++)
 			{
-
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet 3");
 
 				// X
 				ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemX = new QTableWidgetItem();
-				new_itemX->setText( QString::number( pX->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemX );
+				new_itemX->setText(QString::number(pX->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemX);
 				columnIndex++;
 				// Y
 				ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemY = new QTableWidgetItem();
-				new_itemY->setText( QString::number( pY->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemY );
+				new_itemY->setText(QString::number(pY->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemY);
 				columnIndex++;
 				// Z
 				ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemZ = new QTableWidgetItem();
-				new_itemZ->setText( QString::number( pZ->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemZ );
+				new_itemZ->setText(QString::number(pZ->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemZ);
 				columnIndex++;
 				// Roll
 				ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemR = new QTableWidgetItem();
-				new_itemR->setText( QString::number( pR->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemR );
+				new_itemR->setText(QString::number(pR->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemR);
 				columnIndex++;
 				// Pitch
 				ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemP = new QTableWidgetItem();
-				new_itemP->setText( QString::number( pP->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemP );
+				new_itemP->setText(QString::number(pP->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemP);
 				columnIndex++;
 				// Yaw (Bearing)
 				ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
 				QTableWidgetItem* new_itemB = new QTableWidgetItem();
-				new_itemB->setText( QString::number( pB->get_X() ) );  // 
-				my_table->setItem(  n+1, columnIndex, new_itemB );
+				new_itemB->setText(QString::number(pB->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemB);
 				columnIndex++;
-
-			} // End of loop over surfaces.
-
-		} // End of loop through Key Frames.
-
+			}
+		}
 	}
-} // End of updateSpreadsheet.
-
-
+}
 
 void Moveit::on_actionExit_triggered()
 {
@@ -764,17 +669,15 @@ void Moveit::on_actionExit_triggered()
 	}
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionExit_triggered. Just returned from checkExitWithUnsavedData.");
-
-} // End of on_actionExit_triggered.
-
+}
 
 bool Moveit::checkExitWithUnsavedData()
 {
 	if (UnsavedChanges)
 	{
 		QMessageBox::StandardButton reply;
-		reply = QMessageBox::question(this, "Unsaved Data", "You have unsaved data.\nAre you sure you want to quit?", QMessageBox::Yes|QMessageBox::No);
-		if (reply == QMessageBox::Yes) 
+		reply = QMessageBox::question(this, "Unsaved Data", "You have unsaved data.\nAre you sure you want to quit?", QMessageBox::Yes | QMessageBox::No);
+		if (reply == QMessageBox::Yes)
 		{
 			closeProject();
 
@@ -782,8 +685,8 @@ bool Moveit::checkExitWithUnsavedData()
 			sendHTTPRequest(QString("Program"), QString("Terminated"), 0, 0, DataFileNameWithPath);
 
 			return true;
-		} 
-		else 
+		}
+		else
 		{
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Cancelled quit");
 			return false;
@@ -803,12 +706,10 @@ bool Moveit::checkExitWithUnsavedData()
 
 		return true;
 	}
-} // End of checkExitWithUnsavedData.
-
+}
 
 void Moveit::closeProject()
 {
-
 	// Clear the spreadsheet window.
 	ui.mySpreadsheet->clear();
 
@@ -857,12 +758,7 @@ void Moveit::closeProject()
 
 	// Send the HTTP request.
 	sendHTTPRequest(QString("File"), QString("Closed"), 0, 0, DataFileNameWithPath);
-
-} // End of closeProject.
-
-
-
-
+}
 
 void Moveit::on_actionSave_As_triggered()
 {
@@ -886,16 +782,12 @@ void Moveit::on_actionSave_As_triggered()
 	// Close the file.
 	file.close();
 
-
 	// OK, the file is there, so let's start writing to the file.
-
 	// Get a char * from the file name.
 	QByteArray latin1BAFilenameString = fileName.toLatin1();
 
 	// Write the project to the file.
 	ITIO::writeMyProjectToFile(latin1BAFilenameString.data());
-
-
 
 	// Set status message.
 	QString str1 = QString("File %1 saved successfully.").arg(fileName);
@@ -910,8 +802,7 @@ void Moveit::on_actionSave_As_triggered()
 	// Finally set flags.
 	UnsavedChanges = false;
 
-} // End of on_actionSave_As_triggered.
-
+}
 
 void Moveit::on_actionClose_triggered()
 {
@@ -922,12 +813,12 @@ void Moveit::on_actionClose_triggered()
 		if (UnsavedChanges)
 		{
 			QMessageBox::StandardButton reply;
-			reply = QMessageBox::question(this, "Unsaved Data", "You have unsaved data.\nAre you sure you want to close without saving?", QMessageBox::Yes|QMessageBox::No);
-			if (reply == QMessageBox::Yes) 
+			reply = QMessageBox::question(this, "Unsaved Data", "You have unsaved data.\nAre you sure you want to close without saving?", QMessageBox::Yes | QMessageBox::No);
+			if (reply == QMessageBox::Yes)
 			{
 				closeProject();
-			} 
-			else 
+			}
+			else
 			{
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Cancelled close");
 			}
@@ -936,59 +827,44 @@ void Moveit::on_actionClose_triggered()
 		{
 			closeProject();
 		}
-
 	}
-
-} // End of on_actionClose_triggered.
-
-
+}
 
 // Detect user clicking the 'x' close window button.
 void Moveit::closeEvent(QCloseEvent *bar)
 {
 	if (checkExitWithUnsavedData())
 	{
-        bar->accept();
-    }
+		bar->accept();
+	}
 	else
 	{
 		bar->ignore();
 	}
-
-
-} // End of closeEvent.
-
+}
 
 void Moveit::resetModeButtons()
 {
-
-	/// Reset the icon.
+	// Reset the icon.
 	QIcon icon = QIcon("Resources/icon_Drag_trajectory_point.png");
-	this->ui.actionDrag_trajectory_point->setIcon( icon );
+	this->ui.actionDrag_trajectory_point->setIcon(icon);
 
-} // End resetModeButtons.
-
-
-
-
-
+}
 
 void Moveit::sendHTTPRequest(QString actionKey, QString actionValue, float elapsedTimeSecs, int totalProblemSize, QString fileNameWithPath)
 {
 	if (IsScrutiny)
 	{
- 
 		// Ref: https://karanbalkar.com/2014/02/sending-a-http-request-using-qt-5-framework/
-
 		// create custom temporary event loop on stack
 		QEventLoop eventLoop;
- 
+
 		// "quit()" the event-loop, when the network request "finished()"
 		QNetworkAccessManager mgr;
 		QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
- 
+
 		// Get idArray.
-		int idArray[4] = {0};
+		int idArray[4] = { 0 };
 		unsigned    nIds;
 		__cpuid(idArray, 0);
 
@@ -998,20 +874,20 @@ void Moveit::sendHTTPRequest(QString actionKey, QString actionValue, float elaps
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside sendHTTPRequest. str: %s", str);
 
 		// the HTTP request.
-	//	QNetworkRequest req = QNetworkRequest( QUrl( QString("http://www.scrapeworld.com/cgi-bin/surfit/receiveLogFromProgram.pl?ProgramName=Moveit&UserID=1&WorkgroupID=1&PlatformID=%1").arg(QString::number(*idArray)) ) );
-		QNetworkRequest req = QNetworkRequest( QUrl( QString("http://www.scrapeworld.com/cgi-bin/surfit/receiveLogFromProgram.pl?ProgramName=Moveit&UserID=1&WorkgroupID=1&PlatformID=%1&ActionKey=%2&ActionValue=%3&ElapsedTimeSecs=%4&ProgramVersion=%5&DataFileNameWithPath=%6&TotalProblemSize=%7&MaxKeyFrame=%8").arg(str).arg(actionKey).arg(actionValue).arg(elapsedTimeSecs).arg(PROGRAM_VERSION).arg(fileNameWithPath).arg(totalProblemSize).arg(project->get_MaxKeyFrame()) ) );
+	    //QNetworkRequest req = QNetworkRequest( QUrl( QString("http://www.scrapeworld.com/cgi-bin/surfit/receiveLogFromProgram.pl?ProgramName=Moveit&UserID=1&WorkgroupID=1&PlatformID=%1").arg(QString::number(*idArray)) ) );
+		QNetworkRequest req = QNetworkRequest(QUrl(QString("http://www.scrapeworld.com/cgi-bin/surfit/receiveLogFromProgram.pl?ProgramName=Moveit&UserID=1&WorkgroupID=1&PlatformID=%1&ActionKey=%2&ActionValue=%3&ElapsedTimeSecs=%4&ProgramVersion=%5&DataFileNameWithPath=%6&TotalProblemSize=%7&MaxKeyFrame=%8").arg(str).arg(actionKey).arg(actionValue).arg(elapsedTimeSecs).arg(PROGRAM_VERSION).arg(fileNameWithPath).arg(totalProblemSize).arg(project->get_MaxKeyFrame())));
 		QNetworkReply *reply = mgr.get(req);
-		
+
 		eventLoop.exec(); // blocks stack until "finished()" has been called
- 
-		if (reply->error() == QNetworkReply::NoError) 
+
+		if (reply->error() == QNetworkReply::NoError)
 		{
 			//success
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Success: %s", reply->readAll());
 
 			delete reply;
 		}
-		else 
+		else
 		{
 			//failure
 			qDebug() << "Failure" << reply->errorString();
@@ -1019,12 +895,8 @@ void Moveit::sendHTTPRequest(QString actionKey, QString actionValue, float elaps
 
 			delete reply;
 		}
-	} // End of if IsScrutiny.
-
-} // End of sendHTTPRequest.
-
-
-
+	}
+}
 
 void Moveit::keyPressEvent(QKeyEvent *event)
 {
@@ -1032,8 +904,7 @@ void Moveit::keyPressEvent(QKeyEvent *event)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "keyPressEvent");
 
 	// Get the focus widget.
-	QWidget *w = QApplication::focusWidget(); 
-
+	QWidget *w = QApplication::focusWidget();
 
 	if (w == ui.mySpreadsheet)
 	{
@@ -1045,13 +916,12 @@ void Moveit::keyPressEvent(QKeyEvent *event)
 
 		QModelIndexList list = myModel->selectedIndexes();
 
-		if(list.size() > 0)
+		if (list.size() > 0)
 		{
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "List item found. Size: %i", list.size());
 
-			for (int t=0; t<list.size(); t++) 
+			for (int t = 0; t < list.size(); t++)
 			{
-
 				QModelIndex item = list.at(t);
 
 				QString contentsOfCurrentItem = item.data().toString();
@@ -1062,30 +932,29 @@ void Moveit::keyPressEvent(QKeyEvent *event)
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Row: %i, Column: %i, Contents: %s", row, col, contentsOfCurrentItem.toStdString().c_str());
 
 				int baseCol = col - 2;
-				int surfaceIndex = baseCol/6.0;
-				int curveIndex = baseCol%6;
-				int segIndex = row-1;
+				int surfaceIndex = baseCol / 6.0;
+				int curveIndex = baseCol % 6;
+				int segIndex = row - 1;
 
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface Index: %i, curveIndex: %i, segment index: %i", surfaceIndex, curveIndex, segIndex);
-
 
 				// Update the value.
 				if (segIndex > -1)
 				{
-					project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex)->get_P1_p()->set_X( contentsOfCurrentItem.toFloat() );
+					project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex)->get_P1_p()->set_X(contentsOfCurrentItem.toFloat());
 				}
 				else
 				{
 					// Treat the first row differently.
-					project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p()->set_X( contentsOfCurrentItem.toFloat() );
+					project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p()->set_X(contentsOfCurrentItem.toFloat());
 				}
 
 				// See if we need to update the start point of the next curve.
 				int noOfSegments = project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->size();
 
-				if ((segIndex < noOfSegments-1) && (segIndex > -1))
+				if ((segIndex < noOfSegments - 1) && (segIndex > -1))
 				{
-					project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex+1)->get_P0_p()->set_X( contentsOfCurrentItem.toFloat() );
+					project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex + 1)->get_P0_p()->set_X(contentsOfCurrentItem.toFloat());
 				}
 
 				// Recompute tangents etc.
@@ -1093,7 +962,6 @@ void Moveit::keyPressEvent(QKeyEvent *event)
 
 				// Set flag.
 				UnsavedChanges = true;
-
 			}
 
 			// Update the spreadsheet.
@@ -1101,25 +969,17 @@ void Moveit::keyPressEvent(QKeyEvent *event)
 
 			// Update the plots.
 			updateAllTabs();
-
-		} // End of if list size > 0.
-
+		}
 	}
 	else
 	{
 		// We are on another widget.
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "We are focused on another widget");
-
 	}
-
-
 
 	// Call the base class method.
 	QMainWindow::keyPressEvent(event);
-
-} // End of keyPressEvent.
-
-
+}
 
 void Moveit::appendStatusTableWidget(const QString key, const QString val)
 {
@@ -1131,17 +991,17 @@ void Moveit::appendStatusTableWidget(const QString key, const QString val)
 
 		QTableWidget* my_statusTable = ui.myStatusTableWidget;
 		int insertRow = my_statusTable->rowCount();
-		my_statusTable->insertRow( insertRow );
+		my_statusTable->insertRow(insertRow);
 
 		QTableWidgetItem* new_itemKey = new QTableWidgetItem();
-		new_itemKey->setText( key );  // 
+		new_itemKey->setText(key);  // 
 		new_itemKey->setFont(fnt);
-		my_statusTable->setItem(  insertRow, 0, new_itemKey );
+		my_statusTable->setItem(insertRow, 0, new_itemKey);
 
 		QTableWidgetItem* new_itemVal = new QTableWidgetItem();
-		new_itemVal->setText( val );
+		new_itemVal->setText(val);
 		new_itemVal->setFont(fnt);
-		my_statusTable->setItem(  insertRow, 1, new_itemVal );
+		my_statusTable->setItem(insertRow, 1, new_itemVal);
 
 		// Try to change the default row height.
 		my_statusTable->resizeRowsToContents();
@@ -1150,5 +1010,4 @@ void Moveit::appendStatusTableWidget(const QString key, const QString val)
 
 		my_statusTable->update();
 	}
-} // End of appendStatusTableWidget.
-
+}

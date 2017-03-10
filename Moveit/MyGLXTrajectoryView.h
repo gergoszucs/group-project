@@ -4,11 +4,11 @@
 
 class MyGLXTrajectoryView : public QGLWidget
 {
-	    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit MyGLXTrajectoryView(QWidget *parent = 0);
-	~MyGLXTrajectoryView(void);
+	~MyGLXTrajectoryView(void) {};
 
 	void resetMyView();
 
@@ -19,17 +19,13 @@ public:
 	float get_MaxY();
 	void set_MaxY(float y);
 
-signals:
-
-public slots:
-
 protected:
 
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
 	void setViewOrtho(int width, int height);
-	void keyPressEvent( QKeyEvent * event );
+	void keyPressEvent(QKeyEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *releaseEvent);
@@ -62,5 +58,4 @@ private:
 	void dragFocusPoints(float posX, float posY, float old_posX, float old_posY);
 	void drawMyCurveHandles(int curveIndex);
 	void drawMyInterpolatedCurve(int curveIndex);
-
 };
