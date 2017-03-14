@@ -81,6 +81,16 @@ public:
 
 	void userHasEnteredTextData();
 
+	/**
+	 * @fn	void Surfit::updateDataFromSpreadsheet();
+	 *
+	 * @brief	Handles updating mesh data when spreadsheet is modified.
+	 *
+	 * @author	Pawel Zybura
+	 * @date	14.03.2017
+	 */
+	void updateDataFromSpreadsheet();
+
 private:
 	Ui::SurfitClass ui;
 
