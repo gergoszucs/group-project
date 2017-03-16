@@ -65,32 +65,30 @@ All of us are committed to work together. If one team member encounters a proble
 
 \section{Market Analysis}
 
+There are several cloud providers in the market. The three biggest ones are Amazon with their AWS, Google with their Google Cloud Platform and Microsoft with Azure.
 
+For our project we need to access the visualized system on a low level since we need to install CUDA and QT libraries. Thus we require infrastructure as a service (IaaS). Google is focusing more on platform as a service (PaaS) and software as a service (SaaS). Microsoft offers hybrid solutions. 
+
+We decided to use AWS for our project. Even though we require Windows to run the application Microsoft Azure is not the first choice. AWS also provides systems that run a Windows operating system. Furthermore we have worked with AWS in a previous course before. Therefore accounts already exist and knowledge about how to use the platform is present.
 
 
 \section{Financial Forecast}
 
+The host machine must have access to a GPU since the FlexIT program does calculations on GPUs. There are several different instance types available at the AWS. The one which will be used for this project is called \texttt{g2.2xlarge} and it is the cheapest instance with a dedicated GPU. The hourly cost for on demand operation of this instance is $0.767$ US Dollars. 
+
+The expected up-time of the instance is estimated to be around 20 hours. Withing that time it should be possible to set up all the dependencies and either figure out that it is not possible to run FlexIT on this system or run a benchmark to analyse how the performance compares to a reference system (ie. the lab computer).
+
+The cost on AWS EC2 would therefore amount to approximately 16\$. At the current exchange rate this would be about 13\pounds. There might be small additional charges for snapshot storage. However the use of expensive storage like RDS or EFS is not planned. 
+
+In total the overall cost on AWS should not exceed 20\$ in the course of this project. Since this is a student project those costs should be covered by the university. 
 
 
-\section{Risk Factors}
-
-
-
-
+\newpage
 \section{Conclusion}
 
 
-
-
-
-
-
-
-
-
-
-
-
+FlexIT is a tool for simulating aerodynamics. In order to figure out if it can be run in the cloud and how its performance would be influenced when doing so, Group 1 would like to deploy the program on AWS.
+This requires the use of instances with Windows OS and a dedicated GPU. The expected cost to the university should not exceed 20 US dollars. 
 
 
 
