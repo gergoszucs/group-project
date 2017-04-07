@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Moveit", "Moveit\Moveit.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Surfit", "Surfit\Surfit.vcxproj", "{661CE8D1-7144-4243-B684-3C57FAE495BE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Designit", "Designit\Designit.vcxproj", "{EABD05E0-E4DB-4806-AAE6-3F169071D93A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -27,6 +29,10 @@ Global
 		{661CE8D1-7144-4243-B684-3C57FAE495BE}.Debug|x86.Build.0 = Debug|Win32
 		{661CE8D1-7144-4243-B684-3C57FAE495BE}.Release|x86.ActiveCfg = Release|Win32
 		{661CE8D1-7144-4243-B684-3C57FAE495BE}.Release|x86.Build.0 = Release|Win32
+		{EABD05E0-E4DB-4806-AAE6-3F169071D93A}.Debug|x86.ActiveCfg = Debug|Win32
+		{EABD05E0-E4DB-4806-AAE6-3F169071D93A}.Debug|x86.Build.0 = Debug|Win32
+		{EABD05E0-E4DB-4806-AAE6-3F169071D93A}.Release|x86.ActiveCfg = Release|Win32
+		{EABD05E0-E4DB-4806-AAE6-3F169071D93A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
