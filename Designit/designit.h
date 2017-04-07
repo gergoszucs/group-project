@@ -24,7 +24,6 @@ public:
 	void setMyTextDataField(QString str);
 	void resetModeButtons();
 	void emptyFocusVectors();
-	void updateSpreadsheet();
 	void keyPressEvent(QKeyEvent *event);
 
 	void sendHTTPRequest(QString actionKey, QString actionValue, float elapsedTimeSecs, int totalProblemSize, QString fileNameWithPath);
@@ -82,15 +81,33 @@ public:
 
 	void userHasEnteredTextData();
 
+	void toolBoxTabChanged(int index);
+
+	void showSpreadsheet();
+	void updateSpreadsheet();
+
 	/**
-	 * @fn	void Designit::updateDataFromSpreadsheet();
-	 *
-	 * @brief	Handles updating mesh data when spreadsheet is modified.
-	 *
-	 * @author	Pawel Zybura
-	 * @date	14.03.2017
-	 */
+	* @fn	void Designit::updateDataFromSpreadsheet();
+	*
+	* @brief	Handles updating mesh data when spreadsheet is modified.
+	*
+	* @author	Pawel Zybura
+	* @date	14.03.2017
+	*/
 	void updateDataFromSpreadsheet();
+
+	void showTrajectorySpreadsheet();
+	void updateTrajectorySpreadsheet();
+
+	/**
+	* @fn	void Designit::updateTrajectoryFromSpreadsheet();
+	*
+	* @brief	Handles updating trajectory data when spreadsheet is modified.
+	*
+	* @author	Pawel Zybura
+	* @date	07.04.2017
+	*/
+	void updateTrajectoryFromSpreadsheet();
 
 private:
 	Ui::DesignitClass ui;
@@ -99,7 +116,6 @@ private:
 	bool checkExitWithUnsavedData(); // Returns true if user wants to exit.
 	void closeProject();
 	void closeEvent(QCloseEvent *bar);
-	void showSpreadsheet();
 };
 
 #endif // DESIGNIT_H

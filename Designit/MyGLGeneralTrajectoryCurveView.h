@@ -47,6 +47,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *releaseEvent);
+	void wheelEvent(QWheelEvent *event);
 
 private:
 
@@ -72,6 +73,10 @@ private:
 	int _MyEndOfSegment; // Denotes whether the click is at the p0 or p1 point.
 
 	char _MyChar;
+
+	int orginX;
+	int orginY;
+
 
 	// Drawing methods.
 	void draw();

@@ -14,14 +14,11 @@
    <string>Surfit</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_6">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="childrenCollapsible">
-       <bool>false</bool>
       </property>
       <widget class="QTabWidget" name="tabsAdditionalData">
        <property name="minimumSize">
@@ -202,127 +199,191 @@
         </item>
        </layout>
       </widget>
-      <widget class="QTabWidget" name="tabsWork">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>400</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>10000000</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="tabPosition">
-        <enum>QTabWidget::East</enum>
-       </property>
-       <property name="tabShape">
-        <enum>QTabWidget::Triangular</enum>
-       </property>
+      <widget class="QToolBox" name="editingTools">
        <property name="currentIndex">
-        <number>5</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="tab_XYView">
-        <attribute name="title">
-         <string>XY view</string>
+       <widget class="QWidget" name="SurfaceTools">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>304</width>
+          <height>659</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Surface Tools</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="MyXYView" name="myXYView"/>
+          <widget class="QTabWidget" name="tabsWorkSurface">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>400</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>10000000</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="tabPosition">
+            <enum>QTabWidget::East</enum>
+           </property>
+           <property name="tabShape">
+            <enum>QTabWidget::Triangular</enum>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="tab_XYView">
+            <attribute name="title">
+             <string>XY view</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="MyXYView" name="myXYView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_XZView">
+            <attribute name="title">
+             <string>XZ view</string>
+            </attribute>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="MyXZView" name="myXZView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_YZView">
+            <attribute name="title">
+             <string>YZ view</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="MyYZView" name="myYZView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_gaussianView">
+            <attribute name="title">
+             <string>Gaussian Curvature</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="MyGaussianView" name="myGaussianView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_spreadsheet">
+            <attribute name="title">
+             <string>Spreadsheet</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QTableWidget" name="mySpreadsheet"/>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_XZView">
-        <attribute name="title">
-         <string>XZ view</string>
+       <widget class="QWidget" name="TrajectoryTools">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>304</width>
+          <height>659</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Trajectory Tools</string>
         </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
-          <widget class="MyXZView" name="myXZView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_YZView">
-        <attribute name="title">
-         <string>YZ view</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="MyYZView" name="myYZView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_gaussianView">
-        <attribute name="title">
-         <string>Gaussian Curvature</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_8">
-         <item>
-          <widget class="MyGaussianView" name="myGaussianView"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_spreadsheet">
-        <attribute name="title">
-         <string>Spreadsheet</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
-         <item>
-          <widget class="QTableWidget" name="mySpreadsheet"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_trajectoryTranslations">
-        <attribute name="title">
-         <string>Translations</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_11">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_10">
-           <item>
-            <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveX"/>
-           </item>
-           <item>
-            <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveY"/>
-           </item>
-           <item>
-            <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveZ"/>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_trajectoryRotations">
-        <attribute name="title">
-         <string>Rotations</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_12">
-         <item>
-          <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveR"/>
-         </item>
-         <item>
-          <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveP"/>
-         </item>
-         <item>
-          <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveB"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_trajectorySpreadsheet">
-        <attribute name="title">
-         <string>Spreadsheet</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_13">
-         <item>
-          <widget class="QTableWidget" name="trajectorySpreadsheet"/>
+          <widget class="QTabWidget" name="tabsWorkTrajectory">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>400</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>10000000</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="tabPosition">
+            <enum>QTabWidget::East</enum>
+           </property>
+           <property name="tabShape">
+            <enum>QTabWidget::Triangular</enum>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="tab_trajectoryTranslations">
+            <attribute name="title">
+             <string>Translations</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveX"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveY"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveZ"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_trajectoryRotations">
+            <attribute name="title">
+             <string>Rotations</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_19">
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveR"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveP"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveB"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_trajectorySpreadsheet">
+            <attribute name="title">
+             <string>Spreadsheet</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_20">
+             <item>
+              <widget class="QTableWidget" name="trajectorySpreadsheet"/>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </widget>

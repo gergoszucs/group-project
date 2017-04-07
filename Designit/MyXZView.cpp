@@ -6,6 +6,7 @@
 #include "ITSurface.h"
 #include "ITPoint.h"
 #include "ITControlPoint.h"
+#include "UtililityFunctions.h"
 
 MyXZView::MyXZView(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -469,161 +470,166 @@ void  MyXZView::findControlPointIndicesNearMouse(double posX, double posY, doubl
 
 void MyXZView::mouseMoveEvent(QMouseEvent *event)
 {
-	if (event->modifiers() & Qt::ShiftModifier)
+	// The shift key was pressed, so zoom.
+	float dx = (float)(event->x() - lastPos.x());
+	float dy = (float)(event->y() - lastPos.y());
+
+	float factor = 0.0;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 	{
-		// The shift key was pressed, so zoom.
-		// The shift key was pressed, so zoom.
-		float dx = (float)(event->x() - lastPos.x());
-		float dy = (float)(event->y() - lastPos.y());
-
-		float factor = 0.0;
-
-		// Check for fine movement.
-		if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
-		{
-			// Fine movement.
-			factor = 0.05;
-		}
-		else
-		{
-			// Coarse movement.
-			factor = 1.0;
-		}
-
-		dx = factor * dx;
-		dy = factor * dy;
-
-		// Update zoom.
-		glXZViewHalfExtent = glXZViewHalfExtent + dy;
-
-		lastPos = event->pos();
+		// Fine movement.
+		factor = 0.05;
 	}
-	else if (!(event->modifiers())) // Just clicking without modifiers.
+	else
 	{
-		GLint viewport[4];
-		GLdouble modelview[16];
-		GLdouble projection[16];
-		glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-		glGetDoublev(GL_PROJECTION_MATRIX, projection);
-		glGetIntegerv(GL_VIEWPORT, viewport);
+		// Coarse movement.
+		factor = 1.0;
+	}
 
-		const int x = event->x();
-		const int y = viewport[3] - event->y();
-
-		const int xold = lastPos.x();
-		const int yold = viewport[3] - lastPos.y();
-
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Here: %i, %i", x, y);
-
-		GLdouble posX, posY, posZ;
-		GLdouble old_posX, old_posY, old_posZ;
-		GLint result;
-
-		result = gluUnProject(xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
-		result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
-
-		w->statusBar()->showMessage(QString("X: %1, Z: %2").arg(posX).arg(posZ));
-
-		if ((MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL))
+	//check for left mouse button events
+	if (event->buttons() & Qt::LeftButton)
+	{
+		// Check for shift key press for zoom.
+		if (event->modifiers() & Qt::ShiftModifier)
 		{
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Here: %f, %f, %f", posX, posY, posZ);
+			// Update zoom.
+			float tmp = glXZViewHalfExtent + factor * dy;
 
-			// Drag the Focus points
-			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-			{
-				// Loop over focus points vector and add dx and dy
-				for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); n++)
-				{
-					ITControlPoint *p = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(n);
-
-					p->set_X(p->get_X() + posX - old_posX);
-					p->set_Z(p->get_Z() + posZ - old_posZ);
-
-				}
-
-				// Update interpolated points.
-				project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
-
-			}
-
-			lastPos = event->pos();
-
-			UnsavedChanges = true;
-
-			// Display the distance moved.
-			set_EditValueX(get_EditValueX() + (posX - old_posX));
-			set_EditValueY(get_EditValueY() + (posZ - old_posZ));
-			w->setMyTextDataField(QString("Distance dragged x: %1, z: %2").arg(get_EditValueX()).arg(get_EditValueY()));
+			if (tmp >= 0.0) glXZViewHalfExtent = tmp;
 		}
-		else if (MY_EDIT_MODE == ROTATE_ALL)
+		else if (!(event->modifiers())) // Just clicking without modifiers.
 		{
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mouseMoveEvent. ROTATE_ALL");
+			GLint viewport[4];
+			GLdouble modelview[16];
+			GLdouble projection[16];
+			glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+			glGetDoublev(GL_PROJECTION_MATRIX, projection);
+			glGetIntegerv(GL_VIEWPORT, viewport);
 
-			float thetaOld = atan2(old_posZ, old_posX);
-			float thetaNew = atan2(posZ, posX);
-			float dTheta = thetaNew - thetaOld;
+			const int x = event->x();
+			const int y = viewport[3] - event->y();
 
-			// Rotate the Focus points around the first point in the focus vector. 
-			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
+			const int xold = lastPos.x();
+			const int yold = viewport[3] - lastPos.y();
+
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Here: %i, %i", x, y);
+
+			GLdouble posX, posY, posZ;
+			GLdouble old_posX, old_posY, old_posZ;
+			GLint result;
+
+			result = gluUnProject(xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
+			result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
+
+			w->statusBar()->showMessage(QString("X: %1, Z: %2").arg(posX).arg(posZ));
+
+			if ((MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL))
 			{
-				if (project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size() == 0)
+				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Here: %f, %f, %f", posX, posY, posZ);
+
+				// Drag the Focus points
+				for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 				{
-					return;
-				}
+					// Loop over focus points vector and add dx and dy
+					for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); n++)
+					{
+						ITControlPoint *p = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(n);
 
-				ITPoint *basePoint = new ITPoint(project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(0)->get_X(),
-					project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(0)->get_Y(),
-					project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(0)->get_Z());
+						p->set_X(p->get_X() + posX - old_posX);
+						p->set_Z(p->get_Z() + posZ - old_posZ);
 
-				// Loop over focus points vector and add dx and dy
-				for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); n++)
-				{
-					ITControlPoint *p = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(n);
-					float pxOld = p->get_X() - basePoint->get_X();
-					float pyOld = p->get_Y() - basePoint->get_Y();
-					float pzOld = p->get_Z() - basePoint->get_Z();
+					}
 
-					float pxNew = pxOld*cos(dTheta) - pzOld*sin(dTheta);
-					float pzNew = pxOld*sin(dTheta) + pzOld*cos(dTheta);
-
-					pxNew = pxNew + basePoint->get_X();
-					pzNew = pzNew + basePoint->get_Z();
-
-					p->set_X(pxNew);
-					p->set_Z(pzNew);
+					// Update interpolated points.
+					project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
 
 				}
-
-				delete basePoint;
-
-				// Update interpolated points.
-				project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
-			}
-
-			lastPos = event->pos();
-			UnsavedChanges = true;
-		}
-		else if (MY_EDIT_MODE == CENTRED_ROTATE)
-		{
-			if (get_SecondClicksFinished())
-			{
-				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside mouseMoveEvent. CENTRED_ROTATE");
-
-				float thetaOld = atan2(old_posZ - get_ScratchControlPoint()->get_Z(), old_posX - get_ScratchControlPoint()->get_X());
-				float thetaNew = atan2(posZ - get_ScratchControlPoint()->get_Z(), posX - get_ScratchControlPoint()->get_X());
-				float dTheta = thetaNew - thetaOld;
-
-				set_EditValue(get_EditValue() + dTheta*180.0 / PI);
-
-				// Rotate the Focus points around the first point in the focus vector. 
-				centredRotateFocusPoints(dTheta);
-				lastPos = event->pos();
 
 				UnsavedChanges = true;
-				w->setMyTextDataField(QString::number(get_EditValue()));
+
+				// Display the distance moved.
+				set_EditValueX(get_EditValueX() + (posX - old_posX));
+				set_EditValueY(get_EditValueY() + (posZ - old_posZ));
+				w->setMyTextDataField(QString("Distance dragged x: %1, z: %2").arg(get_EditValueX()).arg(get_EditValueY()));
+			}
+			else if (MY_EDIT_MODE == ROTATE_ALL)
+			{
+				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mouseMoveEvent. ROTATE_ALL");
+
+				float thetaOld = atan2(old_posZ, old_posX);
+				float thetaNew = atan2(posZ, posX);
+				float dTheta = thetaNew - thetaOld;
+
+				// Rotate the Focus points around the first point in the focus vector. 
+				for (int k = 0; k < project->get_MySurfaces()->size(); k++)
+				{
+					if (project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size() == 0)
+					{
+						return;
+					}
+
+					ITPoint *basePoint = new ITPoint(project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(0)->get_X(),
+						project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(0)->get_Y(),
+						project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(0)->get_Z());
+
+					// Loop over focus points vector and add dx and dy
+					for (int n = 0; n < project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size(); n++)
+					{
+						ITControlPoint *p = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->at(n);
+						float pxOld = p->get_X() - basePoint->get_X();
+						float pyOld = p->get_Y() - basePoint->get_Y();
+						float pzOld = p->get_Z() - basePoint->get_Z();
+
+						float pxNew = pxOld*cos(dTheta) - pzOld*sin(dTheta);
+						float pzNew = pxOld*sin(dTheta) + pzOld*cos(dTheta);
+
+						pxNew = pxNew + basePoint->get_X();
+						pzNew = pzNew + basePoint->get_Z();
+
+						p->set_X(pxNew);
+						p->set_Z(pzNew);
+
+					}
+
+					delete basePoint;
+
+					// Update interpolated points.
+					project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
+				}
+
+				UnsavedChanges = true;
+			}
+			else if (MY_EDIT_MODE == CENTRED_ROTATE)
+			{
+				if (get_SecondClicksFinished())
+				{
+					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside mouseMoveEvent. CENTRED_ROTATE");
+
+					float thetaOld = atan2(old_posZ - get_ScratchControlPoint()->get_Z(), old_posX - get_ScratchControlPoint()->get_X());
+					float thetaNew = atan2(posZ - get_ScratchControlPoint()->get_Z(), posX - get_ScratchControlPoint()->get_X());
+					float dTheta = thetaNew - thetaOld;
+
+					set_EditValue(get_EditValue() + dTheta*180.0 / PI);
+
+					// Rotate the Focus points around the first point in the focus vector. 
+					centredRotateFocusPoints(dTheta);
+
+					UnsavedChanges = true;
+					w->setMyTextDataField(QString::number(get_EditValue()));
+				}
 			}
 		}
 	}
+	else if (event->buttons() & Qt::RightButton)
+	{
+		if (factor == 1.0) factor = 0.5;
+		glXZPanCentreX -= factor * dx;
+		glXZPanCentreY += factor * dy;
+	}
+
+	lastPos = event->pos();
 
 	// Adjust viewport view.
 	setViewOrtho(myWidth, myHeight);
@@ -634,6 +640,43 @@ void MyXZView::mouseMoveEvent(QMouseEvent *event)
 	// Redraw other views.
 	w->updateAllTabs();
 
+}
+
+void MyXZView::wheelEvent(QWheelEvent *event)
+{
+	float factor = 0.0;
+	float dy = event->delta() / 8;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
+	{
+		// Fine movement.
+		factor = 0.05;
+	}
+	else
+	{
+		// Coarse movement.
+		factor = 1.0;
+	}
+
+	float tmpAx, tmpAy, tmpBx, tmpBy;
+
+	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), glXZPanCentreX, glXZPanCentreY, glXZViewHalfExtent);
+
+	float tmp = glXZViewHalfExtent - factor * dy;
+
+	if (tmp >= 0.0) glXZViewHalfExtent = tmp;
+
+	getInAxesPosition(tmpBx, tmpBy, event->x(), event->y(), this->width(), this->height(), glXZPanCentreX, glXZPanCentreY, glXZViewHalfExtent);
+
+	glXZPanCentreX += tmpAx - tmpBx;
+	glXZPanCentreY += tmpAy - tmpBy;
+
+	// Adjust viewport view.
+	setViewOrtho(myWidth, myHeight);
+
+	// Redraw everything.
+	updateGL();
 }
 
 void MyXZView::drawMyControlPointsNet()

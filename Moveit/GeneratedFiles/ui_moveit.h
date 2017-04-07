@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'moveit.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.2
+** Created by: Qt User Interface Compiler version 5.7.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -370,32 +370,32 @@ public:
 
     void retranslateUi(QMainWindow *MoveitClass)
     {
-        MoveitClass->setWindowTitle(QApplication::translate("MoveitClass", "Moveit", 0));
-        actionOpen->setText(QApplication::translate("MoveitClass", "Open", 0));
-        actionAxes->setText(QApplication::translate("MoveitClass", "Axes", 0));
-        actionInterpolated_points->setText(QApplication::translate("MoveitClass", "Interpolated points", 0));
-        actionControl_points->setText(QApplication::translate("MoveitClass", "Control points", 0));
-        actionNormals->setText(QApplication::translate("MoveitClass", "Normals", 0));
-        actionAnnotations->setText(QApplication::translate("MoveitClass", "Annotations", 0));
-        actionDrag_trajectory_point->setText(QApplication::translate("MoveitClass", "Drag trajectory point", 0));
-        actionDry_run->setText(QApplication::translate("MoveitClass", "Dry run", 0));
-        actionReset_all_views->setText(QApplication::translate("MoveitClass", "Reset all views", 0));
-        actionExit->setText(QApplication::translate("MoveitClass", "Exit", 0));
-        actionSave_As->setText(QApplication::translate("MoveitClass", "Save As ...", 0));
-        actionClose->setText(QApplication::translate("MoveitClass", "Close", 0));
-        label->setText(QApplication::translate("MoveitClass", "Status window", 0));
-        label_2->setText(QApplication::translate("MoveitClass", "3D view", 0));
-        label_3->setText(QApplication::translate("MoveitClass", "Data:", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MoveitClass", "Data file", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("MoveitClass", "JSON view", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MoveitClass", "Translations", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("MoveitClass", "Rotations", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("MoveitClass", "Spreadsheet", 0));
-        menuFile->setTitle(QApplication::translate("MoveitClass", "File", 0));
-        menuTest->setTitle(QApplication::translate("MoveitClass", "View", 0));
-        menuHelp->setTitle(QApplication::translate("MoveitClass", "Help", 0));
-        menuMode->setTitle(QApplication::translate("MoveitClass", "Mode", 0));
-        menuSimulation->setTitle(QApplication::translate("MoveitClass", "Simulation", 0));
+        MoveitClass->setWindowTitle(QApplication::translate("MoveitClass", "Moveit", Q_NULLPTR));
+        actionOpen->setText(QApplication::translate("MoveitClass", "Open", Q_NULLPTR));
+        actionAxes->setText(QApplication::translate("MoveitClass", "Axes", Q_NULLPTR));
+        actionInterpolated_points->setText(QApplication::translate("MoveitClass", "Interpolated points", Q_NULLPTR));
+        actionControl_points->setText(QApplication::translate("MoveitClass", "Control points", Q_NULLPTR));
+        actionNormals->setText(QApplication::translate("MoveitClass", "Normals", Q_NULLPTR));
+        actionAnnotations->setText(QApplication::translate("MoveitClass", "Annotations", Q_NULLPTR));
+        actionDrag_trajectory_point->setText(QApplication::translate("MoveitClass", "Drag trajectory point", Q_NULLPTR));
+        actionDry_run->setText(QApplication::translate("MoveitClass", "Dry run", Q_NULLPTR));
+        actionReset_all_views->setText(QApplication::translate("MoveitClass", "Reset all views", Q_NULLPTR));
+        actionExit->setText(QApplication::translate("MoveitClass", "Exit", Q_NULLPTR));
+        actionSave_As->setText(QApplication::translate("MoveitClass", "Save As ...", Q_NULLPTR));
+        actionClose->setText(QApplication::translate("MoveitClass", "Close", Q_NULLPTR));
+        label->setText(QApplication::translate("MoveitClass", "Status window", Q_NULLPTR));
+        label_2->setText(QApplication::translate("MoveitClass", "3D view", Q_NULLPTR));
+        label_3->setText(QApplication::translate("MoveitClass", "Data:", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MoveitClass", "Data file", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("MoveitClass", "JSON view", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MoveitClass", "Translations", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("MoveitClass", "Rotations", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("MoveitClass", "Spreadsheet", Q_NULLPTR));
+        menuFile->setTitle(QApplication::translate("MoveitClass", "File", Q_NULLPTR));
+        menuTest->setTitle(QApplication::translate("MoveitClass", "View", Q_NULLPTR));
+        menuHelp->setTitle(QApplication::translate("MoveitClass", "Help", Q_NULLPTR));
+        menuMode->setTitle(QApplication::translate("MoveitClass", "Mode", Q_NULLPTR));
+        menuSimulation->setTitle(QApplication::translate("MoveitClass", "Simulation", Q_NULLPTR));
     } // retranslateUi
 
 };

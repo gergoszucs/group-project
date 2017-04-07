@@ -161,8 +161,10 @@
     <ClCompile Include="qjsonitem.cpp" />
     <ClCompile Include="qjsonmodel.cpp" />
     <ClCompile Include="ITPointTrajectory.cpp" />
+    <ClCompile Include="UtililityFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="UtililityFunctions.h" />
     <CustomBuild Include="designit.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing designit.h...</Message>

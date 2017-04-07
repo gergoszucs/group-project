@@ -6,6 +6,9 @@
 #include "ITControlPoint.h"
 #include "ITPhysics.h"
 #include "MyAboutDialogBox.h"
+#include "ITTrajectoryCurve.h"
+#include "ITTrajectoryCurveSegment.h"
+#include "ITPointTrajectory.h"
 
 #include <QMessageBox> // QMessageBox
 #include <QFileDialog> // QFileDialog for open data file.
@@ -52,6 +55,10 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 
 	// Connect "finished item editing" signal of spreadsheet to "save data" slot
 	connect(ui.mySpreadsheet->itemDelegate(), &QAbstractItemDelegate::commitData, this, &Designit::updateDataFromSpreadsheet);
+	connect(ui.trajectorySpreadsheet->itemDelegate(), &QAbstractItemDelegate::commitData, this, &Designit::updateTrajectoryFromSpreadsheet);
+
+	// Toolbox tab chenge signal
+	connect(ui.editingTools, &QToolBox::currentChanged, this, &Designit::toolBoxTabChanged);
 
 	// Set up the curve indices for the plot window objects.
 	ui.trajectoryCurveX->set_MyCurveIndex(0);
@@ -153,7 +160,7 @@ void Designit::loadData(QString fileNameWithPath) // Gets called from on_actionO
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "base_filename: %s", base_filename.c_str());
 
-		QString text = "Designit: " + QString(base_filename.c_str());
+		QString text = "DesignIT: " + QString(base_filename.c_str());
 
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "text: %s", text.toStdString().c_str());
 
@@ -173,6 +180,7 @@ void Designit::loadData(QString fileNameWithPath) // Gets called from on_actionO
 	}
 
 	showSpreadsheet();
+	showTrajectorySpreadsheet();
 
 	// Set the flag.
 	IsDataLoaded = true;
@@ -187,6 +195,7 @@ void Designit::loadData(QString fileNameWithPath) // Gets called from on_actionO
 	QApplication::processEvents();
 }
 
+// TODO: write ctrl+c, ctrl+v for trajectory spreadsheet
 void Designit::keyPressEvent(QKeyEvent *event)
 {
 	// Over-ride parent class method.
@@ -718,6 +727,7 @@ void Designit::on_actionNew_surface_triggered()
 	project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
 
 	updateSpreadsheet();
+	updateTrajectorySpreadsheet();
 	updateAllTabs();
 }
 
@@ -1958,6 +1968,167 @@ void Designit::showSpreadsheet()
 	}
 }
 
+void Designit::showTrajectorySpreadsheet()
+{
+	// Populate the output table tab.
+	if (MY_RUN_MODE == MYGUI)
+	{
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "showTrajectorySpreadsheet");
+		// Compute the number of columns and display column headers.============================================================================
+		int noOfSurfaces = project->get_MySurfaces()->size();
+		QTableWidget* my_table = ui.trajectorySpreadsheet;
+
+		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size() + 1);
+
+		int columnCount = 2 + 6 * noOfSurfaces; // The column count for the FrameNumber, CL, CD, Lift and Drag for each surface.
+
+												// Actually set the column count of the table.
+		my_table->setColumnCount(columnCount);
+
+		// Now display the column headers.
+		my_table->setHorizontalHeaderItem(0, new QTableWidgetItem("Index"));
+		my_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Frame Number"));
+
+		int columnIndex = 2;
+		for (int k = 0; k < noOfSurfaces; k++)
+		{
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("X %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Y %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Z %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Roll %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Pitch %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Yaw %1").arg(k)));
+			my_table->setColumnWidth(columnIndex, 50);
+			columnIndex++;
+		}
+
+		// Display first row (p0 of the first segments)
+		columnIndex = 0;
+
+		QTableWidgetItem* new_itemF = new QTableWidgetItem();
+		new_itemF->setText(QString::number(0));  // 
+		my_table->setItem(0, columnIndex, new_itemF);
+		columnIndex++;
+
+		int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_StartKeyFrame();
+		QTableWidgetItem* new_itemT = new QTableWidgetItem();
+		new_itemT->setText(QString::number(currentFrame));  // 
+		my_table->setItem(0, columnIndex, new_itemT);
+		columnIndex++;
+
+		for (int k = 0; k < noOfSurfaces; k++)
+		{
+			// X
+			ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemX = new QTableWidgetItem();
+			new_itemX->setText(QString::number(pX->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemX);
+			columnIndex++;
+			// Y
+			ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemY = new QTableWidgetItem();
+			new_itemY->setText(QString::number(pY->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemY);
+			columnIndex++;
+			// Z
+			ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemZ = new QTableWidgetItem();
+			new_itemZ->setText(QString::number(pZ->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemZ);
+			columnIndex++;
+			// Roll
+			ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemR = new QTableWidgetItem();
+			new_itemR->setText(QString::number(pR->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemR);
+			columnIndex++;
+			// Pitch
+			ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemP = new QTableWidgetItem();
+			new_itemP->setText(QString::number(pP->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemP);
+			columnIndex++;
+			// Yaw
+			ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemB = new QTableWidgetItem();
+			new_itemB->setText(QString::number(pB->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemB);
+			columnIndex++;
+		} // End of k loop.
+
+		  // Display data for each surface.======================================================================================
+		for (int n = 0; n < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++)
+		{
+			int columnIndex = 0;
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "showSpreadsheet. n = %i", n);
+
+			QTableWidgetItem* new_itemF = new QTableWidgetItem();
+			new_itemF->setText(QString::number(n + 1));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemF);
+			columnIndex++;
+
+			int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_EndKeyFrame();
+			QTableWidgetItem* new_itemT = new QTableWidgetItem();
+			new_itemT->setText(QString::number(currentFrame));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemT);
+			columnIndex++;
+
+			for (int k = 0; k < noOfSurfaces; k++)
+			{
+				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "showSpreadsheet 3");
+
+				// X
+				ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemX = new QTableWidgetItem();
+				new_itemX->setText(QString::number(pX->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemX);
+				columnIndex++;
+				// Y
+				ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemY = new QTableWidgetItem();
+				new_itemY->setText(QString::number(pY->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemY);
+				columnIndex++;
+				// Z
+				ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemZ = new QTableWidgetItem();
+				new_itemZ->setText(QString::number(pZ->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemZ);
+				columnIndex++;
+				// Roll
+				ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemR = new QTableWidgetItem();
+				new_itemR->setText(QString::number(pR->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemR);
+				columnIndex++;
+				// Pitch
+				ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemP = new QTableWidgetItem();
+				new_itemP->setText(QString::number(pP->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemP);
+				columnIndex++;
+				// Yaw
+				ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemB = new QTableWidgetItem();
+				new_itemB->setText(QString::number(pB->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemB);
+				columnIndex++;
+			}
+		}
+	}
+}
+
 void Designit::updateSpreadsheet()
 {
 	// Update the output table tab.
@@ -2036,6 +2207,136 @@ void Designit::updateSpreadsheet()
 
 					rowIndex++;
 				}
+			}
+		}
+	}
+}
+
+void Designit::updateTrajectorySpreadsheet()
+{
+	// Update the output table tab.
+	if (MY_RUN_MODE == MYGUI)
+	{
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet");
+
+		int noOfSurfaces = project->get_MySurfaces()->size();
+		QTableWidget* my_table = ui.trajectorySpreadsheet;
+
+		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size() + 1);
+
+		// Display first row (p0 of the first segments)
+		int columnIndex = 0;
+
+		QTableWidgetItem* new_itemF = new QTableWidgetItem();
+		new_itemF->setText(QString::number(0));  // 
+		my_table->setItem(0, columnIndex, new_itemF);
+		columnIndex++;
+
+		int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_StartKeyFrame();
+		QTableWidgetItem* new_itemT = new QTableWidgetItem();
+		new_itemT->setText(QString::number(currentFrame));  // 
+		my_table->setItem(0, columnIndex, new_itemT);
+		columnIndex++;
+
+		for (int k = 0; k < noOfSurfaces; k++)
+		{
+			// X
+			ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemX = new QTableWidgetItem();
+			new_itemX->setText(QString::number(pX->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemX);
+			columnIndex++;
+			// Y
+			ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemY = new QTableWidgetItem();
+			new_itemY->setText(QString::number(pY->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemY);
+			columnIndex++;
+			// Z
+			ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemZ = new QTableWidgetItem();
+			new_itemZ->setText(QString::number(pZ->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemZ);
+			columnIndex++;
+			// Roll
+			ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemR = new QTableWidgetItem();
+			new_itemR->setText(QString::number(pR->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemR);
+			columnIndex++;
+			// Pitch
+			ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemP = new QTableWidgetItem();
+			new_itemP->setText(QString::number(pP->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemP);
+			columnIndex++;
+			// Yaw
+			ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
+			QTableWidgetItem* new_itemB = new QTableWidgetItem();
+			new_itemB->setText(QString::number(pB->get_X()));  // 
+			my_table->setItem(0, columnIndex, new_itemB);
+			columnIndex++;
+		}
+
+		// Display data for each segment (after the first).======================================================================================
+		for (int n = 0; n < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++)
+		{
+			int columnIndex = 0;
+
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet. n = %i", n);
+
+			QTableWidgetItem* new_itemF = new QTableWidgetItem();
+			new_itemF->setText(QString::number(n + 1));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemF);
+			columnIndex++;
+
+			int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_EndKeyFrame();
+			QTableWidgetItem* new_itemT = new QTableWidgetItem();
+			new_itemT->setText(QString::number(currentFrame));  // 
+			my_table->setItem(n + 1, columnIndex, new_itemT);
+			columnIndex++;
+
+			// For the current segment, loop over each surface.
+			for (int k = 0; k < noOfSurfaces; k++)
+			{
+				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet 3");
+
+				// X
+				ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemX = new QTableWidgetItem();
+				new_itemX->setText(QString::number(pX->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemX);
+				columnIndex++;
+				// Y
+				ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemY = new QTableWidgetItem();
+				new_itemY->setText(QString::number(pY->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemY);
+				columnIndex++;
+				// Z
+				ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemZ = new QTableWidgetItem();
+				new_itemZ->setText(QString::number(pZ->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemZ);
+				columnIndex++;
+				// Roll
+				ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemR = new QTableWidgetItem();
+				new_itemR->setText(QString::number(pR->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemR);
+				columnIndex++;
+				// Pitch
+				ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemP = new QTableWidgetItem();
+				new_itemP->setText(QString::number(pP->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemP);
+				columnIndex++;
+				// Yaw (Bearing)
+				ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				QTableWidgetItem* new_itemB = new QTableWidgetItem();
+				new_itemB->setText(QString::number(pB->get_X()));  // 
+				my_table->setItem(n + 1, columnIndex, new_itemB);
+				columnIndex++;
 			}
 		}
 	}
@@ -2241,4 +2542,83 @@ void Designit::updateDataFromSpreadsheet()
 		// The user has changed something, so there is now unsaved data.
 		UnsavedChanges = true;
 	}
+}
+
+void Designit::updateTrajectoryFromSpreadsheet()
+{
+	// We are on the spreadsheet widget.
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "We are focused on the spreadsheet");
+
+	// Model of my first QTableWidget
+	QItemSelectionModel *myModel = ui.trajectorySpreadsheet->selectionModel();
+
+	QModelIndexList list = myModel->selectedIndexes();
+
+	if (list.size() > 0)
+	{
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "List item found. Size: %i", list.size());
+
+		for (int t = 0; t < list.size(); t++)
+		{
+			QModelIndex item = list.at(t);
+
+			QString contentsOfCurrentItem = item.data().toString();
+
+			int col = item.column();
+			int row = item.row();
+
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Row: %i, Column: %i, Contents: %s", row, col, contentsOfCurrentItem.toStdString().c_str());
+
+			int baseCol = col - 2;
+			int surfaceIndex = baseCol / 6.0;
+			int curveIndex = baseCol % 6;
+			int segIndex = row - 1;
+
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface Index: %i, curveIndex: %i, segment index: %i", surfaceIndex, curveIndex, segIndex);
+
+			// Update the value.
+			if (segIndex > -1)
+			{
+				project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex)->get_P1_p()->set_X(contentsOfCurrentItem.toFloat());
+			}
+			else
+			{
+				// Treat the first row differently.
+				project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p()->set_X(contentsOfCurrentItem.toFloat());
+			}
+
+			// See if we need to update the start point of the next curve.
+			int noOfSegments = project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->size();
+
+			if ((segIndex < noOfSegments - 1) && (segIndex > -1))
+			{
+				project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex + 1)->get_P0_p()->set_X(contentsOfCurrentItem.toFloat());
+			}
+
+			// Recompute tangents etc.
+			project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->computeMySegmentEndTangentVectors();
+
+			// Set flag.
+			UnsavedChanges = true;
+		}
+
+		// Update the spreadsheet.
+		updateTrajectorySpreadsheet();
+
+		// Update the plots.
+		updateAllTabs();
+	}
+}
+
+void Designit::toolBoxTabChanged( int index )
+{
+	if (index == 1)
+	{
+		trajectoryMode = true;
+	}
+	else {
+		trajectoryMode = false;
+	}
+
+	updateAllTabs();
 }

@@ -95,12 +95,6 @@
     <ClCompile Include="ITTrajectoryCurveSegment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_moveit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_moveit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_designit.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -160,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_MyYZView.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="UtililityFunctions.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +241,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="ITPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UtililityFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

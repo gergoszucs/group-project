@@ -85,6 +85,8 @@ extern bool drawGrids;
 extern bool IsVerticalDragOnly;
 extern bool IsHorizontalDragOnly;
 
+extern bool trajectoryMode;
+
 // Editing mode flags.
 enum EDIT_MODES_ENUM {NONE, 
 					  DRAG, 

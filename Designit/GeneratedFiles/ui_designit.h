@@ -29,6 +29,7 @@
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolBar>
+#include <QtWidgets/QToolBox>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -86,7 +87,7 @@ public:
     QAction *actionMeasure_distance;
     QAction *actionCentred_rotate;
     QWidget *centralWidget;
-    QVBoxLayout *verticalLayout_6;
+    QHBoxLayout *horizontalLayout_2;
     QSplitter *splitter;
     QTabWidget *tabsAdditionalData;
     QWidget *tab_statusWindow;
@@ -110,7 +111,10 @@ public:
     QSpacerItem *horizontalSpacer_2;
     QLineEdit *myEditTextDataField;
     MyGLWidget *myGLWidget;
-    QTabWidget *tabsWork;
+    QToolBox *editingTools;
+    QWidget *SurfaceTools;
+    QHBoxLayout *horizontalLayout;
+    QTabWidget *tabsWorkSurface;
     QWidget *tab_XYView;
     QVBoxLayout *verticalLayout_4;
     MyXYView *myXYView;
@@ -126,19 +130,21 @@ public:
     QWidget *tab_spreadsheet;
     QVBoxLayout *verticalLayout_7;
     QTableWidget *mySpreadsheet;
+    QWidget *TrajectoryTools;
+    QHBoxLayout *horizontalLayout_7;
+    QTabWidget *tabsWorkTrajectory;
     QWidget *tab_trajectoryTranslations;
-    QVBoxLayout *verticalLayout_11;
-    QVBoxLayout *verticalLayout_10;
+    QVBoxLayout *verticalLayout_6;
     MyGLGeneralTrajectoryCurveView *trajectoryCurveX;
     MyGLGeneralTrajectoryCurveView *trajectoryCurveY;
     MyGLGeneralTrajectoryCurveView *trajectoryCurveZ;
     QWidget *tab_trajectoryRotations;
-    QVBoxLayout *verticalLayout_12;
+    QVBoxLayout *verticalLayout_19;
     MyGLGeneralTrajectoryCurveView *trajectoryCurveR;
     MyGLGeneralTrajectoryCurveView *trajectoryCurveP;
     MyGLGeneralTrajectoryCurveView *trajectoryCurveB;
     QWidget *tab_trajectorySpreadsheet;
-    QVBoxLayout *verticalLayout_13;
+    QVBoxLayout *verticalLayout_20;
     QTableWidget *trajectorySpreadsheet;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -337,14 +343,13 @@ public:
         actionCentred_rotate->setIcon(icon31);
         centralWidget = new QWidget(DesignitClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        verticalLayout_6 = new QVBoxLayout(centralWidget);
-        verticalLayout_6->setSpacing(6);
-        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
+        horizontalLayout_2 = new QHBoxLayout(centralWidget);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         splitter = new QSplitter(centralWidget);
         splitter->setObjectName(QStringLiteral("splitter"));
         splitter->setOrientation(Qt::Horizontal);
-        splitter->setChildrenCollapsible(false);
         tabsAdditionalData = new QTabWidget(splitter);
         tabsAdditionalData->setObjectName(QStringLiteral("tabsAdditionalData"));
         tabsAdditionalData->setMinimumSize(QSize(200, 400));
@@ -459,13 +464,22 @@ public:
         verticalLayout_2->addWidget(myGLWidget);
 
         splitter->addWidget(frame_2);
-        tabsWork = new QTabWidget(splitter);
-        tabsWork->setObjectName(QStringLiteral("tabsWork"));
-        tabsWork->setMinimumSize(QSize(200, 400));
-        tabsWork->setMaximumSize(QSize(10000000, 16777215));
-        tabsWork->setFont(font);
-        tabsWork->setTabPosition(QTabWidget::East);
-        tabsWork->setTabShape(QTabWidget::Triangular);
+        editingTools = new QToolBox(splitter);
+        editingTools->setObjectName(QStringLiteral("editingTools"));
+        SurfaceTools = new QWidget();
+        SurfaceTools->setObjectName(QStringLiteral("SurfaceTools"));
+        SurfaceTools->setGeometry(QRect(0, 0, 304, 659));
+        horizontalLayout = new QHBoxLayout(SurfaceTools);
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        tabsWorkSurface = new QTabWidget(SurfaceTools);
+        tabsWorkSurface->setObjectName(QStringLiteral("tabsWorkSurface"));
+        tabsWorkSurface->setMinimumSize(QSize(200, 400));
+        tabsWorkSurface->setMaximumSize(QSize(10000000, 16777215));
+        tabsWorkSurface->setFont(font);
+        tabsWorkSurface->setTabPosition(QTabWidget::East);
+        tabsWorkSurface->setTabShape(QTabWidget::Triangular);
         tab_XYView = new QWidget();
         tab_XYView->setObjectName(QStringLiteral("tab_XYView"));
         verticalLayout_4 = new QVBoxLayout(tab_XYView);
@@ -477,7 +491,7 @@ public:
 
         verticalLayout_4->addWidget(myXYView);
 
-        tabsWork->addTab(tab_XYView, QString());
+        tabsWorkSurface->addTab(tab_XYView, QString());
         tab_XZView = new QWidget();
         tab_XZView->setObjectName(QStringLiteral("tab_XZView"));
         horizontalLayout_3 = new QHBoxLayout(tab_XZView);
@@ -489,7 +503,7 @@ public:
 
         horizontalLayout_3->addWidget(myXZView);
 
-        tabsWork->addTab(tab_XZView, QString());
+        tabsWorkSurface->addTab(tab_XZView, QString());
         tab_YZView = new QWidget();
         tab_YZView->setObjectName(QStringLiteral("tab_YZView"));
         verticalLayout_3 = new QVBoxLayout(tab_YZView);
@@ -501,7 +515,7 @@ public:
 
         verticalLayout_3->addWidget(myYZView);
 
-        tabsWork->addTab(tab_YZView, QString());
+        tabsWorkSurface->addTab(tab_YZView, QString());
         tab_gaussianView = new QWidget();
         tab_gaussianView->setObjectName(QStringLiteral("tab_gaussianView"));
         verticalLayout_8 = new QVBoxLayout(tab_gaussianView);
@@ -513,7 +527,7 @@ public:
 
         verticalLayout_8->addWidget(myGaussianView);
 
-        tabsWork->addTab(tab_gaussianView, QString());
+        tabsWorkSurface->addTab(tab_gaussianView, QString());
         tab_spreadsheet = new QWidget();
         tab_spreadsheet->setObjectName(QStringLiteral("tab_spreadsheet"));
         verticalLayout_7 = new QVBoxLayout(tab_spreadsheet);
@@ -525,72 +539,88 @@ public:
 
         verticalLayout_7->addWidget(mySpreadsheet);
 
-        tabsWork->addTab(tab_spreadsheet, QString());
+        tabsWorkSurface->addTab(tab_spreadsheet, QString());
+
+        horizontalLayout->addWidget(tabsWorkSurface);
+
+        editingTools->addItem(SurfaceTools, QStringLiteral("Surface Tools"));
+        TrajectoryTools = new QWidget();
+        TrajectoryTools->setObjectName(QStringLiteral("TrajectoryTools"));
+        TrajectoryTools->setGeometry(QRect(0, 0, 304, 659));
+        horizontalLayout_7 = new QHBoxLayout(TrajectoryTools);
+        horizontalLayout_7->setSpacing(6);
+        horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
+        tabsWorkTrajectory = new QTabWidget(TrajectoryTools);
+        tabsWorkTrajectory->setObjectName(QStringLiteral("tabsWorkTrajectory"));
+        tabsWorkTrajectory->setMinimumSize(QSize(200, 400));
+        tabsWorkTrajectory->setMaximumSize(QSize(10000000, 16777215));
+        tabsWorkTrajectory->setFont(font);
+        tabsWorkTrajectory->setTabPosition(QTabWidget::East);
+        tabsWorkTrajectory->setTabShape(QTabWidget::Triangular);
         tab_trajectoryTranslations = new QWidget();
         tab_trajectoryTranslations->setObjectName(QStringLiteral("tab_trajectoryTranslations"));
-        verticalLayout_11 = new QVBoxLayout(tab_trajectoryTranslations);
-        verticalLayout_11->setSpacing(6);
-        verticalLayout_11->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
-        verticalLayout_10 = new QVBoxLayout();
-        verticalLayout_10->setSpacing(6);
-        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
+        verticalLayout_6 = new QVBoxLayout(tab_trajectoryTranslations);
+        verticalLayout_6->setSpacing(6);
+        verticalLayout_6->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
         trajectoryCurveX = new MyGLGeneralTrajectoryCurveView(tab_trajectoryTranslations);
         trajectoryCurveX->setObjectName(QStringLiteral("trajectoryCurveX"));
 
-        verticalLayout_10->addWidget(trajectoryCurveX);
+        verticalLayout_6->addWidget(trajectoryCurveX);
 
         trajectoryCurveY = new MyGLGeneralTrajectoryCurveView(tab_trajectoryTranslations);
         trajectoryCurveY->setObjectName(QStringLiteral("trajectoryCurveY"));
 
-        verticalLayout_10->addWidget(trajectoryCurveY);
+        verticalLayout_6->addWidget(trajectoryCurveY);
 
         trajectoryCurveZ = new MyGLGeneralTrajectoryCurveView(tab_trajectoryTranslations);
         trajectoryCurveZ->setObjectName(QStringLiteral("trajectoryCurveZ"));
 
-        verticalLayout_10->addWidget(trajectoryCurveZ);
+        verticalLayout_6->addWidget(trajectoryCurveZ);
 
-
-        verticalLayout_11->addLayout(verticalLayout_10);
-
-        tabsWork->addTab(tab_trajectoryTranslations, QString());
+        tabsWorkTrajectory->addTab(tab_trajectoryTranslations, QString());
         tab_trajectoryRotations = new QWidget();
         tab_trajectoryRotations->setObjectName(QStringLiteral("tab_trajectoryRotations"));
-        verticalLayout_12 = new QVBoxLayout(tab_trajectoryRotations);
-        verticalLayout_12->setSpacing(6);
-        verticalLayout_12->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_12->setObjectName(QStringLiteral("verticalLayout_12"));
+        verticalLayout_19 = new QVBoxLayout(tab_trajectoryRotations);
+        verticalLayout_19->setSpacing(6);
+        verticalLayout_19->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_19->setObjectName(QStringLiteral("verticalLayout_19"));
         trajectoryCurveR = new MyGLGeneralTrajectoryCurveView(tab_trajectoryRotations);
         trajectoryCurveR->setObjectName(QStringLiteral("trajectoryCurveR"));
 
-        verticalLayout_12->addWidget(trajectoryCurveR);
+        verticalLayout_19->addWidget(trajectoryCurveR);
 
         trajectoryCurveP = new MyGLGeneralTrajectoryCurveView(tab_trajectoryRotations);
         trajectoryCurveP->setObjectName(QStringLiteral("trajectoryCurveP"));
 
-        verticalLayout_12->addWidget(trajectoryCurveP);
+        verticalLayout_19->addWidget(trajectoryCurveP);
 
         trajectoryCurveB = new MyGLGeneralTrajectoryCurveView(tab_trajectoryRotations);
         trajectoryCurveB->setObjectName(QStringLiteral("trajectoryCurveB"));
 
-        verticalLayout_12->addWidget(trajectoryCurveB);
+        verticalLayout_19->addWidget(trajectoryCurveB);
 
-        tabsWork->addTab(tab_trajectoryRotations, QString());
+        tabsWorkTrajectory->addTab(tab_trajectoryRotations, QString());
         tab_trajectorySpreadsheet = new QWidget();
         tab_trajectorySpreadsheet->setObjectName(QStringLiteral("tab_trajectorySpreadsheet"));
-        verticalLayout_13 = new QVBoxLayout(tab_trajectorySpreadsheet);
-        verticalLayout_13->setSpacing(6);
-        verticalLayout_13->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_13->setObjectName(QStringLiteral("verticalLayout_13"));
+        verticalLayout_20 = new QVBoxLayout(tab_trajectorySpreadsheet);
+        verticalLayout_20->setSpacing(6);
+        verticalLayout_20->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_20->setObjectName(QStringLiteral("verticalLayout_20"));
         trajectorySpreadsheet = new QTableWidget(tab_trajectorySpreadsheet);
         trajectorySpreadsheet->setObjectName(QStringLiteral("trajectorySpreadsheet"));
 
-        verticalLayout_13->addWidget(trajectorySpreadsheet);
+        verticalLayout_20->addWidget(trajectorySpreadsheet);
 
-        tabsWork->addTab(tab_trajectorySpreadsheet, QString());
-        splitter->addWidget(tabsWork);
+        tabsWorkTrajectory->addTab(tab_trajectorySpreadsheet, QString());
 
-        verticalLayout_6->addWidget(splitter);
+        horizontalLayout_7->addWidget(tabsWorkTrajectory);
+
+        editingTools->addItem(TrajectoryTools, QStringLiteral("Trajectory Tools"));
+        splitter->addWidget(editingTools);
+
+        horizontalLayout_2->addWidget(splitter);
 
         DesignitClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(DesignitClass);
@@ -717,7 +747,9 @@ public:
         retranslateUi(DesignitClass);
 
         tabsAdditionalData->setCurrentIndex(0);
-        tabsWork->setCurrentIndex(5);
+        editingTools->setCurrentIndex(0);
+        tabsWorkSurface->setCurrentIndex(0);
+        tabsWorkTrajectory->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(DesignitClass);
@@ -776,14 +808,16 @@ public:
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_viewJSON), QApplication::translate("DesignitClass", "JSON view", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_dataFile), QApplication::translate("DesignitClass", "Data file", Q_NULLPTR));
         label_2->setText(QApplication::translate("DesignitClass", "3D view", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_XYView), QApplication::translate("DesignitClass", "XY view", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_XZView), QApplication::translate("DesignitClass", "XZ view", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_YZView), QApplication::translate("DesignitClass", "YZ view", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_gaussianView), QApplication::translate("DesignitClass", "Gaussian Curvature", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_spreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_trajectoryTranslations), QApplication::translate("DesignitClass", "Translations", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_trajectoryRotations), QApplication::translate("DesignitClass", "Rotations", Q_NULLPTR));
-        tabsWork->setTabText(tabsWork->indexOf(tab_trajectorySpreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", Q_NULLPTR));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XYView), QApplication::translate("DesignitClass", "XY view", Q_NULLPTR));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XZView), QApplication::translate("DesignitClass", "XZ view", Q_NULLPTR));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_YZView), QApplication::translate("DesignitClass", "YZ view", Q_NULLPTR));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_gaussianView), QApplication::translate("DesignitClass", "Gaussian Curvature", Q_NULLPTR));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_spreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", Q_NULLPTR));
+        editingTools->setItemText(editingTools->indexOf(SurfaceTools), QApplication::translate("DesignitClass", "Surface Tools", Q_NULLPTR));
+        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectoryTranslations), QApplication::translate("DesignitClass", "Translations", Q_NULLPTR));
+        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectoryRotations), QApplication::translate("DesignitClass", "Rotations", Q_NULLPTR));
+        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectorySpreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", Q_NULLPTR));
+        editingTools->setItemText(editingTools->indexOf(TrajectoryTools), QApplication::translate("DesignitClass", "Trajectory Tools", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("DesignitClass", "File", Q_NULLPTR));
         menuView->setTitle(QApplication::translate("DesignitClass", "View", Q_NULLPTR));
         menuEdit->setTitle(QApplication::translate("DesignitClass", "Mode", Q_NULLPTR));

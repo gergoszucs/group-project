@@ -6,6 +6,7 @@
 #include "ITSurface.h"
 #include "ITPoint.h"
 #include "ITControlPoint.h"
+#include "UtililityFunctions.h"
 
 MyGaussianView::MyGaussianView(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -205,45 +206,89 @@ void MyGaussianView::drawMyAxes()
 
 void MyGaussianView::mouseMoveEvent(QMouseEvent *event)
 {
+	// The shift key was pressed, so zoom.
 	float dx = (float)(event->x() - lastPos.x());
 	float dy = (float)(event->y() - lastPos.y());
 
-	if (event->modifiers() & Qt::ShiftModifier)
+	float factor = 0.0;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 	{
-		// The shift key was pressed, so zoom.
-		float factor = 0.0;
-
-		// Check for fine movement.
-		if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
-		{
-			// Fine movement.
-			factor = 0.05;
-		}
-		else
-		{
-			// Coarse movement.
-			factor = 1.0;
-		}
-
-		dx = factor * dx;
-		dy = factor * dy;
-
-		// Update zoom.
-		glGaussianViewHalfExtent = glGaussianViewHalfExtent + dy;
-
-		lastPos = event->pos();
+		// Fine movement.
+		factor = 0.05;
 	}
 	else
 	{
-		// No other keys pressed so rotate.
-		if (event->buttons() & Qt::LeftButton)
+		// Coarse movement.
+		factor = 1.0;
+	}
+
+	if (event->buttons() & Qt::LeftButton)
+	{
+		// Check for shift key press for zoom.
+		if (event->modifiers() & Qt::ShiftModifier)
 		{
-			xRot = xRot + dy;
-			yRot = yRot + dx;
+			// Update zoom.
+			float tmp = glGaussianViewHalfExtent + factor * dy;
+
+			if (tmp >= 0.0) glGaussianViewHalfExtent = tmp;
 		}
+		else
+		{
+			// No other keys pressed so rotate.
+			if (event->buttons() & Qt::LeftButton)
+			{
+				xRot = xRot + dy;
+				yRot = yRot + dx;
+			}
+		}
+	}
+	else if (event->buttons() & Qt::RightButton)
+	{
+		if (factor == 1.0) factor = 0.5;
+		glGaussianPanCentreX -= factor * dx;
+		glGaussianPanCentreY += factor * dy;
 	}
 
 	lastPos = event->pos();
+
+	// Adjust viewport view.
+	setViewOrtho(myWidth, myHeight);
+
+	// Redraw everything.
+	updateGL();
+}
+
+void MyGaussianView::wheelEvent(QWheelEvent *event)
+{
+	float factor = 0.0;
+	float dy = event->delta() / 8;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
+	{
+		// Fine movement.
+		factor = 0.05;
+	}
+	else
+	{
+		// Coarse movement.
+		factor = 1.0;
+	}
+
+	float tmpAx, tmpAy, tmpBx, tmpBy;
+
+	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), glGaussianPanCentreX, glGaussianPanCentreY, glGaussianViewHalfExtent);
+
+	float tmp = glGaussianViewHalfExtent - factor * dy;
+
+	if (tmp >= 0.0) glGaussianViewHalfExtent = tmp;
+
+	getInAxesPosition(tmpBx, tmpBy, event->x(), event->y(), this->width(), this->height(), glGaussianPanCentreX, glGaussianPanCentreY, glGaussianViewHalfExtent);
+
+	glGaussianPanCentreX += tmpAx - tmpBx;
+	glGaussianPanCentreY += tmpAy - tmpBy;
 
 	// Adjust viewport view.
 	setViewOrtho(myWidth, myHeight);

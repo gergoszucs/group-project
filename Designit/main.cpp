@@ -31,13 +31,15 @@
 Designit* w;
 ITProject *project;
 bool IsScrutiny = false; // Enable HTTP logging.
-QString PROGRAM_VERSION = QString("0.1.000");
+QString PROGRAM_VERSION = QString("0.1.100");
 
 // Simulation progress variables.
 int FrameNumber = 0;
 
 // Simulation semaphores.
 bool IsDryRun = false;
+
+bool trajectoryMode = false;
 
 // Data file name strings.
 QString DataFileNameWithPath;
@@ -79,7 +81,7 @@ float gl3DPanCentreX = 0.0;
 float gl3DPanCentreY = 0.0;
 
 float glXViewHalfExtent = 50.0;
-float glXPanCentreX = 40.0;
+float glXPanCentreX = 50.0;
 float glXPanCentreY = 0.0;
 
 float glYViewHalfExtent = 50.0;
@@ -136,7 +138,7 @@ int main(int argc, char *argv[])
 		w = new Designit();
 
 		// Set the decals.
-		w->setWindowTitle("Designit");
+		w->setWindowTitle("DesignIT");
 		w->statusBar()->showMessage(QObject::tr("Ready"));
 
 		// Set the main window icon.

@@ -6,6 +6,10 @@
 #include "ITPoint.h"
 #include "ITPanel.h"
 #include "ITControlPoint.h"
+#include "ITTrajectoryCurve.h"
+#include "ITTrajectoryCurveSegment.h"
+#include "ITPointTrajectory.h"
+#include "UtililityFunctions.h"
 
 MyGLWidget::MyGLWidget(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -109,46 +113,7 @@ void MyGLWidget::setViewOrtho(int width, int height)
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void MyGLWidget::keyPressEvent(QKeyEvent * event)
-{
-	float factor = 0.0;
-
-	// Check for fine movement.
-	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
-	{
-		// Fine movement.
-		factor = 0.05;
-	}
-	else
-	{
-		// Coarse movement.
-		factor = 1.0;
-	}
-
-	if (event->key() == Qt::Key_Up)
-	{
-		gl3DPanCentreY = gl3DPanCentreY + factor;
-	}
-	else if (event->key() == Qt::Key_Down)
-	{
-		gl3DPanCentreY = gl3DPanCentreY - factor;
-	}
-	else if (event->key() == Qt::Key_Left)
-	{
-		gl3DPanCentreX = gl3DPanCentreX - factor;
-	}
-	else if (event->key() == Qt::Key_Right)
-	{
-		gl3DPanCentreX = gl3DPanCentreX + factor;
-	}
-
-	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
-
-	// Force redraw.
-	update();
-
-}
+//drawing functions
 
 void MyGLWidget::draw()
 {
@@ -174,9 +139,14 @@ void MyGLWidget::draw()
 			drawMyAnnotations();
 		}
 
-		//<from moveit>
-		drawMyTracks();
-		//</from moveit>
+		if ( trajectoryMode && ( project->get_MySurfaces()->size() > 0 ) )
+		{
+			int n = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size() - 1;
+			int frame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_EndKeyFrame();
+
+			drawMyTracks( frame );
+		}
+		
 	}
 }
 
@@ -360,6 +330,116 @@ void MyGLWidget::drawMyControlPointsNet()
 	}
 }
 
+void MyGLWidget::drawMyTracks( int frame )
+{
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside drawMyTracks.");
+
+	glColor3f(1.0f, 0.0f, 0.0f); // Red.
+
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
+	{
+		glBegin(GL_LINE_STRIP);
+
+		// Loop through the frames for the first corner control point.
+		for (int n = 0; n < frame; n++)
+		{
+			ITPoint *translationPoint = new ITPoint(0.0, 0.0, 0.0);
+			ITPoint *rotationPoint = new ITPoint(0.0, 0.0, 0.0);
+
+			project->get_MySurfaces()->at(k)->computeTrajectoryPointsAtFrame(n, k, translationPoint, rotationPoint);
+
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "drawing translationPoint x: %f, y: %f, z: %f", translationPoint->get_X(), translationPoint->get_Y(), translationPoint->get_Z());
+
+			ITPoint *currentPoint = new ITPoint(0.0, 0.0, 0.0);
+
+			currentPoint->set_X(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(0).at(0)->get_X());
+			currentPoint->set_Y(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(0).at(0)->get_Y());
+			currentPoint->set_Z(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(0).at(0)->get_Z());
+
+			ITPoint *cp = project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint();
+			currentPoint->propagateMe(cp, rotationPoint, translationPoint);
+
+			glVertex3f(currentPoint->get_X(), currentPoint->get_Y(), currentPoint->get_Z());
+
+			delete translationPoint;
+			delete rotationPoint;
+			delete currentPoint;
+		}
+
+		glEnd();
+		glBegin(GL_LINE_STRIP);
+
+		// Loop through the frames for the second corner control point.
+		for (int n = 0; n < frame; n++)
+		{
+			ITPoint *translationPoint = new ITPoint(0.0, 0.0, 0.0);
+			ITPoint *rotationPoint = new ITPoint(0.0, 0.0, 0.0);
+
+			project->get_MySurfaces()->at(k)->computeTrajectoryPointsAtFrame(n, k, translationPoint, rotationPoint);
+
+			ITPoint *currentPoint = new ITPoint(0.0, 0.0, 0.0);
+
+			currentPoint->set_X(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->back().at(0)->get_X());
+			currentPoint->set_Y(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->back().at(0)->get_Y());
+			currentPoint->set_Z(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->back().at(0)->get_Z());
+
+			ITPoint *cp = project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint();
+			currentPoint->propagateMe(cp, rotationPoint, translationPoint);
+
+			glVertex3f(currentPoint->get_X(), currentPoint->get_Y(), currentPoint->get_Z());
+
+			delete translationPoint;
+			delete rotationPoint;
+			delete currentPoint;
+		}
+
+		glEnd();
+	}
+}
+
+//Control slots
+
+void MyGLWidget::keyPressEvent(QKeyEvent * event)
+{
+	float factor = 0.0;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
+	{
+		// Fine movement.
+		factor = 0.05;
+	}
+	else
+	{
+		// Coarse movement.
+		factor = 1.0;
+	}
+
+	if (event->key() == Qt::Key_Up)
+	{
+		gl3DPanCentreY = gl3DPanCentreY + factor;
+	}
+	else if (event->key() == Qt::Key_Down)
+	{
+		gl3DPanCentreY = gl3DPanCentreY - factor;
+	}
+	else if (event->key() == Qt::Key_Left)
+	{
+		gl3DPanCentreX = gl3DPanCentreX - factor;
+	}
+	else if (event->key() == Qt::Key_Right)
+	{
+		gl3DPanCentreX = gl3DPanCentreX + factor;
+	}
+
+	// Adjust viewport view.
+	setViewOrtho(myWidth, myHeight);
+
+	// Force redraw.
+	update();
+
+}
+
 void MyGLWidget::mousePressEvent(QMouseEvent *event)
 {
 	lastPos = event->pos();
@@ -400,9 +480,9 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
 			xRot = xRot + dy;
 			yRot = yRot + dx;
 		}
-	} 
-	else if ( event -> buttons() & Qt::RightButton )
-	{ 
+	}
+	else if (event->buttons() & Qt::RightButton)
+	{
 		if (factor == 1.0) factor = 0.5;
 		gl3DPanCentreX = gl3DPanCentreX - factor * dx;
 		gl3DPanCentreY = gl3DPanCentreY + factor * dy;
@@ -434,80 +514,22 @@ void MyGLWidget::wheelEvent(QWheelEvent *event)
 		factor = 1.0;
 	}
 
-	float tmp = gl3DViewHalfExtent - factor * dy;
+	float tmpAx, tmpAy, tmpBx, tmpBy;
 
+	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), gl3DPanCentreX, gl3DPanCentreY, gl3DViewHalfExtent);
+
+	float tmp = gl3DViewHalfExtent - factor * dy;
+	
 	if (tmp >= 0.0) gl3DViewHalfExtent = tmp;
+
+	getInAxesPosition(tmpBx, tmpBy, event->x(), event->y(), this->width(), this->height(), gl3DPanCentreX, gl3DPanCentreY, gl3DViewHalfExtent);
+
+	gl3DPanCentreX += tmpAx - tmpBx;
+	gl3DPanCentreY += tmpAy - tmpBy;
 
 	// Adjust viewport view.
 	setViewOrtho(myWidth, myHeight);
 
 	// Redraw everything.
 	updateGL();
-}
-
-void MyGLWidget::drawMyTracks()
-{
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside drawMyTracks.");
-
-	glColor3f(1.0f, 0.0f, 0.0f); // Red.
-
-	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-	{
-		glBegin(GL_LINE_STRIP);
-
-		// Loop through the frames for the first corner control point.
-		for (int n = 0; n < FrameNumber; n++)
-		{
-			ITPoint *translationPoint = new ITPoint(0.0, 0.0, 0.0);
-			ITPoint *rotationPoint = new ITPoint(0.0, 0.0, 0.0);
-
-			project->get_MySurfaces()->at(k)->computeTrajectoryPointsAtFrame(n, k, translationPoint, rotationPoint);
-
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "drawing translationPoint x: %f, y: %f, z: %f", translationPoint->get_X(), translationPoint->get_Y(), translationPoint->get_Z());
-
-			ITPoint *currentPoint = new ITPoint(0.0, 0.0, 0.0);
-
-			currentPoint->set_X(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(0).at(0)->get_X());
-			currentPoint->set_Y(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(0).at(0)->get_Y());
-			currentPoint->set_Z(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(0).at(0)->get_Z());
-
-			ITPoint *cp = project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint();
-			currentPoint->propagateMe(cp, rotationPoint, translationPoint);
-
-			glVertex3f(currentPoint->get_X(), currentPoint->get_Y(), currentPoint->get_Z());
-
-			delete translationPoint;
-			delete rotationPoint;
-			delete currentPoint;
-		}
-
-		glEnd();
-		glBegin(GL_LINE_STRIP);
-
-		// Loop through the frames for the second corner control point.
-		for (int n = 0; n < FrameNumber; n++)
-		{
-			ITPoint *translationPoint = new ITPoint(0.0, 0.0, 0.0);
-			ITPoint *rotationPoint = new ITPoint(0.0, 0.0, 0.0);
-
-			project->get_MySurfaces()->at(k)->computeTrajectoryPointsAtFrame(n, k, translationPoint, rotationPoint);
-
-			ITPoint *currentPoint = new ITPoint(0.0, 0.0, 0.0);
-
-			currentPoint->set_X(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->back().at(0)->get_X());
-			currentPoint->set_Y(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->back().at(0)->get_Y());
-			currentPoint->set_Z(project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->back().at(0)->get_Z());
-
-			ITPoint *cp = project->get_MyBaseSurfaces()->at(k)->get_MyCentreOfRotationPoint();
-			currentPoint->propagateMe(cp, rotationPoint, translationPoint);
-
-			glVertex3f(currentPoint->get_X(), currentPoint->get_Y(), currentPoint->get_Z());
-
-			delete translationPoint;
-			delete rotationPoint;
-			delete currentPoint;
-		}
-
-		glEnd();
-	}
 }

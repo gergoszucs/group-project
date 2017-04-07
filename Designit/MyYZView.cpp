@@ -6,6 +6,7 @@
 #include "ITSurface.h"
 #include "ITPoint.h"
 #include "ITControlPoint.h"
+#include "UtililityFunctions.h"
 
 MyYZView::MyYZView(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -395,73 +396,84 @@ void  MyYZView::findControlPointIndicesNearMouse(double posX, double posY, doubl
 
 void MyYZView::mouseMoveEvent(QMouseEvent *event)
 {
-	if (event->modifiers() & Qt::ShiftModifier)
+	// The shift key was pressed, so zoom.
+	float dx = (float)(event->x() - lastPos.x());
+	float dy = (float)(event->y() - lastPos.y());
+
+	float factor = 0.0;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 	{
-		// The shift key was pressed, so zoom.
-		float dx = (float)(event->x() - lastPos.x());
-		float dy = (float)(event->y() - lastPos.y());
-
-		float factor = 0.0;
-
-		// Check for fine movement.
-		if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
-		{
-			// Fine movement.
-			factor = 0.05;
-		}
-		else
-		{
-			// Coarse movement.
-			factor = 1.0;
-		}
-
-		dx = factor * dx;
-		dy = factor * dy;
-
-		// Update zoom.
-		glYZViewHalfExtent = glYZViewHalfExtent + dy;
-
-		lastPos = event->pos();
+		// Fine movement.
+		factor = 0.05;
 	}
-	else if (!(event->modifiers())) // Just clicking without modifiers.
+	else
 	{
-		if ((MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL))
-		{
-			GLint viewport[4];
-			GLdouble modelview[16];
-			GLdouble projection[16];
-			glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-			glGetDoublev(GL_PROJECTION_MATRIX, projection);
-			glGetIntegerv(GL_VIEWPORT, viewport);
-
-			const int x = event->x();
-			const int y = viewport[3] - event->y();
-
-			const int xold = lastPos.x();
-			const int yold = viewport[3] - lastPos.y();
-
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Here: %i, %i", x, y);
-
-			GLdouble posX, posY, posZ;
-			GLdouble old_posX, old_posY, old_posZ;
-			GLint result;
-
-			result = gluUnProject(xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
-			result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
-
-			// Drag the Focus points
-			dragFocusPoints(posY, posZ, old_posY, old_posZ);
-
-			lastPos = event->pos();
-
-			UnsavedChanges = true;
-
-			// Display the distance moved.
-			set_EditValueX(get_EditValueX() + (posY - old_posY));
-			set_EditValueY(get_EditValueY() + (posZ - old_posZ));
-			w->setMyTextDataField(QString("Distance dragged y: %1, z: %2").arg(get_EditValueX()).arg(get_EditValueY()));
-		}
+		// Coarse movement.
+		factor = 1.0;
 	}
+
+	//check for left mouse button events
+	if (event->buttons() & Qt::LeftButton)
+	{
+		// Check for shift key press for zoom.
+		if (event->modifiers() & Qt::ShiftModifier)
+		{
+			// Update zoom.
+			float tmp = glYZViewHalfExtent + factor * dy;
+
+			if (tmp >= 0.0) glYZViewHalfExtent = tmp;
+		}
+		else if (!(event->modifiers())) // Just clicking without modifiers.
+		{
+			if ((MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL))
+			{
+				GLint viewport[4];
+				GLdouble modelview[16];
+				GLdouble projection[16];
+				glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+				glGetDoublev(GL_PROJECTION_MATRIX, projection);
+				glGetIntegerv(GL_VIEWPORT, viewport);
+
+				const int x = event->x();
+				const int y = viewport[3] - event->y();
+
+				const int xold = lastPos.x();
+				const int yold = viewport[3] - lastPos.y();
+
+				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Here: %i, %i", x, y);
+
+				GLdouble posX, posY, posZ;
+				GLdouble old_posX, old_posY, old_posZ;
+				GLint result;
+
+				result = gluUnProject(xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
+				result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
+
+				// Drag the Focus points
+				dragFocusPoints(posY, posZ, old_posY, old_posZ);
+
+				lastPos = event->pos();
+
+				UnsavedChanges = true;
+
+				// Display the distance moved.
+				set_EditValueX(get_EditValueX() + (posY - old_posY));
+				set_EditValueY(get_EditValueY() + (posZ - old_posZ));
+				w->setMyTextDataField(QString("Distance dragged y: %1, z: %2").arg(get_EditValueX()).arg(get_EditValueY()));
+			}
+		}
+
+	}
+	else if (event->buttons() & Qt::RightButton)
+	{
+		if (factor == 1.0) factor = 0.5;
+		glYZPanCentreX -= factor * dx;
+		glYZPanCentreY += factor * dy;
+	}
+
+	lastPos = event->pos();
 
 	// Adjust viewport view.
 	setViewOrtho(myWidth, myHeight);
@@ -471,6 +483,43 @@ void MyYZView::mouseMoveEvent(QMouseEvent *event)
 
 	// Redraw other views.
 	w->updateAllTabs();
+}
+
+void MyYZView::wheelEvent(QWheelEvent *event)
+{
+	float factor = 0.0;
+	float dy = event->delta() / 8;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
+	{
+		// Fine movement.
+		factor = 0.05;
+	}
+	else
+	{
+		// Coarse movement.
+		factor = 1.0;
+	}
+	
+	float tmpAx, tmpAy, tmpBx, tmpBy;
+
+	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), glYZPanCentreX, glYZPanCentreY, glYZViewHalfExtent);
+
+	float tmp = glYZViewHalfExtent - factor * dy;
+
+	if (tmp >= 0.0) glYZViewHalfExtent = tmp;
+
+	getInAxesPosition(tmpBx, tmpBy, event->x(), event->y(), this->width(), this->height(), glYZPanCentreX, glYZPanCentreY, glYZViewHalfExtent);
+
+	glYZPanCentreX += tmpAx - tmpBx;
+	glYZPanCentreY += tmpAy - tmpBy;
+
+	// Adjust viewport view.
+	setViewOrtho(myWidth, myHeight);
+
+	// Redraw everything.
+	updateGL();
 }
 
 void MyYZView::dragFocusPoints(float posY, float posZ, float old_posY, float old_posZ)

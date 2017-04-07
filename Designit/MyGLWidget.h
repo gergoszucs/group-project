@@ -41,5 +41,5 @@ private:
 	void drawMyNormals();
 	void drawMyPanelNormals();
 	void drawMyAnnotations();
-	void drawMyTracks();
+	void drawMyTracks( int frame );
 };
