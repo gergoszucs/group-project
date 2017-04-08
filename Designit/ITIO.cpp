@@ -536,7 +536,6 @@ void ITIO::createTrajectoryCurvesFromJSON(Document& d, int k)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Max key frame: %i", project->get_MaxKeyFrame());
 }
 
-//TODO: devide write function to allow saving only surface data (instead of surface + movement)
 void ITIO::writeMyProjectToFile(char *fileNameWithPath)
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside writeMyProjectToFile. fileName: %s", fileNameWithPath);

@@ -58,6 +58,8 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event);
 	void wheelEvent(QWheelEvent *event);
 
+
+
 private:
 
 	// Drawing parameters.
@@ -80,6 +82,10 @@ private:
 	bool _PrimedForSecondClick;
 	bool _SecondClicksFinished;
 
+	bool drawDial = false;
+	float dialCentreX, dialCentreY, dialAngle;
+	float dialSize = 2;
+
 	ITControlPoint *_ScratchControlPoint; // Used for MATCH_POINT mode.
 
 	// Drawing methods.
@@ -92,6 +98,7 @@ private:
 	void drawMyGrids();
 	void drawMyScratchControlPoint();
 	void drawSphere(double r, int lats, int longs, float R, float GG, float B);
+	void drawAngleDial();
 
 	void findControlPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI, int *targetJ);
 	void AssignFocusPoint(QMouseEvent *event);

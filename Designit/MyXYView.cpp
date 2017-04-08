@@ -12,6 +12,7 @@
 #include "ITControlPoint.h"
 #include "ITPhysics.h"
 #include "UtililityFunctions.h"
+#include <math.h>
 
 MyXYView::MyXYView(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -206,6 +207,11 @@ void MyXYView::draw()
 			drawMyGrids();
 		}
 
+		if (drawDial)
+		{
+			drawAngleDial();
+		}
+		
 		drawMyFocusControlPoints();
 		drawMyScratchControlPoint();
 	}
@@ -305,6 +311,67 @@ void MyXYView::drawMyAxes()
 	renderText(0.0, 0.0, 30.0, QString("z-axis"));
 }
 
+void MyXYView::drawAngleDial()
+{
+	dialSize = glXYViewHalfExtent * 0.25;
+
+	float beginX = dialCentreX + dialSize;
+	float beginY = dialCentreY;
+
+	float endX = dialCentreX + dialSize * cosf(dialAngle);
+	float endY = dialCentreY + dialSize * sinf(dialAngle);
+
+	glBegin(GL_LINE_STRIP);
+
+	glVertex2f(beginX, beginY);
+	glVertex2f(dialCentreX, dialCentreY);
+	glVertex2f(endX, endY);
+
+	glEnd();
+
+	float angle = 0;
+	float dAngle = 0.001;
+
+	float x = dialCentreX + dialSize * cosf(angle);
+	float y = dialCentreY + dialSize * sinf(angle);
+
+	glBegin(GL_LINE_STRIP);
+
+	if (dialAngle > 0)
+	{
+		while (angle < dialAngle)
+		{
+			glVertex2f(x, y);
+
+			x = dialCentreX + 0.9 * dialSize * cosf(angle);
+			y = dialCentreY + 0.9 * dialSize * sinf(angle);
+
+			angle += dAngle;
+		}
+	}
+	else {
+		dAngle = -dAngle;
+
+		while (angle > dialAngle)
+		{
+			glVertex2f(x, y);
+
+			x = dialCentreX + 0.9 * dialSize * cosf(angle);
+			y = dialCentreY + 0.9 * dialSize * sinf(angle);
+
+			angle += dAngle;
+		}
+	}
+	
+
+	glEnd();
+	
+	float textX = dialCentreX + dialSize * cosf(dialAngle/2) * 1.2;
+	float textY = dialCentreY + dialSize * sinf(dialAngle/2) * 1.2;
+
+	renderText(textX, textY, 0, QString("%1 deg").arg(dialAngle * 180 / 3.14));
+}
+
 void MyXYView::mousePressEvent(QMouseEvent *event)
 {
 	lastPos = event->pos();
@@ -313,127 +380,54 @@ void MyXYView::mousePressEvent(QMouseEvent *event)
 	{
 		set_EditValue(event->x()); // Used in perspective transformation.
 
-		if (MY_EDIT_MODE == DRAG)
+		if (	(MY_EDIT_MODE == DRAG) ||
+				(MY_EDIT_MODE == DRAG_ROW) ||
+				(MY_EDIT_MODE == DRAG_COL) ||
+				(MY_EDIT_MODE == DRAG_ALL) ||
+				(MY_EDIT_MODE == ROTATE_ALL) ||
+				(MY_EDIT_MODE == RESIZE_ALL) ||
+				(MY_EDIT_MODE == SHEAR_ALL) ||
+				(MY_EDIT_MODE == PERSPECTIVE_ALL) ||
+				(MY_EDIT_MODE == FLIP_HORIZONTAL_ALL) ||
+				(MY_EDIT_MODE == COPY_SURFACE) ||
+				(MY_EDIT_MODE == DELETE_SURFACE) ||
+				(MY_EDIT_MODE == INSERT_ROW) ||
+				(MY_EDIT_MODE == DELETE_ROW) ||
+				(MY_EDIT_MODE == DUPLICATE_ROW) ||
+				(MY_EDIT_MODE == INSERT_COL) ||
+				(MY_EDIT_MODE == DELETE_COL) ||
+				(MY_EDIT_MODE == DUPLICATE_COL) ||
+				(MY_EDIT_MODE == MATE_POINTS) ||
+				(MY_EDIT_MODE == MERGE_SURFACES_BY_ROW) ||
+				(MY_EDIT_MODE == MERGE_SURFACES_BY_ROW_REVERSE) ||
+				(MY_EDIT_MODE == COPY_SURFACE_MIRROR) ||
+				(MY_EDIT_MODE == MEASURE_DISTANCE) ||
+				(MY_EDIT_MODE == CENTRED_ROTATE)
+			)
 		{
 			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DRAG_ROW)
+		} 
+
+		if (MY_EDIT_MODE == ROTATE_ALL)
 		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DRAG_COL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DRAG_ALL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == ROTATE_ALL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == RESIZE_ALL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == SHEAR_ALL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == PERSPECTIVE_ALL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == FLIP_HORIZONTAL_ALL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == COPY_SURFACE)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DELETE_SURFACE)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == INSERT_ROW)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DELETE_ROW)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DUPLICATE_ROW)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == INSERT_COL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DELETE_COL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == DUPLICATE_COL)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == MATE_POINTS)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == MERGE_SURFACES_BY_ROW)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == MERGE_SURFACES_BY_ROW_REVERSE)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == COPY_SURFACE_MIRROR)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == MEASURE_DISTANCE)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
-		}
-		else if (MY_EDIT_MODE == CENTRED_ROTATE)
-		{
-			AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
+			dialAngle = 0;
+
+			getInAxesPosition(dialCentreX, dialCentreY, event->x(), event->y(), this->width(), this->height(), glXYPanCentreX, glXYPanCentreY, glXYViewHalfExtent);
+
+			drawDial = true;
 		}
 	}
 }
 
 void MyXYView::AssignFocusPoint(QMouseEvent *event)
 {
-	GLint viewport[4];
-	GLdouble modelview[16];
-	GLdouble projection[16];
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-	glGetDoublev(GL_PROJECTION_MATRIX, projection);
-	glGetIntegerv(GL_VIEWPORT, viewport);
-
-	const int x = event->x();
-	const int y = viewport[3] - event->y();
-
-	//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Here: %i, %i", x, y);
-
-	GLdouble posX, posY, posZ;
-	GLint result;
-	result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
-
-	//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "3D point with POS: %f, %f, %f", posX, posY, posZ);
+	float posX, posY, posZ;
+	
+	getInAxesPosition(posX, posY, event->x(), event->y(), this->width(), this->height(), glXYPanCentreX, glXYPanCentreY, glXYViewHalfExtent);
 
 	// Find the vertex that is closest.
 	int i, j, k;
 	findControlPointIndicesNearMouse(posX, posY, posZ, &k, &i, &j);
-
-	// Make sure all focus vectors are empty.
-	//	w->emptyFocusVectors();
 
 	// Make sure lastPos is reset.
 	lastPos = event->pos();
@@ -1305,6 +1299,42 @@ void MyXYView::AssignFocusPoint(QMouseEvent *event)
 	updateGL();
 }
 
+void MyXYView::findControlPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI, int *targetJ)
+{
+	float threshold = 0.2;
+	float minDistance = 10000.0;
+	*targetI = -1;
+	*targetJ = -1;
+	*targetK = -1;
+
+	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
+	{
+		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
+		{
+			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
+			{
+				ITControlPoint *currentPoint = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
+
+				float deltaX = posX - currentPoint->get_X();
+				float deltaY = posY - currentPoint->get_Y();
+				float deltaZ = posZ - currentPoint->get_Z();
+
+				float distanceSquared = deltaX*deltaX + deltaY*deltaY;
+
+				if ((distanceSquared < threshold) && (distanceSquared < minDistance))
+				{
+					minDistance = distanceSquared;
+					*targetK = k;
+					*targetI = i;
+					*targetJ = j;
+				}
+			}
+		}
+	}
+
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Indices of nearest control point. k: %i, i: %i, j: %i", *targetK, *targetI, *targetJ);
+}
+
 void MyXYView::mergeSurfacesByRowReverse(int k1, int k2)
 {
 }
@@ -1508,42 +1538,6 @@ void MyXYView::copyNewSurfaceMirror(int k)
 	w->updateAllTabs();
 }
 
-void MyXYView::findControlPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI, int *targetJ)
-{
-	float threshold = 0.1;
-	float minDistance = 10000.0;
-	*targetI = -1;
-	*targetJ = -1;
-	*targetK = -1;
-
-	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-	{
-		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
-		{
-			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
-			{
-				ITControlPoint *currentPoint = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
-
-				float deltaX = posX - currentPoint->get_X();
-				float deltaY = posY - currentPoint->get_Y();
-				float deltaZ = posZ - currentPoint->get_Z();
-
-				float distanceSquared = deltaX*deltaX + deltaY*deltaY;
-
-				if ((distanceSquared < threshold) && (distanceSquared < minDistance))
-				{
-					minDistance = distanceSquared;
-					*targetK = k;
-					*targetI = i;
-					*targetJ = j;
-				}
-			}
-		}
-	}
-
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Indices of nearest control point. k: %i, i: %i, j: %i", *targetK, *targetI, *targetJ);
-}
-
 void MyXYView::mouseMoveEvent(QMouseEvent *event)
 {
 	// The shift key was pressed, so zoom.
@@ -1576,11 +1570,13 @@ void MyXYView::mouseMoveEvent(QMouseEvent *event)
 		}
 		else if (!(event->modifiers())) // Just clicking without modifiers.
 		{
+
+			float posX, posY, posZ, old_posX, old_posY, old_posZ;
+
+			getInAxesPosition(posX, posY, event->x(), event->y(), this->width(), this->height(), glXYPanCentreX, glXYPanCentreY, glXYViewHalfExtent);
+			getInAxesPosition(old_posX, old_posY, lastPos.x(), lastPos.y(), this->width(), this->height(), glXYPanCentreX, glXYPanCentreY, glXYViewHalfExtent);
+
 			GLint viewport[4];
-			GLdouble modelview[16];
-			GLdouble projection[16];
-			glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-			glGetDoublev(GL_PROJECTION_MATRIX, projection);
 			glGetIntegerv(GL_VIEWPORT, viewport);
 
 			const int x = event->x();
@@ -1589,16 +1585,9 @@ void MyXYView::mouseMoveEvent(QMouseEvent *event)
 			const int xold = lastPos.x();
 			const int yold = viewport[3] - lastPos.y();
 
-			GLdouble posX, posY, posZ;
-			GLdouble old_posX, old_posY, old_posZ;
-			GLint result;
-
-			result = gluUnProject(xold, yold, 0, modelview, projection, viewport, &old_posX, &old_posY, &old_posZ);
-			result = gluUnProject(x, y, 0, modelview, projection, viewport, &posX, &posY, &posZ);
-
 			w->statusBar()->showMessage(QString("X: %1, Y: %2").arg(posX).arg(posY));
 
-			if ((MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL))
+			if (((MY_EDIT_MODE == DRAG) || (MY_EDIT_MODE == DRAG_ROW) || (MY_EDIT_MODE == DRAG_COL) || (MY_EDIT_MODE == DRAG_ALL)) && (project->get_MySurfaces()->at(0)->get_MyFocusControlPoints()->size() > 0))
 			{
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Here: %i, %i", x, y);
 
@@ -1618,9 +1607,11 @@ void MyXYView::mouseMoveEvent(QMouseEvent *event)
 			{
 				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mouseMoveEvent. ROTATE_ALL");
 
-				float thetaOld = atan2(old_posY, old_posX);
-				float thetaNew = atan2(posY, posX);
+				float thetaOld = atan2(old_posY - dialCentreY, old_posX - dialCentreX);
+				float thetaNew = atan2(posY - dialCentreY, posX - dialCentreX);
 				float dTheta = thetaNew - thetaOld;
+
+				dialAngle += dTheta;
 
 				set_EditValue(get_EditValue() + dTheta*180.0 / PI);
 
@@ -2054,6 +2045,11 @@ void MyXYView::mouseReleaseEvent(QMouseEvent *event)
 		}
 
 	} // End of CENTRED_ROTATE
+
+	if (MY_EDIT_MODE == ROTATE_ALL)
+	{
+		drawDial = false;
+	}
 
 	set_EditValue(0.0);
 
