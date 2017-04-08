@@ -1,0 +1,921 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DesignitClass</class>
+ <widget class="QMainWindow" name="DesignitClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1129</width>
+    <height>806</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Surfit</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QTabWidget" name="tabsAdditionalData">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="tabPosition">
+        <enum>QTabWidget::West</enum>
+       </property>
+       <property name="tabShape">
+        <enum>QTabWidget::Triangular</enum>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab_statusWindow">
+        <attribute name="title">
+         <string>Status window</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QTableWidget" name="myStatusTableWidget">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="showDropIndicator" stdset="0">
+            <bool>false</bool>
+           </property>
+           <property name="dragDropOverwriteMode">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_viewJSON">
+        <attribute name="title">
+         <string>JSON view</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <item>
+          <widget class="QTreeView" name="jsonTreeView"/>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QPushButton" name="collapseAllButton">
+             <property name="text">
+              <string>Collapse All</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="expandAllButton">
+             <property name="text">
+              <string>Expand All</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_dataFile">
+        <attribute name="title">
+         <string>Data file</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QTextEdit" name="fileTextEdit"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_2">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>100000</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QFrame" name="frame_3">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>3D view</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="myEditTextDataField">
+             <property name="minimumSize">
+              <size>
+               <width>400</width>
+               <height>20</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="MyGLWidget" name="myGLWidget"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QToolBox" name="editingTools">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="SurfaceTools">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>304</width>
+          <height>659</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Surface Tools</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QTabWidget" name="tabsWorkSurface">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>400</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>10000000</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="tabPosition">
+            <enum>QTabWidget::East</enum>
+           </property>
+           <property name="tabShape">
+            <enum>QTabWidget::Triangular</enum>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="tab_XYView">
+            <attribute name="title">
+             <string>XY view</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="MyXYView" name="myXYView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_XZView">
+            <attribute name="title">
+             <string>XZ view</string>
+            </attribute>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="MyXZView" name="myXZView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_YZView">
+            <attribute name="title">
+             <string>YZ view</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="MyYZView" name="myYZView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_gaussianView">
+            <attribute name="title">
+             <string>Gaussian Curvature</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="MyGaussianView" name="myGaussianView"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_spreadsheet">
+            <attribute name="title">
+             <string>Spreadsheet</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QTableWidget" name="mySpreadsheet"/>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="TrajectoryTools">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>304</width>
+          <height>659</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Trajectory Tools</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QTabWidget" name="tabsWorkTrajectory">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>400</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>10000000</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Arial</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="tabPosition">
+            <enum>QTabWidget::East</enum>
+           </property>
+           <property name="tabShape">
+            <enum>QTabWidget::Triangular</enum>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="tab_trajectoryTranslations">
+            <attribute name="title">
+             <string>Translations</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveX"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveY"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveZ"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_trajectoryRotations">
+            <attribute name="title">
+             <string>Rotations</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_19">
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveR"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveP"/>
+             </item>
+             <item>
+              <widget class="MyGLGeneralTrajectoryCurveView" name="trajectoryCurveB"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tab_trajectorySpreadsheet">
+            <attribute name="title">
+             <string>Spreadsheet</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_20">
+             <item>
+              <widget class="QTableWidget" name="trajectorySpreadsheet"/>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1129</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave_As"/>
+    <addaction name="actionExit"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionNormals"/>
+    <addaction name="actionInterpolated_points"/>
+    <addaction name="actionControl_points"/>
+    <addaction name="actionAnnotations"/>
+    <addaction name="actionGrids"/>
+    <addaction name="actionReset_all_views"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Mode</string>
+    </property>
+    <addaction name="actionDrag"/>
+    <addaction name="actionCentred_rotate"/>
+    <addaction name="actionDrag_row"/>
+    <addaction name="actionDrag_col"/>
+    <addaction name="actionDrag_all"/>
+    <addaction name="separator"/>
+    <addaction name="actionRotate_all"/>
+    <addaction name="actionResize_all"/>
+    <addaction name="separator"/>
+    <addaction name="actionShear"/>
+    <addaction name="actionPerspective"/>
+    <addaction name="actionFlip_horizontal"/>
+    <addaction name="actionCopy_surface"/>
+    <addaction name="actionCopy_surface_mirror"/>
+    <addaction name="separator"/>
+    <addaction name="actionInsert_row"/>
+    <addaction name="actionDelete_row"/>
+    <addaction name="actionDuplicate_row"/>
+    <addaction name="separator"/>
+    <addaction name="actionInsert_col"/>
+    <addaction name="actionDelete_col"/>
+    <addaction name="actionDuplicate_col"/>
+    <addaction name="actionMate_points"/>
+    <addaction name="actionMerge_surfaces_by_row"/>
+    <addaction name="actionMerge_surfaces_by_row_reverse"/>
+    <addaction name="actionMeasure_distance"/>
+   </widget>
+   <widget class="QMenu" name="menuSurface">
+    <property name="title">
+     <string>Surface</string>
+    </property>
+    <addaction name="actionNew_surface"/>
+    <addaction name="actionDelete_surface"/>
+   </widget>
+   <widget class="QMenu" name="menuTest">
+    <property name="title">
+     <string>Test</string>
+    </property>
+    <addaction name="actionPlayout_Test"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionWeb_help"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>Analysis</string>
+    </property>
+    <addaction name="actionGaussian_curvature"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit_2">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionInterpolated_points_density_U"/>
+    <addaction name="actionInterpolated_points_density_V"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit_2"/>
+   <addaction name="menuSurface"/>
+   <addaction name="menuView"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuTest"/>
+   <addaction name="menuAnalysis"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave_As"/>
+   <addaction name="actionClose"/>
+   <addaction name="actionExit"/>
+   <addaction name="actionReset_all_views"/>
+   <addaction name="separator"/>
+   <addaction name="actionNew_surface"/>
+   <addaction name="actionDelete_surface"/>
+   <addaction name="separator"/>
+   <addaction name="actionDrag"/>
+   <addaction name="actionCentred_rotate"/>
+   <addaction name="actionDrag_row"/>
+   <addaction name="actionDrag_col"/>
+   <addaction name="actionDrag_all"/>
+   <addaction name="actionResize_all"/>
+   <addaction name="separator"/>
+   <addaction name="actionRotate_all"/>
+   <addaction name="actionShear"/>
+   <addaction name="actionPerspective"/>
+   <addaction name="actionFlip_horizontal"/>
+   <addaction name="actionCopy_surface"/>
+   <addaction name="actionCopy_surface_mirror"/>
+   <addaction name="separator"/>
+   <addaction name="actionInsert_row"/>
+   <addaction name="actionDelete_row"/>
+   <addaction name="actionDuplicate_row"/>
+   <addaction name="separator"/>
+   <addaction name="actionInsert_col"/>
+   <addaction name="actionDelete_col"/>
+   <addaction name="actionDuplicate_col"/>
+   <addaction name="separator"/>
+   <addaction name="actionMate_points"/>
+   <addaction name="separator"/>
+   <addaction name="actionGaussian_curvature"/>
+   <addaction name="actionMerge_surfaces_by_row"/>
+   <addaction name="actionMerge_surfaces_by_row_reverse"/>
+   <addaction name="actionMeasure_distance"/>
+   <addaction name="separator"/>
+   <addaction name="actionPlayout_Test"/>
+   <addaction name="actionWeb_help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNew">
+   <property name="text">
+    <string>New...</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_open.png</normaloff>Resources/icon_open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open...</string>
+   </property>
+  </action>
+  <action name="actionSave_As">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_save.png</normaloff>Resources/icon_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save As ...</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_exit.png</normaloff>Resources/icon_exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionDrag">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_drag.png</normaloff>Resources/icon_drag.png</iconset>
+   </property>
+   <property name="text">
+    <string>Drag</string>
+   </property>
+  </action>
+  <action name="actionNew_surface">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_new_surface.png</normaloff>Resources/icon_new_surface.png</iconset>
+   </property>
+   <property name="text">
+    <string>New surface</string>
+   </property>
+  </action>
+  <action name="actionDrag_all">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_drag_all.png</normaloff>Resources/icon_drag_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Drag all</string>
+   </property>
+  </action>
+  <action name="actionNormals">
+   <property name="text">
+    <string>Normals</string>
+   </property>
+  </action>
+  <action name="actionDrag_row">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_drag_row.png</normaloff>Resources/icon_drag_row.png</iconset>
+   </property>
+   <property name="text">
+    <string>Drag row</string>
+   </property>
+  </action>
+  <action name="actionDrag_col">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_drag_col.png</normaloff>Resources/icon_drag_col.png</iconset>
+   </property>
+   <property name="text">
+    <string>Drag col</string>
+   </property>
+  </action>
+  <action name="actionInterpolated_points">
+   <property name="text">
+    <string>Interpolated points</string>
+   </property>
+  </action>
+  <action name="actionControl_points">
+   <property name="text">
+    <string>Control points</string>
+   </property>
+  </action>
+  <action name="actionRotate_all">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_rotate_all.png</normaloff>Resources/icon_rotate_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate all</string>
+   </property>
+  </action>
+  <action name="actionResize_all">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_resize_all.png</normaloff>Resources/icon_resize_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Resize all</string>
+   </property>
+  </action>
+  <action name="actionShear">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_shear.png</normaloff>Resources/icon_shear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Shear</string>
+   </property>
+  </action>
+  <action name="actionPerspective">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_perspective_all.png</normaloff>Resources/icon_perspective_all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Perspective</string>
+   </property>
+  </action>
+  <action name="actionPlayout_Test">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_test.png</normaloff>Resources/icon_test.png</iconset>
+   </property>
+   <property name="text">
+    <string>Playout Test</string>
+   </property>
+  </action>
+  <action name="actionFlip_horizontal">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_flip_horizontal.png</normaloff>Resources/icon_flip_horizontal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip all horizontal</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_close.png</normaloff>Resources/icon_close.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionCopy_surface">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_copy.png</normaloff>Resources/icon_copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy surface</string>
+   </property>
+  </action>
+  <action name="actionDelete_surface">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_delete_surface.png</normaloff>Resources/icon_delete_surface.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete surface</string>
+   </property>
+  </action>
+  <action name="actionAnnotations">
+   <property name="text">
+    <string>Annotations</string>
+   </property>
+  </action>
+  <action name="actionInsert_row">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_insert_row.png</normaloff>Resources/icon_insert_row.png</iconset>
+   </property>
+   <property name="text">
+    <string>Insert row</string>
+   </property>
+  </action>
+  <action name="actionDelete_row">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_delete_row.png</normaloff>Resources/icon_delete_row.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete row</string>
+   </property>
+  </action>
+  <action name="actionDuplicate_row">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_duplicate_row.png</normaloff>Resources/icon_duplicate_row.png</iconset>
+   </property>
+   <property name="text">
+    <string>Duplicate row</string>
+   </property>
+  </action>
+  <action name="actionInsert_col">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_insert_column.png</normaloff>Resources/icon_insert_column.png</iconset>
+   </property>
+   <property name="text">
+    <string>Insert col</string>
+   </property>
+  </action>
+  <action name="actionDelete_col">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_delete_column.png</normaloff>Resources/icon_delete_column.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete col</string>
+   </property>
+  </action>
+  <action name="actionDuplicate_col">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_duplicate_column.png</normaloff>Resources/icon_duplicate_column.png</iconset>
+   </property>
+   <property name="text">
+    <string>Duplicate col</string>
+   </property>
+  </action>
+  <action name="actionMate_points">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_mate_points.png</normaloff>Resources/icon_mate_points.png</iconset>
+   </property>
+   <property name="text">
+    <string>Mate points</string>
+   </property>
+   <property name="toolTip">
+    <string>Mate points (master first)</string>
+   </property>
+  </action>
+  <action name="actionCopy_surface_mirror">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_copy_mirror.png</normaloff>Resources/icon_copy_mirror.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy surface mirror</string>
+   </property>
+  </action>
+  <action name="actionMerge_surfaces_by_row">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_merge_surfaces.png</normaloff>Resources/icon_merge_surfaces.png</iconset>
+   </property>
+   <property name="text">
+    <string>Merge surfaces by row</string>
+   </property>
+  </action>
+  <action name="actionReset_all_views">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_reset_all_views.png</normaloff>Resources/icon_reset_all_views.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset all views</string>
+   </property>
+  </action>
+  <action name="actionWeb_help">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_help.png</normaloff>Resources/icon_help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Web help ...</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionGaussian_curvature">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_gaussian_curvature.png</normaloff>Resources/icon_gaussian_curvature.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gaussian curvature</string>
+   </property>
+  </action>
+  <action name="actionInterpolated_points_density_U">
+   <property name="text">
+    <string>Interpolated points density U</string>
+   </property>
+  </action>
+  <action name="actionInterpolated_points_density_V">
+   <property name="text">
+    <string>Interpolated points density V</string>
+   </property>
+  </action>
+  <action name="actionGrids">
+   <property name="text">
+    <string>Grids</string>
+   </property>
+  </action>
+  <action name="actionMerge_surfaces_by_row_reverse">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_merge_surfaces_reverse.png</normaloff>Resources/icon_merge_surfaces_reverse.png</iconset>
+   </property>
+   <property name="text">
+    <string>Merge surfaces by row reverse</string>
+   </property>
+  </action>
+  <action name="actionMeasure_distance">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_measure_distance.png</normaloff>Resources/icon_measure_distance.png</iconset>
+   </property>
+   <property name="text">
+    <string>Measure distance</string>
+   </property>
+  </action>
+  <action name="actionCentred_rotate">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/icon_centred_rotate.png</normaloff>Resources/icon_centred_rotate.png</iconset>
+   </property>
+   <property name="text">
+    <string>Centred rotate</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>myglwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyXYView</class>
+   <extends>QOpenGLWidget</extends>
+   <header>myxyview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyXZView</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">myxzview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyYZView</class>
+   <extends>QOpenGLWidget</extends>
+   <header>myyzview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyGaussianView</class>
+   <extends>QOpenGLWidget</extends>
+   <header>mygaussianview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyGLGeneralTrajectoryCurveView</class>
+   <extends>QOpenGLWidget</extends>
+   <header>myglgeneraltrajectorycurveview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="designit.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -41,7 +41,6 @@ local.properties
 *db
 *pdb
 *.sln.docstates
-*vcxproj
 
 # Build results
 

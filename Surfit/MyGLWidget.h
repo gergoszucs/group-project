@@ -19,6 +19,7 @@ protected:
 	void keyPressEvent(QKeyEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
+	void wheelEvent(QWheelEvent *event);
 
 private:
 
@@ -40,4 +41,5 @@ private:
 	void drawMyNormals();
 	void drawMyPanelNormals();
 	void drawMyAnnotations();
+
 };

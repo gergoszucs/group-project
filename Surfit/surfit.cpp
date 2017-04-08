@@ -49,6 +49,9 @@ Surfit::Surfit(QWidget *parent) : QMainWindow(parent)
 
 	// Connect user text edit to enter method.
 	connect(ui.myEditTextDataField, &QLineEdit::returnPressed, this, &Surfit::userHasEnteredTextData);
+
+	// Connect "finished item editing" signal of spreadsheet to "save data" slot
+	connect(ui.mySpreadsheet->itemDelegate(), &QAbstractItemDelegate::commitData, this, &Surfit::updateDataFromSpreadsheet);
 }
 
 void Surfit::on_actionOpen_triggered()
@@ -263,80 +266,6 @@ void Surfit::keyPressEvent(QKeyEvent *event)
 						ui.mySpreadsheet->setItem(row + i, col + j, new_item);
 					}
 				}
-			}
-		}
-		else
-		{
-			// User is editing the cells.
-			// Model of my first QTableWidget
-			QItemSelectionModel *myModel = ui.mySpreadsheet->selectionModel();
-
-			QModelIndexList list = myModel->selectedIndexes();
-
-			if (list.size() > 0)
-			{
-				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "List item found. Size: %i", list.size());
-
-				for (int t = 0; t < list.size(); t++)
-				{
-					QModelIndex item = list.at(t);
-
-					QString contentsOfCurrentItem = item.data().toString();
-
-					int col = item.column();
-					int row = item.row();
-
-					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Row: %i, Column: %i, Contents: %s", row, col, contentsOfCurrentItem.toStdString().c_str());
-
-					int rowOffset = 0;
-					int lastRowOffset = 0;
-					for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-					{
-						int noOfRows = project->get_MySurfaces()->at(k)->get_MyControlPoints()->size();
-						int noOfCols = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).size();
-						rowOffset = rowOffset + noOfRows * noOfCols;
-
-						if ((lastRowOffset <= row) && (row < rowOffset))
-						{
-							// We are editing the current surface.
-							int innerRow = row - lastRowOffset;
-							int i = innerRow / noOfCols;
-							int j = innerRow%noOfCols;
-
-							if (col == 3)
-							{
-								// We are editing an x value.
-								project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_X(contentsOfCurrentItem.toFloat());
-								project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_X(contentsOfCurrentItem.toFloat());
-							}
-							else if (col == 4)
-							{
-								// We are editing a y value.
-								project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Y(contentsOfCurrentItem.toFloat());
-								project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Y(contentsOfCurrentItem.toFloat());
-							}
-							else if (col == 5)
-							{
-								// We are editing a z value.
-								project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Z(contentsOfCurrentItem.toFloat());
-								project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Z(contentsOfCurrentItem.toFloat());
-							}
-
-							// Update the Bezier data.
-							project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
-						}
-						lastRowOffset = rowOffset;
-					}
-				}
-
-				// Update the spreadsheet.
-				updateSpreadsheet();
-
-				// Update the plots.
-				updateAllTabs();
-
-				// The user has changed something, so there is now unsaved data.
-				UnsavedChanges = true;
 			}
 		}
 	}
@@ -2216,5 +2145,80 @@ void Surfit::on_actionPlayout_Test_triggered()
 		free(h_x);
 		free(h_y);
 		free(h_yx);
+	}
+}
+
+void Surfit::updateDataFromSpreadsheet()
+{
+	// User is editing the cells.
+	// Model of my first QTableWidget
+	QItemSelectionModel *myModel = ui.mySpreadsheet->selectionModel();
+
+	QModelIndexList list = myModel->selectedIndexes();
+
+	if (list.size() > 0)
+	{
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "List item found. Size: %i", list.size());
+
+		for (int t = 0; t < list.size(); t++)
+		{
+			QModelIndex item = list.at(t);
+
+			QString contentsOfCurrentItem = item.data().toString();
+
+			int col = item.column();
+			int row = item.row();
+
+			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Row: %i, Column: %i, Contents: %s", row, col, contentsOfCurrentItem.toStdString().c_str());
+
+			int rowOffset = 0;
+			int lastRowOffset = 0;
+			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
+			{
+				int noOfRows = project->get_MySurfaces()->at(k)->get_MyControlPoints()->size();
+				int noOfCols = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).size();
+				rowOffset = rowOffset + noOfRows * noOfCols;
+
+				if ((lastRowOffset <= row) && (row < rowOffset))
+				{
+					// We are editing the current surface.
+					int innerRow = row - lastRowOffset;
+					int i = innerRow / noOfCols;
+					int j = innerRow%noOfCols;
+
+					if (col == 3)
+					{
+						// We are editing an x value.
+						project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_X(contentsOfCurrentItem.toFloat());
+						project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_X(contentsOfCurrentItem.toFloat());
+					}
+					else if (col == 4)
+					{
+						// We are editing a y value.
+						project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Y(contentsOfCurrentItem.toFloat());
+						project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Y(contentsOfCurrentItem.toFloat());
+					}
+					else if (col == 5)
+					{
+						// We are editing a z value.
+						project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Z(contentsOfCurrentItem.toFloat());
+						project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Z(contentsOfCurrentItem.toFloat());
+					}
+
+					// Update the Bezier data.
+					project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
+				}
+				lastRowOffset = rowOffset;
+			}
+		}
+
+		// Update the spreadsheet.
+		updateSpreadsheet();
+
+		// Update the plots.
+		updateAllTabs();
+
+		// The user has changed something, so there is now unsaved data.
+		UnsavedChanges = true;
 	}
 }

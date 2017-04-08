@@ -358,43 +358,73 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
 	float dx = (float)(event->x() - lastPos.x());
 	float dy = (float)(event->y() - lastPos.y());
 
-	// Check for shift key press for zoom.
-	if (event->modifiers() & Qt::ShiftModifier)
+	float factor = 0.0;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
 	{
-		// The shift key was pressed, so zoom.
-		float factor = 0.0;
-
-		// Check for fine movement.
-		if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
-		{
-			// Fine movement.
-			factor = 0.05;
-		}
-		else
-		{
-			// Coarse movement.
-			factor = 1.0;
-		}
-
-		dx = factor * dx;
-		dy = factor * dy;
-
-		// Update zoom.
-		gl3DViewHalfExtent = gl3DViewHalfExtent + dy;
-
-		lastPos = event->pos();
+		// Fine movement.
+		factor = 0.05;
 	}
 	else
 	{
-		// No other keys pressed so rotate.
-		if (event->buttons() & Qt::LeftButton)
+		// Coarse movement.
+		factor = 1.0;
+	}
+
+	//check for left mouse button events
+	if (event->buttons() & Qt::LeftButton)
+	{
+		// Check for shift key press for zoom.
+		if (event->modifiers() & Qt::ShiftModifier)
+		{
+			// Update zoom.
+			float tmp = gl3DViewHalfExtent + factor * dy;
+
+			if (tmp >= 0.0) gl3DViewHalfExtent = tmp;
+		}
+		else // No other keys pressed so rotate.
 		{
 			xRot = xRot + dy;
 			yRot = yRot + dx;
 		}
+	} 
+	else if ( event -> buttons() & Qt::RightButton )
+	{ 
+		if (factor == 1.0) factor = 0.5;
+		gl3DPanCentreX = gl3DPanCentreX - factor * dx;
+		gl3DPanCentreY = gl3DPanCentreY + factor * dy;
 	}
 
 	lastPos = event->pos();
+
+	// Adjust viewport view.
+	setViewOrtho(myWidth, myHeight);
+
+	// Redraw everything.
+	updateGL();
+}
+
+void MyGLWidget::wheelEvent(QWheelEvent *event)
+{
+	float factor = 0.0;
+	float dy = event->delta() / 8;
+
+	// Check for fine movement.
+	if (QApplication::keyboardModifiers().testFlag(Qt::ControlModifier) == true)
+	{
+		// Fine movement.
+		factor = 0.05;
+	}
+	else
+	{
+		// Coarse movement.
+		factor = 1.0;
+	}
+
+	float tmp = gl3DViewHalfExtent - factor * dy;
+
+	if (tmp >= 0.0) gl3DViewHalfExtent = tmp;
 
 	// Adjust viewport view.
 	setViewOrtho(myWidth, myHeight);
