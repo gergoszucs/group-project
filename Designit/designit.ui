@@ -510,6 +510,7 @@
    <addaction name="actionClose"/>
    <addaction name="actionExit"/>
    <addaction name="actionReset_all_views"/>
+   <addaction name="action_Flexit"/>
    <addaction name="separator"/>
    <addaction name="actionNew_surface"/>
    <addaction name="actionDelete_surface"/>
@@ -881,6 +882,21 @@
    </property>
    <property name="text">
     <string>Centred rotate</string>
+   </property>
+  </action>
+  <action name="action_Flexit">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/flexit.ico</normaloff>Resources/flexit.ico</iconset>
+   </property>
+   <property name="text">
+    <string>action_Flexit</string>
+   </property>
+   <property name="toolTip">
+    <string>Open the current project in Flexit</string>
    </property>
   </action>
  </widget>

@@ -20,7 +20,7 @@ extern int FrameNumber;
 extern float cummulativeElapsedTimeSeconds;
 
 // Program mode flags.
-enum RUN_MODES_ENUM { MYGUI, MYBATCH };
+enum RUN_MODES_ENUM { MYGUI, MYBATCH, MYAUTOSAVED };
 extern RUN_MODES_ENUM MY_RUN_MODE; // GUI, BATCH.
 
 // File management flags.

@@ -91,6 +91,39 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.commandLine->installEventFilter(this);
 }
 
+void Designit::on_action_Flexit_triggered() {
+	QString fileName = "autosave.json";
+
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly))
+	{
+		QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+		return;
+	}
+
+	// Close the file.
+	file.close();
+
+	// OK, the file is there, so let's start writing to the file.
+	// Get a char * from the file name.
+	QByteArray latin1BAFilenameString = fileName.toLatin1();
+
+	// Write the project to the file.
+	ITIO::writeMyProjectToFile(latin1BAFilenameString.data());
+
+	// Set status message.
+	QString str1 = QString("File %1 saved successfully.").arg(fileName);
+	w->statusBar()->showMessage(str1);
+
+	// Show status log entry
+	appendStatusTableWidget(QString("File"), QString("Saved"));
+
+	// Send the HTTP request.
+	sendHTTPRequest(QString("File"), QString("Saved"), 0.0, 0, DataFileNameWithPath);
+
+	system("Flexit.exe autosave.json");
+}
+
 void Designit::on_actionOpen_triggered()
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionOpen_triggered.");

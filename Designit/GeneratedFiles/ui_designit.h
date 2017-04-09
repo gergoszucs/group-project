@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'designit.ui'
 **
-** Created by: Qt User Interface Compiler version 5.7.1
+** Created by: Qt User Interface Compiler version 5.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -86,6 +86,7 @@ public:
     QAction *actionMerge_surfaces_by_row_reverse;
     QAction *actionMeasure_distance;
     QAction *actionCentred_rotate;
+    QAction *action_Flexit;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout_2;
     QSplitter *splitter;
@@ -342,6 +343,12 @@ public:
         QIcon icon31;
         icon31.addFile(QStringLiteral("Resources/icon_centred_rotate.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionCentred_rotate->setIcon(icon31);
+        action_Flexit = new QAction(DesignitClass);
+        action_Flexit->setObjectName(QStringLiteral("action_Flexit"));
+        action_Flexit->setCheckable(false);
+        QIcon icon32;
+        icon32.addFile(QStringLiteral("Resources/flexit.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        action_Flexit->setIcon(icon32);
         centralWidget = new QWidget(DesignitClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout_2 = new QHBoxLayout(centralWidget);
@@ -714,6 +721,7 @@ public:
         mainToolBar->addAction(actionClose);
         mainToolBar->addAction(actionExit);
         mainToolBar->addAction(actionReset_all_views);
+        mainToolBar->addAction(action_Flexit);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionNew_surface);
         mainToolBar->addAction(actionDelete_surface);
@@ -763,75 +771,79 @@ public:
 
     void retranslateUi(QMainWindow *DesignitClass)
     {
-        DesignitClass->setWindowTitle(QApplication::translate("DesignitClass", "Surfit", Q_NULLPTR));
-        actionNew->setText(QApplication::translate("DesignitClass", "New...", Q_NULLPTR));
-        actionOpen->setText(QApplication::translate("DesignitClass", "Open...", Q_NULLPTR));
-        actionSave_As->setText(QApplication::translate("DesignitClass", "Save As ...", Q_NULLPTR));
-        actionExit->setText(QApplication::translate("DesignitClass", "Exit", Q_NULLPTR));
-        actionDrag->setText(QApplication::translate("DesignitClass", "Drag", Q_NULLPTR));
-        actionNew_surface->setText(QApplication::translate("DesignitClass", "New surface", Q_NULLPTR));
-        actionDrag_all->setText(QApplication::translate("DesignitClass", "Drag all", Q_NULLPTR));
-        actionNormals->setText(QApplication::translate("DesignitClass", "Normals", Q_NULLPTR));
-        actionDrag_row->setText(QApplication::translate("DesignitClass", "Drag row", Q_NULLPTR));
-        actionDrag_col->setText(QApplication::translate("DesignitClass", "Drag col", Q_NULLPTR));
-        actionInterpolated_points->setText(QApplication::translate("DesignitClass", "Interpolated points", Q_NULLPTR));
-        actionControl_points->setText(QApplication::translate("DesignitClass", "Control points", Q_NULLPTR));
-        actionRotate_all->setText(QApplication::translate("DesignitClass", "Rotate all", Q_NULLPTR));
-        actionResize_all->setText(QApplication::translate("DesignitClass", "Resize all", Q_NULLPTR));
-        actionShear->setText(QApplication::translate("DesignitClass", "Shear", Q_NULLPTR));
-        actionPerspective->setText(QApplication::translate("DesignitClass", "Perspective", Q_NULLPTR));
-        actionPlayout_Test->setText(QApplication::translate("DesignitClass", "Playout Test", Q_NULLPTR));
-        actionFlip_horizontal->setText(QApplication::translate("DesignitClass", "Flip all horizontal", Q_NULLPTR));
-        actionClose->setText(QApplication::translate("DesignitClass", "Close", Q_NULLPTR));
-        actionCopy_surface->setText(QApplication::translate("DesignitClass", "Copy surface", Q_NULLPTR));
-        actionDelete_surface->setText(QApplication::translate("DesignitClass", "Delete surface", Q_NULLPTR));
-        actionAnnotations->setText(QApplication::translate("DesignitClass", "Annotations", Q_NULLPTR));
-        actionInsert_row->setText(QApplication::translate("DesignitClass", "Insert row", Q_NULLPTR));
-        actionDelete_row->setText(QApplication::translate("DesignitClass", "Delete row", Q_NULLPTR));
-        actionDuplicate_row->setText(QApplication::translate("DesignitClass", "Duplicate row", Q_NULLPTR));
-        actionInsert_col->setText(QApplication::translate("DesignitClass", "Insert col", Q_NULLPTR));
-        actionDelete_col->setText(QApplication::translate("DesignitClass", "Delete col", Q_NULLPTR));
-        actionDuplicate_col->setText(QApplication::translate("DesignitClass", "Duplicate col", Q_NULLPTR));
-        actionMate_points->setText(QApplication::translate("DesignitClass", "Mate points", Q_NULLPTR));
+        DesignitClass->setWindowTitle(QApplication::translate("DesignitClass", "Surfit", 0));
+        actionNew->setText(QApplication::translate("DesignitClass", "New...", 0));
+        actionOpen->setText(QApplication::translate("DesignitClass", "Open...", 0));
+        actionSave_As->setText(QApplication::translate("DesignitClass", "Save As ...", 0));
+        actionExit->setText(QApplication::translate("DesignitClass", "Exit", 0));
+        actionDrag->setText(QApplication::translate("DesignitClass", "Drag", 0));
+        actionNew_surface->setText(QApplication::translate("DesignitClass", "New surface", 0));
+        actionDrag_all->setText(QApplication::translate("DesignitClass", "Drag all", 0));
+        actionNormals->setText(QApplication::translate("DesignitClass", "Normals", 0));
+        actionDrag_row->setText(QApplication::translate("DesignitClass", "Drag row", 0));
+        actionDrag_col->setText(QApplication::translate("DesignitClass", "Drag col", 0));
+        actionInterpolated_points->setText(QApplication::translate("DesignitClass", "Interpolated points", 0));
+        actionControl_points->setText(QApplication::translate("DesignitClass", "Control points", 0));
+        actionRotate_all->setText(QApplication::translate("DesignitClass", "Rotate all", 0));
+        actionResize_all->setText(QApplication::translate("DesignitClass", "Resize all", 0));
+        actionShear->setText(QApplication::translate("DesignitClass", "Shear", 0));
+        actionPerspective->setText(QApplication::translate("DesignitClass", "Perspective", 0));
+        actionPlayout_Test->setText(QApplication::translate("DesignitClass", "Playout Test", 0));
+        actionFlip_horizontal->setText(QApplication::translate("DesignitClass", "Flip all horizontal", 0));
+        actionClose->setText(QApplication::translate("DesignitClass", "Close", 0));
+        actionCopy_surface->setText(QApplication::translate("DesignitClass", "Copy surface", 0));
+        actionDelete_surface->setText(QApplication::translate("DesignitClass", "Delete surface", 0));
+        actionAnnotations->setText(QApplication::translate("DesignitClass", "Annotations", 0));
+        actionInsert_row->setText(QApplication::translate("DesignitClass", "Insert row", 0));
+        actionDelete_row->setText(QApplication::translate("DesignitClass", "Delete row", 0));
+        actionDuplicate_row->setText(QApplication::translate("DesignitClass", "Duplicate row", 0));
+        actionInsert_col->setText(QApplication::translate("DesignitClass", "Insert col", 0));
+        actionDelete_col->setText(QApplication::translate("DesignitClass", "Delete col", 0));
+        actionDuplicate_col->setText(QApplication::translate("DesignitClass", "Duplicate col", 0));
+        actionMate_points->setText(QApplication::translate("DesignitClass", "Mate points", 0));
 #ifndef QT_NO_TOOLTIP
-        actionMate_points->setToolTip(QApplication::translate("DesignitClass", "Mate points (master first)", Q_NULLPTR));
+        actionMate_points->setToolTip(QApplication::translate("DesignitClass", "Mate points (master first)", 0));
 #endif // QT_NO_TOOLTIP
-        actionCopy_surface_mirror->setText(QApplication::translate("DesignitClass", "Copy surface mirror", Q_NULLPTR));
-        actionMerge_surfaces_by_row->setText(QApplication::translate("DesignitClass", "Merge surfaces by row", Q_NULLPTR));
-        actionReset_all_views->setText(QApplication::translate("DesignitClass", "Reset all views", Q_NULLPTR));
-        actionWeb_help->setText(QApplication::translate("DesignitClass", "Web help ...", Q_NULLPTR));
-        actionAbout->setText(QApplication::translate("DesignitClass", "About", Q_NULLPTR));
-        actionGaussian_curvature->setText(QApplication::translate("DesignitClass", "Gaussian curvature", Q_NULLPTR));
-        actionInterpolated_points_density_U->setText(QApplication::translate("DesignitClass", "Interpolated points density U", Q_NULLPTR));
-        actionInterpolated_points_density_V->setText(QApplication::translate("DesignitClass", "Interpolated points density V", Q_NULLPTR));
-        actionGrids->setText(QApplication::translate("DesignitClass", "Grids", Q_NULLPTR));
-        actionMerge_surfaces_by_row_reverse->setText(QApplication::translate("DesignitClass", "Merge surfaces by row reverse", Q_NULLPTR));
-        actionMeasure_distance->setText(QApplication::translate("DesignitClass", "Measure distance", Q_NULLPTR));
-        actionCentred_rotate->setText(QApplication::translate("DesignitClass", "Centred rotate", Q_NULLPTR));
-        tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_statusWindow), QApplication::translate("DesignitClass", "Status window", Q_NULLPTR));
-        collapseAllButton->setText(QApplication::translate("DesignitClass", "Collapse All", Q_NULLPTR));
-        expandAllButton->setText(QApplication::translate("DesignitClass", "Expand All", Q_NULLPTR));
-        tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_viewJSON), QApplication::translate("DesignitClass", "JSON view", Q_NULLPTR));
-        tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_dataFile), QApplication::translate("DesignitClass", "Data file", Q_NULLPTR));
-        label_2->setText(QApplication::translate("DesignitClass", "3D view", Q_NULLPTR));
-        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XYView), QApplication::translate("DesignitClass", "XY view", Q_NULLPTR));
-        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XZView), QApplication::translate("DesignitClass", "XZ view", Q_NULLPTR));
-        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_YZView), QApplication::translate("DesignitClass", "YZ view", Q_NULLPTR));
-        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_gaussianView), QApplication::translate("DesignitClass", "Gaussian Curvature", Q_NULLPTR));
-        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_spreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", Q_NULLPTR));
-        editingTools->setItemText(editingTools->indexOf(SurfaceTools), QApplication::translate("DesignitClass", "Surface Tools", Q_NULLPTR));
-        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectoryTranslations), QApplication::translate("DesignitClass", "Translations", Q_NULLPTR));
-        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectoryRotations), QApplication::translate("DesignitClass", "Rotations", Q_NULLPTR));
-        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectorySpreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", Q_NULLPTR));
-        editingTools->setItemText(editingTools->indexOf(TrajectoryTools), QApplication::translate("DesignitClass", "Trajectory Tools", Q_NULLPTR));
-        menuFile->setTitle(QApplication::translate("DesignitClass", "File", Q_NULLPTR));
-        menuView->setTitle(QApplication::translate("DesignitClass", "View", Q_NULLPTR));
-        menuEdit->setTitle(QApplication::translate("DesignitClass", "Mode", Q_NULLPTR));
-        menuSurface->setTitle(QApplication::translate("DesignitClass", "Surface", Q_NULLPTR));
-        menuTest->setTitle(QApplication::translate("DesignitClass", "Test", Q_NULLPTR));
-        menuHelp->setTitle(QApplication::translate("DesignitClass", "Help", Q_NULLPTR));
-        menuAnalysis->setTitle(QApplication::translate("DesignitClass", "Analysis", Q_NULLPTR));
-        menuEdit_2->setTitle(QApplication::translate("DesignitClass", "Edit", Q_NULLPTR));
+        actionCopy_surface_mirror->setText(QApplication::translate("DesignitClass", "Copy surface mirror", 0));
+        actionMerge_surfaces_by_row->setText(QApplication::translate("DesignitClass", "Merge surfaces by row", 0));
+        actionReset_all_views->setText(QApplication::translate("DesignitClass", "Reset all views", 0));
+        actionWeb_help->setText(QApplication::translate("DesignitClass", "Web help ...", 0));
+        actionAbout->setText(QApplication::translate("DesignitClass", "About", 0));
+        actionGaussian_curvature->setText(QApplication::translate("DesignitClass", "Gaussian curvature", 0));
+        actionInterpolated_points_density_U->setText(QApplication::translate("DesignitClass", "Interpolated points density U", 0));
+        actionInterpolated_points_density_V->setText(QApplication::translate("DesignitClass", "Interpolated points density V", 0));
+        actionGrids->setText(QApplication::translate("DesignitClass", "Grids", 0));
+        actionMerge_surfaces_by_row_reverse->setText(QApplication::translate("DesignitClass", "Merge surfaces by row reverse", 0));
+        actionMeasure_distance->setText(QApplication::translate("DesignitClass", "Measure distance", 0));
+        actionCentred_rotate->setText(QApplication::translate("DesignitClass", "Centred rotate", 0));
+        action_Flexit->setText(QApplication::translate("DesignitClass", "action_Flexit", 0));
+#ifndef QT_NO_TOOLTIP
+        action_Flexit->setToolTip(QApplication::translate("DesignitClass", "Open the current project in Flexit", 0));
+#endif // QT_NO_TOOLTIP
+        tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_statusWindow), QApplication::translate("DesignitClass", "Status window", 0));
+        collapseAllButton->setText(QApplication::translate("DesignitClass", "Collapse All", 0));
+        expandAllButton->setText(QApplication::translate("DesignitClass", "Expand All", 0));
+        tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_viewJSON), QApplication::translate("DesignitClass", "JSON view", 0));
+        tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_dataFile), QApplication::translate("DesignitClass", "Data file", 0));
+        label_2->setText(QApplication::translate("DesignitClass", "3D view", 0));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XYView), QApplication::translate("DesignitClass", "XY view", 0));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XZView), QApplication::translate("DesignitClass", "XZ view", 0));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_YZView), QApplication::translate("DesignitClass", "YZ view", 0));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_gaussianView), QApplication::translate("DesignitClass", "Gaussian Curvature", 0));
+        tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_spreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", 0));
+        editingTools->setItemText(editingTools->indexOf(SurfaceTools), QApplication::translate("DesignitClass", "Surface Tools", 0));
+        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectoryTranslations), QApplication::translate("DesignitClass", "Translations", 0));
+        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectoryRotations), QApplication::translate("DesignitClass", "Rotations", 0));
+        tabsWorkTrajectory->setTabText(tabsWorkTrajectory->indexOf(tab_trajectorySpreadsheet), QApplication::translate("DesignitClass", "Spreadsheet", 0));
+        editingTools->setItemText(editingTools->indexOf(TrajectoryTools), QApplication::translate("DesignitClass", "Trajectory Tools", 0));
+        menuFile->setTitle(QApplication::translate("DesignitClass", "File", 0));
+        menuView->setTitle(QApplication::translate("DesignitClass", "View", 0));
+        menuEdit->setTitle(QApplication::translate("DesignitClass", "Mode", 0));
+        menuSurface->setTitle(QApplication::translate("DesignitClass", "Surface", 0));
+        menuTest->setTitle(QApplication::translate("DesignitClass", "Test", 0));
+        menuHelp->setTitle(QApplication::translate("DesignitClass", "Help", 0));
+        menuAnalysis->setTitle(QApplication::translate("DesignitClass", "Analysis", 0));
+        menuEdit_2->setTitle(QApplication::translate("DesignitClass", "Edit", 0));
     } // retranslateUi
 
 };

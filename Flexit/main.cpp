@@ -125,7 +125,12 @@ int main(int argc, char *argv[])
 	project->set_DebugLevel(5);
 
 	// Set the run mode depending on whether or not there are data file argument(s).
-	if (argc > 1)
+	if (argc == 1)
+	{
+		// There are command line arguments, so we're running in batch mode.
+		MY_RUN_MODE = MYAUTOSAVED;
+	}
+	else if (argc > 1)
 	{
 		// There are command line arguments, so we're running in batch mode.
 		MY_RUN_MODE = MYBATCH;
@@ -135,7 +140,7 @@ int main(int argc, char *argv[])
 		MY_RUN_MODE = MYGUI;
 	}
 
-	if (MY_RUN_MODE == MYGUI)
+	if (MY_RUN_MODE != MYBATCH)
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "GUI MODE.");
 		QApplication a(argc, argv);
@@ -170,6 +175,11 @@ int main(int argc, char *argv[])
 
 		// Send HTTP log message.
 		w->sendHTTPRequest(QString("Program"), QString("Launched"), 0.0, 0, QString());
+
+		if (MY_RUN_MODE == MYAUTOSAVED)
+		{
+			w->loadData("autosave.json");
+		}
 
 		return a.exec();
 	}

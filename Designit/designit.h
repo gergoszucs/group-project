@@ -39,6 +39,7 @@ public:
 	void on_actionReset_all_views_triggered();
 	void on_actionWeb_help_triggered();
 	void on_actionAbout_triggered();
+	void on_action_Flexit_triggered();
 
 	void on_actionNew_surface_triggered();
 	void on_actionDelete_surface_triggered();
