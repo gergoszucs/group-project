@@ -66,6 +66,9 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLineEdit" name="commandLine"/>
+         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="tab_viewJSON">
@@ -304,8 +307,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>304</width>
-          <height>659</height>
+          <width>218</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">

@@ -57,6 +57,10 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	connect(ui.mySpreadsheet->itemDelegate(), &QAbstractItemDelegate::commitData, this, &Designit::updateDataFromSpreadsheet);
 	connect(ui.trajectorySpreadsheet->itemDelegate(), &QAbstractItemDelegate::commitData, this, &Designit::updateTrajectoryFromSpreadsheet);
 
+	// Connect enter key pressed signal to executing command line command;
+	connect(ui.commandLine, &QLineEdit::returnPressed, this, &Designit::handleCommand);
+	connect(ui.commandLine, &QLineEdit::textEdited, this, &Designit::resetCommandMemory);
+
 	// Toolbox tab chenge signal
 	connect(ui.editingTools, &QToolBox::currentChanged, this, &Designit::toolBoxTabChanged);
 
@@ -78,6 +82,13 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 
 	ui.trajectoryCurveB->set_MyCurveIndex(5);
 	ui.trajectoryCurveB->set_MyChar('B');
+
+	//populate command list
+	functions.emplace("testFunction", &Designit::testFunction);
+	functions.emplace("movePoint", &Designit::movePoint);
+	functions.emplace("setPoint", &Designit::setPoint);
+
+	ui.commandLine->installEventFilter(this);
 }
 
 void Designit::on_actionOpen_triggered()
@@ -1885,6 +1896,50 @@ void Designit::userHasEnteredTextData()
 	}
 }
 
+void Designit::handleCommand()
+{
+	QString input = ui.commandLine->text();
+
+	commandPointer = -1;
+	commandMemory.insert(commandMemory.begin(), input);
+
+	ui.commandLine->setText("");
+
+	QRegExp rx("(\\ |\\t+|\\s+)"); //RegEx for ' ' or '\t'
+	QStringList arguments = input.split(rx);
+	
+	if (functions.find(arguments[0].toUtf8().constData()) != functions.end())
+	{
+		int returnCode = functions[arguments[0].toUtf8().constData()](arguments);
+
+		switch (returnCode)
+		{
+		case 0:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("DONE"));
+			break;
+		case 1:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Wrong number of arguments"));
+			break;
+		case 2:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Wrong arguments of function"));
+			break;
+		case 99:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Unspecified error"));
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		w->statusBar()->showMessage(QObject::tr("Unknown command"));
+	}
+}
+
+void Designit::resetCommandMemory()
+{
+	commandPointer = -1;
+}
+
 // TODO: import spreadsheet functions for moveIT spreadsheet
 void Designit::showSpreadsheet()
 {
@@ -2621,4 +2676,147 @@ void Designit::toolBoxTabChanged( int index )
 	}
 
 	updateAllTabs();
+}
+
+bool Designit::eventFilter(QObject *obj, QEvent *event)
+{
+	if ((event->type() == QEvent::KeyPress) && (obj == ui.commandLine))
+	{
+		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+		switch (keyEvent->key())
+		{
+		case Qt::Key_Up:
+
+			if (commandPointer < 0)
+			{
+				commandPointer = 0;
+			} 
+			else if (commandPointer >= commandMemory.size() - 1)  \
+			{
+				commandPointer = commandMemory.size() - 1;
+			}
+			else
+			{
+				commandPointer++;
+			}
+
+			ui.commandLine->setText(commandMemory[commandPointer]);
+
+			return true;
+
+			break;
+
+		case Qt::Key_Down:
+
+			if (commandPointer <= 0)
+			{
+				commandPointer = 0;
+			}
+			else if (commandPointer > commandMemory.size() - 1)  \
+			{
+				commandPointer = commandMemory.size() - 1;
+			}
+			else
+			{
+				commandPointer--;
+			}
+
+			ui.commandLine->setText(commandMemory[commandPointer]);
+			
+			return true;
+
+			break;
+
+		default:
+			return QMainWindow::eventFilter(obj, event);
+			break;
+		}
+	}
+	else {
+		// pass the event on to the parent class
+		return QMainWindow::eventFilter(obj, event);
+	}
+}
+
+int Designit::testFunction(const QStringList & arguments)
+{
+	for (int i = 0; i < arguments.size(); i++)
+	{
+		QByteArray ba = arguments[i].toLatin1();
+		const char *c_str2 = ba.data();
+
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, c_str2);
+	}
+
+	return 0;
+}
+
+int Designit::setPoint(const QStringList & arguments)
+{
+	if (arguments.size() != 7)
+	{
+		return 1;
+	}
+
+	int i, j, k;
+	float posX, posY, posZ;
+	bool status;
+
+	i = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	k = arguments[3].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[5].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[6].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->setPoint(i,j,k,posX,posY,posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+	
+	return 0;
+}
+
+int Designit::movePoint(const QStringList & arguments)
+{
+	if (arguments.size() != 7)
+	{
+		return 1;
+	}
+
+	int i, j, k;
+	float posX, posY, posZ;
+	bool status;
+
+	i = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	k = arguments[3].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[5].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[6].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->movePoint(i, j, k, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
 }

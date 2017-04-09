@@ -93,6 +93,7 @@ public:
     QWidget *tab_statusWindow;
     QVBoxLayout *verticalLayout;
     QTableWidget *myStatusTableWidget;
+    QLineEdit *commandLine;
     QWidget *tab_viewJSON;
     QVBoxLayout *verticalLayout_9;
     QTreeView *jsonTreeView;
@@ -374,6 +375,11 @@ public:
 
         verticalLayout->addWidget(myStatusTableWidget);
 
+        commandLine = new QLineEdit(tab_statusWindow);
+        commandLine->setObjectName(QStringLiteral("commandLine"));
+
+        verticalLayout->addWidget(commandLine);
+
         tabsAdditionalData->addTab(tab_statusWindow, QString());
         tab_viewJSON = new QWidget();
         tab_viewJSON->setObjectName(QStringLiteral("tab_viewJSON"));
@@ -546,7 +552,7 @@ public:
         editingTools->addItem(SurfaceTools, QStringLiteral("Surface Tools"));
         TrajectoryTools = new QWidget();
         TrajectoryTools->setObjectName(QStringLiteral("TrajectoryTools"));
-        TrajectoryTools->setGeometry(QRect(0, 0, 304, 659));
+        TrajectoryTools->setGeometry(QRect(0, 0, 218, 418));
         horizontalLayout_7 = new QHBoxLayout(TrajectoryTools);
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setContentsMargins(11, 11, 11, 11);

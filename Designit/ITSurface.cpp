@@ -114,6 +114,29 @@ ITSurface::~ITSurface(void)
 	delete _MyPreviousRotationPoint;
 }
 
+int ITSurface::sizeX()
+{
+	return _MyControlPoints->size();
+}
+
+int ITSurface::sizeY()
+{ 
+	if (sizeX() > 0)
+	{
+		return _MyControlPoints->at(0).size();
+	}
+	else {
+		return 0;
+	}
+}
+
+ITPoint * ITSurface::getControlPoint(const int i, const int j)
+{
+	if ((i > sizeX()) || (j > sizeY())) throw std::exception("OUT OF RANGE");
+
+	return _MyControlPoints->at(i).at(j);
+}
+
 void ITSurface::propagateGeometry(int k)
 {
 	// This method computes new surface, panel and vortex segment geometry for the current FrameNumber.

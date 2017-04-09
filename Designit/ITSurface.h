@@ -68,6 +68,10 @@ public:
 	ITSurface(void);
 	~ITSurface(void);
 
+	int sizeX();
+	int sizeY();
+	ITPoint * getControlPoint(const int i, const int j);
+
 	// Utilities.
 	void manageComputationOfInterpolatedPoints();
 	void computeTrajectoryPointsAtFrame(int myFrameNumber, int mySurfaceIndex, ITPoint* translationPoint, ITPoint* rotationPoint);

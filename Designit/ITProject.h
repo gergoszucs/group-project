@@ -67,6 +67,9 @@ public:
 	ITProject(void);
 	~ITProject(void);
 
+	void setPoint(const int surfaceID, const int i, const int j, const float posX, const float posY, const float posZ);
+	void movePoint(const int surfaceID, const int i, const int j, const float dX, const float dY, const float dZ);
+
 	// Admin methods.
 	void currentDateTime(char * currentTime);
 	void printDebug(const char *FILE, int LINE, const char *FUNC, int level, const char * format, ...);
@@ -173,4 +176,6 @@ public:
 
 	bool get_IsActiveControlSurfaces();
 	void set_IsActiveControlSurfaces(bool b);
+
+	ITSurface* getSurface(const int k);
 };

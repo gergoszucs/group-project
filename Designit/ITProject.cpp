@@ -73,6 +73,58 @@ ITProject::~ITProject(void)
 	delete _MyBaseSurfaces;
 }
 
+void ITProject::setPoint(const int surfaceID, const int i, const int j, const float posX, const float posY, const float posZ)
+{
+	if (surfaceID > get_MySurfaces()->size()) throw std::exception("No surface with id: " + surfaceID);
+
+	if ((i > getSurface( surfaceID )->sizeX()) || (j > getSurface(surfaceID)->sizeY()))
+	{
+		std::ostringstream stringStream;
+		stringStream << "No point (" << i << "," << j << ") in surface: " << surfaceID;
+
+		throw std::exception(stringStream.str().c_str());
+	}
+
+	getSurface(surfaceID)->getControlPoint(i, j)->set_X(posX);
+	getSurface(surfaceID)->getControlPoint(i, j)->set_Y(posY);
+	getSurface(surfaceID)->getControlPoint(i, j)->set_Z(posZ);
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::movePoint(const int surfaceID, const int i, const int j, const float dX, const float dY, const float dZ)
+{
+	if (surfaceID > get_MySurfaces()->size()) throw std::exception("No surface with id: " + surfaceID);
+
+	if ((i > getSurface(surfaceID)->sizeX()) || (j > getSurface(surfaceID)->sizeY()))
+	{
+		std::ostringstream stringStream;
+		stringStream << "No point (" << i << "," << j << ") in surface: " << surfaceID;
+
+		throw std::exception(stringStream.str().c_str());
+	}
+
+	float tmpX, tmpY, tmpZ;
+
+	tmpX = getSurface(surfaceID)->getControlPoint(i, j)->get_X();
+	tmpY = getSurface(surfaceID)->getControlPoint(i, j)->get_Y();
+	tmpZ = getSurface(surfaceID)->getControlPoint(i, j)->get_Z();
+
+	tmpX += dX;
+	tmpY += dY;
+	tmpZ += dZ;
+
+	getSurface(surfaceID)->getControlPoint(i, j)->set_X(tmpX);
+	getSurface(surfaceID)->getControlPoint(i, j)->set_Y(tmpY);
+	getSurface(surfaceID)->getControlPoint(i, j)->set_Z(tmpZ);
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
 // Utilities.
 void ITProject::currentDateTime(char* currentTime)
 {
@@ -270,3 +322,8 @@ void ITProject::set_ReplayDeltaTMSecs(float f) { _ReplayDeltaTMSecs = f; }
 
 bool ITProject::get_IsActiveControlSurfaces() { return _IsActiveControlSurfaces; }
 void ITProject::set_IsActiveControlSurfaces(bool b) { _IsActiveControlSurfaces = b; }
+
+ITSurface* ITProject::getSurface( const int k ) 
+{ 
+	return _MySurfaces->at(k); 
+};

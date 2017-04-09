@@ -10,6 +10,8 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QUrlQuery>
+#include <unordered_map>
+#include <functional>
 
 class Designit : public QMainWindow
 {
@@ -83,6 +85,8 @@ public:
 
 	void toolBoxTabChanged(int index);
 
+	void handleCommand();
+
 	void showSpreadsheet();
 	void updateSpreadsheet();
 
@@ -109,6 +113,10 @@ public:
 	*/
 	void updateTrajectoryFromSpreadsheet();
 
+	bool eventFilter(QObject *obj, QEvent *event);
+
+	void resetCommandMemory();
+
 private:
 	Ui::DesignitClass ui;
 
@@ -116,6 +124,16 @@ private:
 	bool checkExitWithUnsavedData(); // Returns true if user wants to exit.
 	void closeProject();
 	void closeEvent(QCloseEvent *bar);
+
+	static int testFunction(const QStringList & arguments);
+	static int setPoint(const QStringList & arguments);
+	static int movePoint(const QStringList & arguments);
+
+public:
+	//std::unordered_map<QString, std::function<void(const QStringList & arguments)>> functions;
+	std::unordered_map<std::string, std::function<int(const QStringList & arguments)>> functions;
+	std::vector< QString > commandMemory;
+	int commandPointer = -1;
 };
 
 #endif // DESIGNIT_H
