@@ -80,6 +80,27 @@ void ITTrajectoryCurve::computeMySegmentEndTangentVectors()
 	}
 }
 
+void ITTrajectoryCurve::addSegment(const float pointA_x, const float pointA_y, const float pointA_z, const int pointA_frame, const float pointA_U, const float pointA_V,
+	const float pointB_x, const float pointB_y, const float pointB_z, const int pointB_frame, const float pointB_U, const float pointB_V)
+{
+	ITTrajectoryCurveSegment *s = new ITTrajectoryCurveSegment();
+
+	// Set the p0 and p1 instance variables.
+	ITPointTrajectory *p0rp = new ITPointTrajectory(pointA_x, pointA_y, pointA_z);
+	ITPointTrajectory *p1rp = new ITPointTrajectory(pointB_x, pointB_y, pointB_z);
+
+	s->set_P0_p(p0rp);
+	s->set_P1_p(p1rp);
+	s->set_StartKeyFrame(pointA_frame);
+	s->set_EndKeyFrame(pointB_frame);
+
+	s->get_P0_p()->set_U(pointA_U);
+	s->get_P0_p()->set_V(pointA_V);
+	s->get_P1_p()->set_U(pointB_U);
+	s->get_P1_p()->set_V(pointB_V);
+
+	get_MyTrajectoryCurveSegments()->push_back(s);
+}
 // Accessors.
 std::vector <ITTrajectoryCurveSegment*> *ITTrajectoryCurve::get_MyTrajectoryCurveSegments() { return _MyTrajectoryCurveSegments; }
 void ITTrajectoryCurve::set_MyTrajectoryCurveSegments(std::vector <ITTrajectoryCurveSegment*> *v) { _MyTrajectoryCurveSegments = v; }

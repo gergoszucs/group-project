@@ -129,6 +129,8 @@ private:
 	static int setPoint(const QStringList & arguments);
 	static int movePoint(const QStringList & arguments);
 
+	void createNewTrajectoryCurve( const int k );
+
 public:
 	//std::unordered_map<QString, std::function<void(const QStringList & arguments)>> functions;
 	std::unordered_map<std::string, std::function<int(const QStringList & arguments)>> functions;

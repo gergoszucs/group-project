@@ -737,6 +737,8 @@ void Designit::on_actionNew_surface_triggered()
 
 	project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
 
+	createNewTrajectoryCurve(k);
+
 	updateSpreadsheet();
 	updateTrajectorySpreadsheet();
 	updateAllTabs();
@@ -2819,4 +2821,75 @@ int Designit::movePoint(const QStringList & arguments)
 	}
 
 	return 0;
+}
+
+void Designit::createNewTrajectoryCurve(const int k)
+{
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Creating new trajectory curve");
+
+	// Instanciate the ITTrajectoryCurve curves.
+	ITTrajectoryCurve* cx = new ITTrajectoryCurve();
+	ITTrajectoryCurve* cy = new ITTrajectoryCurve();
+	ITTrajectoryCurve* cz = new ITTrajectoryCurve();
+
+	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
+	// Note that the ordinal of each segment end point is stored in the x instance variable of the ITPoint object.
+	for (int i = 0; i < 4; i++)
+	{
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "translation segment %i", i);
+
+		cx->addSegment(i*5.0, 0.0, 0.0, 20 * i, 0.0, 0.0, (i + 1)*5.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		cy->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		cz->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+	}
+
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Finished translation segments");
+
+	// Compute the m0 and m1 tangent vectors for each of the segments in the translation curves.
+	cx->computeMySegmentEndTangentVectors();
+	cy->computeMySegmentEndTangentVectors();
+	cz->computeMySegmentEndTangentVectors();
+
+	// Push the translation curves into the surface.
+	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cx);
+	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cy);
+	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cz);
+
+	// Instanciate the ITTrajectoryCurve curves.
+	ITTrajectoryCurve* cr = new ITTrajectoryCurve();
+	ITTrajectoryCurve* cp = new ITTrajectoryCurve();
+	ITTrajectoryCurve* cyaw = new ITTrajectoryCurve();
+
+	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
+	for (int i = 0; i < 4; i++)
+	{
+		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "rotation segment %i", i);
+
+		cr->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		cp->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		cyaw->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+	}
+
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Finished rotation segments");
+
+	// Compute the m0 and m1 tangent vectors for each of the segments in the translation curves.
+	cr->computeMySegmentEndTangentVectors();
+	cp->computeMySegmentEndTangentVectors();
+	cyaw->computeMySegmentEndTangentVectors();
+
+	// Push the translation curves into the surface.
+	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cr);
+	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cp);
+	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cyaw);
+
+	// Centre of rotation point.
+	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_X(0.0);
+	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(0.0);
+	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(0.0);
+
+	// Finally update the project maxKeyFrame instance variable.
+	// Set it to the end key frame of the last segment of the z trajectory of the last surface.
+	project->set_MaxKeyFrame(project->get_MySurfaces()->back()->get_MyTrajectoryCurves()->back()->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
+
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Max key frame: %i", project->get_MaxKeyFrame());
 }
