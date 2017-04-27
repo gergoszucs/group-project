@@ -87,6 +87,16 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	functions.emplace("testFunction", &Designit::testFunction);
 	functions.emplace("movePoint", &Designit::movePoint);
 	functions.emplace("setPoint", &Designit::setPoint);
+	functions.emplace("rotateSurface", &Designit::rotateSurface);
+	functions.emplace("rotateSurfaceCentral", &Designit::rotateSurfaceCentral);
+	functions.emplace("addSurface", &Designit::addSurface);
+	functions.emplace("rotatePoint", &Designit::rotatePoint);
+	functions.emplace("setColumn", &Designit::setColumn);
+	functions.emplace("setRow", &Designit::setRow);
+	functions.emplace("setSurface", &Designit::setSurface);
+	functions.emplace("moveColumn", &Designit::moveColumn);
+	functions.emplace("moveRow", &Designit::moveRow);
+	functions.emplace("moveSurface", &Designit::moveSurface);
 
 	ui.commandLine->installEventFilter(this);
 }
@@ -770,7 +780,7 @@ void Designit::on_actionNew_surface_triggered()
 
 	project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
 
-	createNewTrajectoryCurve(k);
+	project->createNewTrajectoryCurve(k);
 
 	updateSpreadsheet();
 	updateTrajectorySpreadsheet();
@@ -2812,7 +2822,7 @@ int Designit::setPoint(const QStringList & arguments)
 
 	try
 	{
-		project->setPoint(i,j,k,posX,posY,posZ);
+		project->setPoint(i,j,k,posX,posY,posZ, true);
 	}
 	catch (std::exception& e) {
 		return 99;
@@ -2847,7 +2857,7 @@ int Designit::movePoint(const QStringList & arguments)
 
 	try
 	{
-		project->movePoint(i, j, k, posX, posY, posZ);
+		project->movePoint(i, j, k, posX, posY, posZ, true);
 	}
 	catch (std::exception& e) {
 		return 99;
@@ -2856,73 +2866,404 @@ int Designit::movePoint(const QStringList & arguments)
 	return 0;
 }
 
-void Designit::createNewTrajectoryCurve(const int k)
+int Designit::rotatePoint(const QStringList & arguments)
 {
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Creating new trajectory curve");
-
-	// Instanciate the ITTrajectoryCurve curves.
-	ITTrajectoryCurve* cx = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cy = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cz = new ITTrajectoryCurve();
-
-	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
-	// Note that the ordinal of each segment end point is stored in the x instance variable of the ITPoint object.
-	for (int i = 0; i < 4; i++)
+	if (arguments.size() != 9)
 	{
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "translation segment %i", i);
-
-		cx->addSegment(i*5.0, 0.0, 0.0, 20 * i, 0.0, 0.0, (i + 1)*5.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cy->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cz->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		return 1;
 	}
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Finished translation segments");
+	int surfaceID, i, j;
+	float posX, posY, posZ, angle;
+	PLANE p;
+	bool status;
 
-	// Compute the m0 and m1 tangent vectors for each of the segments in the translation curves.
-	cx->computeMySegmentEndTangentVectors();
-	cy->computeMySegmentEndTangentVectors();
-	cz->computeMySegmentEndTangentVectors();
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	j = arguments[3].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[5].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[6].toFloat(&status);
+	if (!status) return 2;
 
-	// Push the translation curves into the surface.
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cx);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cy);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cz);
+	angle = arguments[7].toFloat(&status);
+	if (!status) return 2;
 
-	// Instanciate the ITTrajectoryCurve curves.
-	ITTrajectoryCurve* cr = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cp = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cyaw = new ITTrajectoryCurve();
+	angle = DEG_TO_RAD(angle);
 
-	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
-	for (int i = 0; i < 4; i++)
+	QString tmpStr = arguments[8].toLower();
+
+	if (tmpStr == "xy")
 	{
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "rotation segment %i", i);
-
-		cr->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cp->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cyaw->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		p = XY;
+	}
+	else if (tmpStr == "xz")
+	{
+		p = XZ;
+	}
+	else if (tmpStr == "yz")
+	{
+		p = YZ;
+	}
+	else
+	{
+		return 2;
 	}
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Finished rotation segments");
+	try
+	{
+		project->rotatePoint(surfaceID, i, j, posX, posY, posZ, angle, p, true);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
 
-	// Compute the m0 and m1 tangent vectors for each of the segments in the translation curves.
-	cr->computeMySegmentEndTangentVectors();
-	cp->computeMySegmentEndTangentVectors();
-	cyaw->computeMySegmentEndTangentVectors();
+	return 0;
+}
 
-	// Push the translation curves into the surface.
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cr);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cp);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cyaw);
+int Designit::setColumn(const QStringList & arguments)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
 
-	// Centre of rotation point.
-	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_X(0.0);
-	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(0.0);
-	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(0.0);
+	int surfaceID, j;
+	float posX, posY, posZ;
+	bool status;
 
-	// Finally update the project maxKeyFrame instance variable.
-	// Set it to the end key frame of the last segment of the z trajectory of the last surface.
-	project->set_MaxKeyFrame(project->get_MySurfaces()->back()->get_MyTrajectoryCurves()->back()->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Max key frame: %i", project->get_MaxKeyFrame());
+	try
+	{
+		project->setColumn(surfaceID, j, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::moveColumn(const QStringList & arguments)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID, j;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->moveColumn(surfaceID, j, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::setRow(const QStringList & arguments)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->setRow(surfaceID, i, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::moveRow(const QStringList & arguments)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->moveRow(surfaceID, i, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::setSurface(const QStringList & arguments)
+{
+	if (arguments.size() != 5)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[2].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[4].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->setSurface(surfaceID, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::moveSurface(const QStringList & arguments)
+{
+	if (arguments.size() != 5)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[2].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[4].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->moveSurface(surfaceID, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::rotateSurface(const QStringList & arguments)
+{
+	if (arguments.size() != 7)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float x, y, z, angle;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	x = arguments[2].toFloat(&status);
+	if (!status) return 2;
+	y = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	z = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	angle = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angle);
+
+	QString tmpStr = arguments[6].toLower();
+	PLANE p;
+
+	if (tmpStr == "xy")
+	{
+		p = XY;
+	}
+	else if (tmpStr == "xz")
+	{
+		p = XZ;
+	}
+	else if (tmpStr == "yz")
+	{
+		p = YZ;
+	}
+	else
+	{
+		return 2;
+	}
+
+	try
+	{
+		project->rotateSurface(surfaceID, x, y, z, angle, p);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::rotateSurfaceCentral(const QStringList & arguments)
+{
+	if (arguments.size() != 4)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float angle;
+	bool status;
+	PLANE p;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	angle = arguments[2].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angle);
+
+	QString tmpStr = arguments[6].toLower();
+
+	if (tmpStr == "xy")
+	{
+		p = XY;
+	}
+	else if (tmpStr == "xz")
+	{
+		p = XZ;
+	}
+	else if (tmpStr == "yz")
+	{
+		p = YZ;
+	}
+	else
+	{
+		return 2;
+	}
+
+	try
+	{
+		project->rotateSurfaceCentral(surfaceID, angle, p);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::addSurface(const QStringList & arguments)
+{
+	if (arguments.size() != 1)
+	{
+		return 1;
+	}
+
+	try
+	{
+		project->addSurface();
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::deleteSurface(const QStringList & arguments)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float angle;
+	bool status;
+	PLANE p;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->deleteSurface(surfaceID);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
 }

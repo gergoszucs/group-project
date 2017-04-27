@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'Flexit.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.2
+** Created by: Qt User Interface Compiler version 5.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -594,75 +594,75 @@ public:
 
     void retranslateUi(QMainWindow *FlexitClass)
     {
-        FlexitClass->setWindowTitle(QApplication::translate("FlexitClass", "Flexit", 0));
-        actionOpen->setText(QApplication::translate("FlexitClass", "Open...", 0));
-        actionClose->setText(QApplication::translate("FlexitClass", "Close", 0));
-        actionExit->setText(QApplication::translate("FlexitClass", "Exit", 0));
-        actionWeb_help->setText(QApplication::translate("FlexitClass", "Web help", 0));
-        actionAxes->setText(QApplication::translate("FlexitClass", "Axes", 0));
-        actionControl_points->setText(QApplication::translate("FlexitClass", "Control points", 0));
-        actionInterpolated_points->setText(QApplication::translate("FlexitClass", "Interpolated points", 0));
-        actionDry_run->setText(QApplication::translate("FlexitClass", "Dry run", 0));
-        actionPause->setText(QApplication::translate("FlexitClass", "Pause", 0));
-        actionTracks->setText(QApplication::translate("FlexitClass", "Tracks", 0));
-        actionPanels->setText(QApplication::translate("FlexitClass", "Panels", 0));
-        actionNormals->setText(QApplication::translate("FlexitClass", "Normals", 0));
-        actionStart->setText(QApplication::translate("FlexitClass", "Start", 0));
-        actionStop->setText(QApplication::translate("FlexitClass", "Stop", 0));
-        actionVorticities->setText(QApplication::translate("FlexitClass", "Vorticities", 0));
-        actionWakes->setText(QApplication::translate("FlexitClass", "Wakes", 0));
-        actionBound_vortices->setText(QApplication::translate("FlexitClass", "Bound vortices", 0));
-        actionStartReplay->setText(QApplication::translate("FlexitClass", "Start replay", 0));
-        actionTranslate_view_with_surface->setText(QApplication::translate("FlexitClass", "Translate view with surface", 0));
-        actionAnnotations->setText(QApplication::translate("FlexitClass", "Annotations", 0));
-        actionPressure_distribution->setText(QApplication::translate("FlexitClass", "Pressure distribution", 0));
-        actionSave_As->setText(QApplication::translate("FlexitClass", "Save As ...", 0));
-        actionBeam_Elements->setText(QApplication::translate("FlexitClass", "Beam Elements", 0));
-        actionBeam_nodes->setText(QApplication::translate("FlexitClass", "Beam nodes", 0));
-        actionBeam_loading->setText(QApplication::translate("FlexitClass", "Beam loading", 0));
-        actionBeam_ghost_nodes->setText(QApplication::translate("FlexitClass", "Beam ghost nodes", 0));
-        actionBeam_ghost_elements->setText(QApplication::translate("FlexitClass", "Beam ghost elements", 0));
-        actionDeflected_beam_nodes->setText(QApplication::translate("FlexitClass", "Deflected beam nodes", 0));
-        actionUVLM->setText(QApplication::translate("FlexitClass", "UVLM", 0));
-        actionEuler_Bernoulli->setText(QApplication::translate("FlexitClass", "Euler Bernoulli", 0));
-        actionVelocity_field->setText(QApplication::translate("FlexitClass", "Velocity field", 0));
-        actionQuiet_graphics->setText(QApplication::translate("FlexitClass", "Quiet graphics", 0));
-        actionStep->setText(QApplication::translate("FlexitClass", "Step", 0));
-        actionTest->setText(QApplication::translate("FlexitClass", "Test", 0));
-        actionDrawVelocityField->setText(QApplication::translate("FlexitClass", "Velocity field", 0));
-        actionTrim->setText(QApplication::translate("FlexitClass", "Trim node masses", 0));
-        actionZ_reset->setText(QApplication::translate("FlexitClass", "Z reset", 0));
-        actionY_reset->setText(QApplication::translate("FlexitClass", "Y reset", 0));
-        actionX_reset->setText(QApplication::translate("FlexitClass", "X reset", 0));
-        actionAbout->setText(QApplication::translate("FlexitClass", "About ...", 0));
-        actionSend_email->setText(QApplication::translate("FlexitClass", "Send email", 0));
-        actionSend_HTTP_log_message->setText(QApplication::translate("FlexitClass", "Send HTTP log message", 0));
-        actionReset->setText(QApplication::translate("FlexitClass", "Reset", 0));
-        actionGust->setText(QApplication::translate("FlexitClass", "Gust", 0));
-        label->setText(QApplication::translate("FlexitClass", "Status window", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("FlexitClass", "Hardware", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("FlexitClass", "Data file", 0));
-        expandAllButton->setText(QApplication::translate("FlexitClass", "Expand All", 0));
-        collapseAllButton->setText(QApplication::translate("FlexitClass", "Collapse All", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("FlexitClass", "JSON tree", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("FlexitClass", "Graphics", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("FlexitClass", "Trajectories", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_6), QApplication::translate("FlexitClass", "B matrix", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_7), QApplication::translate("FlexitClass", "Influence matrix", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_9), QApplication::translate("FlexitClass", "Data view", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_8), QApplication::translate("FlexitClass", "Output table", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_10), QApplication::translate("FlexitClass", "Output graphics", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_11), QApplication::translate("FlexitClass", "Euler-Bernoulli", 0));
-        menuFile->setTitle(QApplication::translate("FlexitClass", "File", 0));
-        menuHelp->setTitle(QApplication::translate("FlexitClass", "Help", 0));
-        menuView->setTitle(QApplication::translate("FlexitClass", "View", 0));
-        menuDry->setTitle(QApplication::translate("FlexitClass", "Dry", 0));
-        menuCompute->setTitle(QApplication::translate("FlexitClass", "Compute", 0));
-        menuReplay->setTitle(QApplication::translate("FlexitClass", "Replay", 0));
-        menuModes->setTitle(QApplication::translate("FlexitClass", "Modes", 0));
-        menuTest->setTitle(QApplication::translate("FlexitClass", "Testing", 0));
-        menuPrepocessing->setTitle(QApplication::translate("FlexitClass", "Prepocessing", 0));
-        menuAccount->setTitle(QApplication::translate("FlexitClass", "Account", 0));
+        FlexitClass->setWindowTitle(QApplication::translate("FlexitClass", "Flexit", Q_NULLPTR));
+        actionOpen->setText(QApplication::translate("FlexitClass", "Open...", Q_NULLPTR));
+        actionClose->setText(QApplication::translate("FlexitClass", "Close", Q_NULLPTR));
+        actionExit->setText(QApplication::translate("FlexitClass", "Exit", Q_NULLPTR));
+        actionWeb_help->setText(QApplication::translate("FlexitClass", "Web help", Q_NULLPTR));
+        actionAxes->setText(QApplication::translate("FlexitClass", "Axes", Q_NULLPTR));
+        actionControl_points->setText(QApplication::translate("FlexitClass", "Control points", Q_NULLPTR));
+        actionInterpolated_points->setText(QApplication::translate("FlexitClass", "Interpolated points", Q_NULLPTR));
+        actionDry_run->setText(QApplication::translate("FlexitClass", "Dry run", Q_NULLPTR));
+        actionPause->setText(QApplication::translate("FlexitClass", "Pause", Q_NULLPTR));
+        actionTracks->setText(QApplication::translate("FlexitClass", "Tracks", Q_NULLPTR));
+        actionPanels->setText(QApplication::translate("FlexitClass", "Panels", Q_NULLPTR));
+        actionNormals->setText(QApplication::translate("FlexitClass", "Normals", Q_NULLPTR));
+        actionStart->setText(QApplication::translate("FlexitClass", "Start", Q_NULLPTR));
+        actionStop->setText(QApplication::translate("FlexitClass", "Stop", Q_NULLPTR));
+        actionVorticities->setText(QApplication::translate("FlexitClass", "Vorticities", Q_NULLPTR));
+        actionWakes->setText(QApplication::translate("FlexitClass", "Wakes", Q_NULLPTR));
+        actionBound_vortices->setText(QApplication::translate("FlexitClass", "Bound vortices", Q_NULLPTR));
+        actionStartReplay->setText(QApplication::translate("FlexitClass", "Start replay", Q_NULLPTR));
+        actionTranslate_view_with_surface->setText(QApplication::translate("FlexitClass", "Translate view with surface", Q_NULLPTR));
+        actionAnnotations->setText(QApplication::translate("FlexitClass", "Annotations", Q_NULLPTR));
+        actionPressure_distribution->setText(QApplication::translate("FlexitClass", "Pressure distribution", Q_NULLPTR));
+        actionSave_As->setText(QApplication::translate("FlexitClass", "Save As ...", Q_NULLPTR));
+        actionBeam_Elements->setText(QApplication::translate("FlexitClass", "Beam Elements", Q_NULLPTR));
+        actionBeam_nodes->setText(QApplication::translate("FlexitClass", "Beam nodes", Q_NULLPTR));
+        actionBeam_loading->setText(QApplication::translate("FlexitClass", "Beam loading", Q_NULLPTR));
+        actionBeam_ghost_nodes->setText(QApplication::translate("FlexitClass", "Beam ghost nodes", Q_NULLPTR));
+        actionBeam_ghost_elements->setText(QApplication::translate("FlexitClass", "Beam ghost elements", Q_NULLPTR));
+        actionDeflected_beam_nodes->setText(QApplication::translate("FlexitClass", "Deflected beam nodes", Q_NULLPTR));
+        actionUVLM->setText(QApplication::translate("FlexitClass", "UVLM", Q_NULLPTR));
+        actionEuler_Bernoulli->setText(QApplication::translate("FlexitClass", "Euler Bernoulli", Q_NULLPTR));
+        actionVelocity_field->setText(QApplication::translate("FlexitClass", "Velocity field", Q_NULLPTR));
+        actionQuiet_graphics->setText(QApplication::translate("FlexitClass", "Quiet graphics", Q_NULLPTR));
+        actionStep->setText(QApplication::translate("FlexitClass", "Step", Q_NULLPTR));
+        actionTest->setText(QApplication::translate("FlexitClass", "Test", Q_NULLPTR));
+        actionDrawVelocityField->setText(QApplication::translate("FlexitClass", "Velocity field", Q_NULLPTR));
+        actionTrim->setText(QApplication::translate("FlexitClass", "Trim node masses", Q_NULLPTR));
+        actionZ_reset->setText(QApplication::translate("FlexitClass", "Z reset", Q_NULLPTR));
+        actionY_reset->setText(QApplication::translate("FlexitClass", "Y reset", Q_NULLPTR));
+        actionX_reset->setText(QApplication::translate("FlexitClass", "X reset", Q_NULLPTR));
+        actionAbout->setText(QApplication::translate("FlexitClass", "About ...", Q_NULLPTR));
+        actionSend_email->setText(QApplication::translate("FlexitClass", "Send email", Q_NULLPTR));
+        actionSend_HTTP_log_message->setText(QApplication::translate("FlexitClass", "Send HTTP log message", Q_NULLPTR));
+        actionReset->setText(QApplication::translate("FlexitClass", "Reset", Q_NULLPTR));
+        actionGust->setText(QApplication::translate("FlexitClass", "Gust", Q_NULLPTR));
+        label->setText(QApplication::translate("FlexitClass", "Status window", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("FlexitClass", "Hardware", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("FlexitClass", "Data file", Q_NULLPTR));
+        expandAllButton->setText(QApplication::translate("FlexitClass", "Expand All", Q_NULLPTR));
+        collapseAllButton->setText(QApplication::translate("FlexitClass", "Collapse All", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("FlexitClass", "JSON tree", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("FlexitClass", "Graphics", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("FlexitClass", "Trajectories", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_6), QApplication::translate("FlexitClass", "B matrix", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_7), QApplication::translate("FlexitClass", "Influence matrix", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_9), QApplication::translate("FlexitClass", "Data view", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_8), QApplication::translate("FlexitClass", "Output table", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_10), QApplication::translate("FlexitClass", "Output graphics", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_11), QApplication::translate("FlexitClass", "Euler-Bernoulli", Q_NULLPTR));
+        menuFile->setTitle(QApplication::translate("FlexitClass", "File", Q_NULLPTR));
+        menuHelp->setTitle(QApplication::translate("FlexitClass", "Help", Q_NULLPTR));
+        menuView->setTitle(QApplication::translate("FlexitClass", "View", Q_NULLPTR));
+        menuDry->setTitle(QApplication::translate("FlexitClass", "Dry", Q_NULLPTR));
+        menuCompute->setTitle(QApplication::translate("FlexitClass", "Compute", Q_NULLPTR));
+        menuReplay->setTitle(QApplication::translate("FlexitClass", "Replay", Q_NULLPTR));
+        menuModes->setTitle(QApplication::translate("FlexitClass", "Modes", Q_NULLPTR));
+        menuTest->setTitle(QApplication::translate("FlexitClass", "Testing", Q_NULLPTR));
+        menuPrepocessing->setTitle(QApplication::translate("FlexitClass", "Prepocessing", Q_NULLPTR));
+        menuAccount->setTitle(QApplication::translate("FlexitClass", "Account", Q_NULLPTR));
     } // retranslateUi
 
 };

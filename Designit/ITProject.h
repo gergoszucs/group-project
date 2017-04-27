@@ -1,9 +1,17 @@
 #pragma once
 
+#include <stdarg.h>     // va_list, va_start, va_arg, va_end
+#include <QDebug>       // qDebug.
+#include <time.h>		// time, localtime, strftime
+#include <iostream>		// For cerr.
+#include <vector>
+
 #include "rapidjson/document.h" // will include "rapidjson/rapidjson.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
+
+#include "Enums.h"
 
 using namespace rapidjson;
 
@@ -67,8 +75,26 @@ public:
 	ITProject(void);
 	~ITProject(void);
 
-	void setPoint(const int surfaceID, const int i, const int j, const float posX, const float posY, const float posZ);
-	void movePoint(const int surfaceID, const int i, const int j, const float dX, const float dY, const float dZ);
+	void setPoint(const int surfaceID, const int i, const int j, const float posX, const float posY, const float posZ, bool update);
+	void movePoint(const int surfaceID, const int i, const int j, const float dX, const float dY, const float dZ, bool update);
+	void rotatePoint(const int surfaceID, const int i, const int j, const float x, const float y, const float z, const float angle, PLANE p, bool update);
+
+	void setColumn(const int surfaceID, const int j, const float posX, const float posY, const float posZ);
+	void moveColumn(const int surfaceID, const int j, const float dX, const float dY, const float dZ);
+
+	void setRow(const int surfaceID, const int i, const float posX, const float posY, const float posZ);
+	void moveRow(const int surfaceID, const int i, const float dX, const float dY, const float dZ);
+
+	void setSurface(const int surfaceID, const float posX, const float posY, const float posZ);
+	void moveSurface(const int surfaceID, const float dX, const float dY, const float dZ);
+	void rotateSurface(const int surfaceID, const float x, const float y, const float z, const float angle, PLANE p);
+	
+	void rotateSurfaceCentral(const int surfaceID, const float angle, PLANE p);
+	
+	void deleteSurface(const int surfaceID);
+	void addSurface();
+
+	void createNewTrajectoryCurve(const int k);
 
 	// Admin methods.
 	void currentDateTime(char * currentTime);
@@ -178,4 +204,6 @@ public:
 	void set_IsActiveControlSurfaces(bool b);
 
 	ITSurface* getSurface(const int k);
+
+	ITSurface* getBaseSurface(const int k);
 };

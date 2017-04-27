@@ -1,6 +1,4 @@
 #include "ITPoint.h"
-
-#include <string>
 #include "ITSurface.h"
 #include "global.h"
 
@@ -15,6 +13,19 @@ ITPoint::ITPoint(float x, float y, float z)
 	set_VZ(0.0f);
 
 	set_Mass(0.0);
+}
+
+ITPoint::ITPoint( ITPoint& p )
+{
+	set_X(p.get_X());
+	set_Y(p.get_Y());
+	set_Z(p.get_Z());
+
+	set_VX(p.get_VX());
+	set_VY(p.get_VY());
+	set_VZ(p.get_VZ());
+
+	set_Mass(p.get_Mass());
 }
 
 ITPoint::~ITPoint(void)
@@ -109,6 +120,42 @@ void ITPoint::propagateMe(ITPoint* cp, ITPoint* rotationPoint, ITPoint* translat
 	set_X(get_X() + cp->get_X() + translationPoint->get_X());
 	set_Y(get_Y() + cp->get_Y() + translationPoint->get_Y());
 	set_Z(get_Z() + cp->get_Z() + translationPoint->get_Z());
+}
+
+void ITPoint::rotateAround(ITPoint& center, const float angle, PLANE p)
+{
+	float pxOld = get_X() - center.get_X();
+	float pyOld = get_Y() - center.get_Y();
+	float pzOld = get_Z() - center.get_Z();
+
+	float pxNew, pyNew, pzNew;
+
+	switch (p) 
+	{
+	case XY:
+		pxNew = pxOld*cos(angle) - pyOld*sin(angle);
+		pyNew = pxOld*sin(angle) + pyOld*cos(angle);
+		pzNew = pzOld;
+		break;
+	case XZ:
+		pxNew = pxOld*cos(angle) - pzOld*sin(angle);
+		pyNew = pyOld;
+		pzNew = pxOld*sin(angle) + pzOld*cos(angle);
+		break;
+	case YZ:
+		pxNew = pxOld;
+		pyNew = pyOld*cos(angle) - pzOld*sin(angle);
+		pzNew = pyOld*sin(angle) + pzOld*cos(angle);
+		break;
+	}
+
+	pxNew += center.get_X();
+	pyNew += center.get_Y();
+	pzNew += center.get_Z();
+
+	set_X(pxNew);
+	set_Y(pyNew);
+	set_Z(pzNew);
 }
 
 // Accessors.

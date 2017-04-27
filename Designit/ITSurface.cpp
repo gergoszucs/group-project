@@ -529,7 +529,6 @@ void ITSurface::computeUPowerMatrix()
 	set_UPowerMatrix(upm);
 }
 
-
 void ITSurface::computeVPowerMatrix()
 {
 	int c = get_MyControlPoints()->at(0).size();
@@ -669,6 +668,49 @@ void ITSurface::computeInterpolatedPoints()
 		_MyInterpolatedNormals->push_back(v_dummy_normals);
 	}
 
+}
+
+void ITSurface::getCenter(float& x, float& y, float& z)
+{
+	int sizeX = this->sizeX();
+	int sizeY = this->sizeY();
+
+	int i = 0;
+	int j = 0;
+
+	x = 0;
+	y = 0;
+	z = 0;
+
+	for (i = 0; i < sizeX; i++ )
+	{
+		for (j = 0; j < sizeY; j++)
+		{
+			x += getControlPoint(i, j)->get_X();
+			y += getControlPoint(i, j)->get_Y();
+			z += getControlPoint(i, j)->get_Z();
+		}
+	}
+
+	x /= (i*j);
+	y /= (i*j);
+	z /= (i*j);
+}
+
+void ITSurface::rotateAround(const float x, const float y, const float z, const float angle, PLANE p)
+{
+	ITPoint center(x, y, z);
+
+	int sizeX = this->sizeX();
+	int sizeY = this->sizeY();
+
+	for (int i = 0; i < sizeX; i++)
+	{
+		for (int j = 0; j < sizeY; j++)
+		{
+			getControlPoint(i, j)->rotateAround(center, angle, p);
+		}
+	}
 }
 
 // Accessors.

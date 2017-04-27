@@ -12,6 +12,7 @@
 #include <QUrlQuery>
 #include <unordered_map>
 #include <functional>
+#include "Enums.h"
 
 class Designit : public QMainWindow
 {
@@ -127,10 +128,24 @@ private:
 	void closeEvent(QCloseEvent *bar);
 
 	static int testFunction(const QStringList & arguments);
+	
 	static int setPoint(const QStringList & arguments);
 	static int movePoint(const QStringList & arguments);
+	static int rotatePoint(const QStringList & arguments);
 
-	void createNewTrajectoryCurve( const int k );
+	static int setColumn(const QStringList & arguments);
+	static int moveColumn(const QStringList & arguments);
+
+	static int setRow(const QStringList & arguments);
+	static int moveRow(const QStringList & arguments);
+
+	static int setSurface(const QStringList & arguments);
+	static int moveSurface(const QStringList & arguments);
+	static int rotateSurface(const QStringList & arguments);
+	
+	static int rotateSurfaceCentral(const QStringList & arguments);
+	static int addSurface(const QStringList & arguments);
+	static int deleteSurface(const QStringList & arguments);
 
 public:
 	//std::unordered_map<QString, std::function<void(const QStringList & arguments)>> functions;

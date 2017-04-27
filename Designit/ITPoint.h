@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "Enums.h"
 
 class ITPoint
 {
@@ -26,6 +27,7 @@ private:
 
 public:
 	ITPoint(float x, float y, float z);
+	ITPoint(ITPoint& p);
 	ITPoint(void) {};
 	~ITPoint(void);
 
@@ -38,6 +40,8 @@ public:
 
 	// Worker methods.
 	void propagateMe(ITPoint* cp, ITPoint* rotationPoint, ITPoint* translationPoint);
+
+	void rotateAround(ITPoint& center, const float angle, PLANE p);
 
 	// Accessors.	
 	float get_X();
