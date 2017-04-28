@@ -75,6 +75,17 @@ public:
 	void getCenter(float& x, float& y, float& z);
 	void rotateAround(const float x, const float y, const float z, const float angle, PLANE p);
 
+	ITSurface * getCopy(const int k);
+	ITSurface * getCopyTranslated(const int k, const float x, const float y, const float z);
+
+	void addRow(const int i);
+	void duplicateRow(const int i);
+	void deleteRow(const int i);
+
+	void addColumn(const int j);
+	void duplicateColumn(const int j);
+	void deleteColumn(const int j);
+
 	// Utilities.
 	void manageComputationOfInterpolatedPoints();
 	void computeTrajectoryPointsAtFrame(int myFrameNumber, int mySurfaceIndex, ITPoint* translationPoint, ITPoint* rotationPoint);

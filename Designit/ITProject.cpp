@@ -73,19 +73,17 @@ ITProject::~ITProject(void)
 
 void ITProject::setPoint(const int surfaceID, const int i, const int j, const float posX, const float posY, const float posZ, bool update)
 {
-	if (surfaceID > get_MySurfaces()->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if ((i > getSurface( surfaceID )->sizeX()) || (j > getSurface(surfaceID)->sizeY()))
-	{
-		std::ostringstream stringStream;
-		stringStream << "No point (" << i << "," << j << ") in surface: " << surfaceID;
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_POINT");
 
-		throw std::exception(stringStream.str().c_str());
-	}
+	if ((j >= getSurface(surfaceID)->sizeX()) || (j < 0)) throw std::exception("NO_POINT");
 
 	getSurface(surfaceID)->getControlPoint(i, j)->set_X(posX);
 	getSurface(surfaceID)->getControlPoint(i, j)->set_Y(posY);
 	getSurface(surfaceID)->getControlPoint(i, j)->set_Z(posZ);
+
+	UnsavedChanges = true;
 
 	if (update)
 	{
@@ -96,15 +94,11 @@ void ITProject::setPoint(const int surfaceID, const int i, const int j, const fl
 
 void ITProject::movePoint(const int surfaceID, const int i, const int j, const float dX, const float dY, const float dZ, bool update)
 {
-	if (surfaceID > get_MySurfaces()->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if ((i > getSurface(surfaceID)->sizeX()) || (j > getSurface(surfaceID)->sizeY()))
-	{
-		std::ostringstream stringStream;
-		stringStream << "No point (" << i << "," << j << ") in surface: " << surfaceID;
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_POINT");
 
-		throw std::exception(stringStream.str().c_str());
-	}
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_POINT");
 
 	float tmpX, tmpY, tmpZ;
 
@@ -120,6 +114,8 @@ void ITProject::movePoint(const int surfaceID, const int i, const int j, const f
 	getSurface(surfaceID)->getControlPoint(i, j)->set_Y(tmpY);
 	getSurface(surfaceID)->getControlPoint(i, j)->set_Z(tmpZ);
 
+	UnsavedChanges = true;
+
 	if (update)
 	{
 		getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
@@ -129,13 +125,15 @@ void ITProject::movePoint(const int surfaceID, const int i, const int j, const f
 
 void ITProject::rotatePoint(const int surfaceID, const int i, const int j, const float x, const float y, const float z, const float angle, PLANE p, bool update)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if (i > getSurface(surfaceID)->sizeX()) throw std::exception("No point in surface");
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_POINT");
 
-	if (j > getSurface(surfaceID)->sizeY()) throw std::exception("No point in surface");
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_POINT");
 
 	getSurface(surfaceID)->getControlPoint(i, j)->rotateAround(ITPoint(x, y, z), angle, p);
+
+	UnsavedChanges = true;
 
 	if (update) 
 	{ 
@@ -146,9 +144,9 @@ void ITProject::rotatePoint(const int surfaceID, const int i, const int j, const
 
 void ITProject::setColumn(const int surfaceID, const int j, const float posX, const float posY, const float posZ)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if (j > getSurface(surfaceID)->sizeY()) throw std::exception("No row in surface");
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_COLUMN");
 
 	//begin of column i = 0, j = j; compute vector of diffrance between orgin point and rest of column
 	float centerX, centerY, centerZ, diffX, diffY, diffZ;
@@ -171,6 +169,8 @@ void ITProject::setColumn(const int surfaceID, const int j, const float posX, co
 		setPoint(surfaceID, i, j, posX + diffX, posY + diffY, posZ + diffZ, false);
 	}
 
+	UnsavedChanges = true;
+
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
 	w->updateAllTabs();
@@ -178,9 +178,9 @@ void ITProject::setColumn(const int surfaceID, const int j, const float posX, co
 
 void ITProject::moveColumn(const int surfaceID, const int j, const float dX, const float dY, const float dZ)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if (j > getSurface(surfaceID)->sizeY()) throw std::exception("No row in surface");
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_COLUMN");
 
 	//begin of column i = 0, j = j; compute vector of diffrance between orgin point and rest of column
 	float centerX, centerY, centerZ;
@@ -191,18 +191,22 @@ void ITProject::moveColumn(const int surfaceID, const int j, const float dX, con
 	centerZ = orgin->get_Z();
 
 	setColumn(surfaceID, j, centerX + dX, centerY + dY, centerY + dY);
+
+	UnsavedChanges = true;
 }
 
 void ITProject::rotateColumn(const int surfaceID, const int j, const float x, const float y, const float z, const float angle, PLANE p)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if (j > getSurface(surfaceID)->sizeY()) throw std::exception("No row in surface");
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_COLUMN");
 
 	for (int i = 0; i < getSurface(surfaceID)->sizeX(); i++)
 	{
 		rotatePoint(surfaceID, i, j, x, y, z, angle, p, false);
 	}
+
+	UnsavedChanges = true;
 
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
@@ -211,9 +215,9 @@ void ITProject::rotateColumn(const int surfaceID, const int j, const float x, co
 
 void ITProject::setRow(const int surfaceID, const int i, const float posX, const float posY, const float posZ)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if (i > getSurface(surfaceID)->sizeX()) throw std::exception("No row in surface");
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_ROW");
 
 	//begin of row i = i, j = 0; compute vector of diffrance between orgin point and rest of column
 	float centerX, centerY, centerZ, diffX, diffY, diffZ;
@@ -236,6 +240,8 @@ void ITProject::setRow(const int surfaceID, const int i, const float posX, const
 		setPoint(surfaceID, i, j, posX + diffX, posY + diffY, posZ + diffZ, false);
 	}
 
+	UnsavedChanges = true;
+
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
 	w->updateAllTabs();
@@ -243,9 +249,9 @@ void ITProject::setRow(const int surfaceID, const int i, const float posX, const
 
 void ITProject::moveRow(const int surfaceID, const int i, const float dX, const float dY, const float dZ)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if (i > getSurface(surfaceID)->sizeX()) throw std::exception("No row in surface");
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_ROW");
 
 	//begin of column i = 0, j = j; compute vector of diffrance between orgin point and rest of column
 	float centerX, centerY, centerZ;
@@ -256,18 +262,22 @@ void ITProject::moveRow(const int surfaceID, const int i, const float dX, const 
 	centerZ = orgin->get_Z();
 
 	setRow(surfaceID, i, centerX + dX, centerY + dY, centerY + dY);
+
+	UnsavedChanges = true;
 }
 
 void ITProject::rotateRow(const int surfaceID, const int i, const float x, const float y, const float z, const float angle, PLANE p)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if (i > getSurface(surfaceID)->sizeX()) throw std::exception("No row in surface");
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_ROW");
 
 	for (int j = 0; j < getSurface(surfaceID)->sizeY(); j++)
 	{
 		rotatePoint(surfaceID, i, j, x, y, z, angle, p, false);
 	}
+
+	UnsavedChanges = true;
 
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
@@ -276,7 +286,7 @@ void ITProject::rotateRow(const int surfaceID, const int i, const float x, const
 
 void ITProject::setSurface(const int surfaceID, const float posX, const float posY, const float posZ)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
 	//set position of center of surface; compute vector of diffrance between orgin point and rest of column
 	float centerX, centerY, centerZ, diffX, diffY, diffZ;
@@ -297,6 +307,8 @@ void ITProject::setSurface(const int surfaceID, const float posX, const float po
 		}
 	}
 
+	UnsavedChanges = true;
+
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
 	w->updateAllTabs();
@@ -304,20 +316,24 @@ void ITProject::setSurface(const int surfaceID, const float posX, const float po
 
 void ITProject::moveSurface(const int surfaceID, const float dX, const float dY, const float dZ)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
 	float centerX, centerY, centerZ;
 
 	getSurface(surfaceID)->getCenter(centerX, centerY, centerZ);
 
 	setSurface(surfaceID, centerX + dX, centerY + dY, centerY + dY);
+
+	UnsavedChanges = true;
 }
 
 void ITProject::rotateSurface(const int surfaceID, const float x, const float y, const float z, const float angle, PLANE p)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
 	_MySurfaces->at(surfaceID)->rotateAround(x, y, z, angle, p);
+
+	UnsavedChanges = true;
 
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
@@ -326,13 +342,15 @@ void ITProject::rotateSurface(const int surfaceID, const float x, const float y,
 
 void ITProject::rotateSurfaceCentral(const int surfaceID, const float angle, PLANE p)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
 	float x, y, z;
 
 	_MySurfaces->at(surfaceID)->getCenter(x, y, z);
 
 	_MySurfaces->at(surfaceID)->rotateAround(x, y, z, angle, p);
+
+	UnsavedChanges = true;
 
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
@@ -341,7 +359,7 @@ void ITProject::rotateSurfaceCentral(const int surfaceID, const float angle, PLA
 
 void ITProject::resizeSurface(const int surfaceID, const float factor)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
 	//set position of center of surface; compute vector of diffrance between orgin point and rest of column
 	float centerX, centerY, centerZ, diffX, diffY, diffZ;
@@ -362,6 +380,8 @@ void ITProject::resizeSurface(const int surfaceID, const float factor)
 		}
 	}
 
+	UnsavedChanges = true;
+
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
 	w->updateAllTabs();
@@ -369,7 +389,7 @@ void ITProject::resizeSurface(const int surfaceID, const float factor)
 
 void ITProject::deleteSurface(const int surfaceID)
 {
-	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
 	// We have found a control point, so delete the k-th surface.
 	project->get_MySurfaces()->erase(project->get_MySurfaces()->begin() + surfaceID);
@@ -395,6 +415,8 @@ void ITProject::deleteSurface(const int surfaceID)
 			}
 		}
 	}
+
+	UnsavedChanges = true;
 
 	w->updateAllTabs();
 }
@@ -473,9 +495,327 @@ void ITProject::addSurface()
 
 	createNewTrajectoryCurve(k);
 
+	IsDataLoaded = true;
+	UnsavedChanges = true;
+
 	w->updateSpreadsheet();
 	w->updateTrajectorySpreadsheet();
 	w->updateAllTabs();
+}
+
+void ITProject::sheer(const int surfaceID, const int orginI, const int orginJ, const int refI, const int refJ, const float diff, PLANE plane)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((orginI >= getSurface(surfaceID)->sizeX()) || (orginI < 0)) throw std::exception("NO_POINT");
+
+	if ((orginJ >= getSurface(surfaceID)->sizeY()) || (orginJ < 0)) throw std::exception("NO_POINT");
+
+	if ((refI >= getSurface(surfaceID)->sizeX()) || (refI < 0)) throw std::exception("NO_POINT");
+
+	if ((refJ >= getSurface(surfaceID)->sizeY()) || (refJ < 0)) throw std::exception("NO_POINT");
+
+	float orginX, orginY, orginZ;
+	float tmpX, tmpY, tmpZ;
+	float refX, refY, refZ;
+
+	orginX = getSurface(surfaceID)->getControlPoint(orginI, orginJ)->get_X();
+	orginY = getSurface(surfaceID)->getControlPoint(orginI, orginJ)->get_Y();
+	orginZ = getSurface(surfaceID)->getControlPoint(orginI, orginJ)->get_Z();
+
+	refX = getSurface(surfaceID)->getControlPoint(refI, refJ)->get_X() - orginX;
+	refY = getSurface(surfaceID)->getControlPoint(refI, refJ)->get_Y() - orginY;
+	refZ = getSurface(surfaceID)->getControlPoint(refI, refJ)->get_Z() - orginZ;
+
+	for (int i = 0; i < getSurface(surfaceID)->sizeX(); i++)
+	{
+		for (int j = 0; j < getSurface(surfaceID)->sizeY(); j++)
+		{
+			ITPoint* p = getSurface(surfaceID)->getControlPoint(i, j);
+
+			// Translate surface back to origin.
+			tmpX = p->get_X() - orginX;
+			tmpY = p->get_Y() - orginY;
+			tmpZ = p->get_Z() - orginZ;
+
+			// Shear to first axis of plane.
+			switch (plane)
+			{
+			case XY:
+				tmpX += tmpY * diff / refY;
+				break;
+			case XZ:
+				tmpX += tmpZ * diff / refZ;
+				break;
+			case YZ:
+				tmpY += tmpZ * diff / refZ;
+				break;
+			}
+
+			// Translate surface back again.
+			p->set_X(tmpX + orginX);
+			p->set_Y(tmpY + orginY);
+			p->set_Z(tmpZ + orginZ);
+		}
+	}
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::sheerD(const int surfaceID, const int orginI, const int orginJ, const float diff, PLANE p)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((orginI >= getSurface(surfaceID)->sizeX()) || (orginI < 0)) throw std::exception("NO_POINT");
+
+	if ((orginJ >= getSurface(surfaceID)->sizeY()) || (orginJ < 0)) throw std::exception("NO_POINT");
+
+	sheer(surfaceID, orginI, orginJ, getSurface(surfaceID)->sizeX() - 1, orginJ, diff, p);
+
+	UnsavedChanges = true;
+}
+
+void ITProject::flipSurface(const int surfaceID, const int x, const int y, const int z, PLANE plane)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	float tmpX, tmpY, tmpZ;
+
+	for (int i = 0; i < getSurface(surfaceID)->sizeX(); i++)
+	{
+		for (int j = 0; j < getSurface(surfaceID)->sizeY(); j++)
+		{
+			ITPoint* p = getSurface(surfaceID)->getControlPoint(i, j);
+
+			tmpX = p->get_X();
+			tmpY = p->get_Y();
+			tmpZ = p->get_Z();
+
+			switch (plane)
+			{
+			case XY:
+				tmpZ -= z;
+				tmpZ = z - tmpZ;
+				break;
+			case XZ:
+				tmpY -= y;
+				tmpY = y - tmpY;
+				break;
+			case YZ:
+				tmpX -= x;
+				tmpX = x - tmpX;
+				break;
+			}
+
+			p->set_X(tmpX);
+			p->set_Y(tmpY);
+			p->set_Z(tmpZ);
+		}
+	}
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::flipSurfacePoint(const int surfaceID, const int orginI, const int orginJ, PLANE plane)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((orginI >= getSurface(surfaceID)->sizeX()) || (orginI < 0)) throw std::exception("NO_POINT");
+
+	if ((orginJ >= getSurface(surfaceID)->sizeY()) || (orginJ < 0)) throw std::exception("NO_POINT");
+
+	float x, y, z;
+
+	x = getSurface(surfaceID)->getControlPoint(orginI, orginJ)->get_X();
+	y = getSurface(surfaceID)->getControlPoint(orginI, orginJ)->get_Y();
+	z = getSurface(surfaceID)->getControlPoint(orginI, orginJ)->get_Z();
+
+	flipSurface(surfaceID, x, y, z, plane);
+
+	UnsavedChanges = true;
+}
+
+void ITProject::flipSurfaceCentral(const int surfaceID, PLANE plane)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	float x, y, z;
+
+	getSurface(surfaceID)->getCenter(x, y, z);
+
+	flipSurface(surfaceID, x, y, z, plane);
+
+	UnsavedChanges = true;
+}
+
+void ITProject::copySurface(const int surfaceID, const int x, const int y, const int z)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	int k = project->get_MySurfaces()->size();
+
+	get_MySurfaces()->push_back( getSurface(surfaceID)->getCopyTranslated(k, x, y, z) );
+	get_MyBaseSurfaces()->push_back( getBaseSurface(surfaceID)->getCopyTranslated(k, x, y, z) );
+	
+	IsDataLoaded = true;
+	UnsavedChanges = true;
+
+	getSurface(k)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::insertRow(const int surfaceID, const int i)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((i >= getSurface(surfaceID)->sizeX() - 1) || (i < 0)) throw std::exception("NO_ROW");
+
+	getSurface(surfaceID)->addRow(i);
+	getBaseSurface(surfaceID)->addRow(i);
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::duplicateRow(const int surfaceID, const int i)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((i >= getSurface(surfaceID)->sizeX() - 1) || (i < 0)) throw std::exception("NO_ROW");
+
+	getSurface(surfaceID)->duplicateRow(i);
+	getBaseSurface(surfaceID)->duplicateRow(i);
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::deleteRow(const int surfaceID, const int i)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_ROW");
+
+	getSurface(surfaceID)->deleteRow(i);
+	getBaseSurface(surfaceID)->deleteRow(i);
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::insertColumn(const int surfaceID, const int j)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((j >= getSurface(surfaceID)->sizeY() - 1) || (j < 0)) throw std::exception("NO_COLUMN");
+
+	getSurface(surfaceID)->addColumn(j);
+	getBaseSurface(surfaceID)->addColumn(j);
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::duplicateColumn(const int surfaceID, const int j)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((j >= getSurface(surfaceID)->sizeY() - 1) || (j < 0)) throw std::exception("NO_COLUMN");
+
+	getSurface(surfaceID)->duplicateColumn(j);
+	getBaseSurface(surfaceID)->duplicateColumn(j);
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::deleteColumn(const int surfaceID, const int j)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_COLUMN");
+
+	getSurface(surfaceID)->deleteColumn(j);
+	getBaseSurface(surfaceID)->deleteColumn(j);
+
+	UnsavedChanges = true;
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::matePoints(const int baseSurfaceID, const int baseI, const int baseJ, const int targetSurfaceID, const int targetI, const int targetJ)
+{
+	if ((baseSurfaceID >= _MySurfaces->size()) || (baseSurfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((baseI >= getSurface(baseSurfaceID)->sizeX()) || (baseI < 0)) throw std::exception("NO_POINT");
+
+	if ((baseJ >= getSurface(baseSurfaceID)->sizeY()) || (baseJ < 0)) throw std::exception("NO_POINT");
+
+	if ((targetSurfaceID >= _MySurfaces->size()) || (targetSurfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((targetI >= getSurface(targetSurfaceID)->sizeX()) || (targetI < 0)) throw std::exception("NO_POINT");
+
+	if ((targetJ >= getSurface(targetSurfaceID)->sizeY()) || (targetJ < 0)) throw std::exception("NO_POINT");
+
+	float x = getSurface(baseSurfaceID)->getControlPoint(baseI, baseJ)->get_X();
+	float y = getSurface(baseSurfaceID)->getControlPoint(baseI, baseJ)->get_Y();
+	float z = getSurface(baseSurfaceID)->getControlPoint(baseI, baseJ)->get_Z();
+
+	setPoint(targetSurfaceID, targetI, targetJ, x, y, z, false);
+
+	UnsavedChanges = true;
+
+	for (int i = 0; i < _MySurfaces->size(); i++)
+	{
+		getSurface(i)->manageComputationOfInterpolatedPoints();
+	}
+
+	w->updateAllTabs();
+}
+
+void ITProject::synchronizeSurfaceVectorsFromControl()
+{
+	for (int k = 0; k < _MySurfaces->size(); k++)
+	{
+		for (int i = 0; i < getSurface(k)->sizeX(); i++)
+		{
+			for (int j = 0; j < getSurface(k)->sizeY(); j++)
+			{
+				ITPoint* p = getSurface(k)->getControlPoint(i, j);
+				ITPoint* pBase = getBaseSurface(k)->getControlPoint(i, j);
+
+				pBase->set_X(p->get_X());
+				pBase->set_Y(p->get_Y());
+				pBase->set_Z(p->get_Z());
+			}
+		}
+	}
 }
 
 void ITProject::createNewTrajectoryCurve(const int k)

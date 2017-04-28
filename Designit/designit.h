@@ -89,6 +89,21 @@ public:
 
 	void handleCommand();
 
+	/**
+	* @fn	static bool Designit::parsePlane(QString str, PLANE & p);
+	*
+	* @brief	Parses plane string.
+	* 
+	* @param str	String to be parsed.
+	* @param p		Variable parsed plane will be hold in.
+	*
+	* @return		Bool status of operations (true if success).
+	*
+	* @author	Pawel Zybura
+	* @date		28.04.2017
+	*/
+	static bool parsePlane(QString str, PLANE & p);
+
 	void showSpreadsheet();
 	void updateSpreadsheet();
 
@@ -118,6 +133,8 @@ public:
 	bool eventFilter(QObject *obj, QEvent *event);
 
 	void resetCommandMemory();
+
+	QString getCommandList();
 
 private:
 	Ui::DesignitClass ui;
@@ -149,6 +166,27 @@ private:
 	static int resizeSurface(const QStringList & arguments);
 	static int addSurface(const QStringList & arguments);
 	static int deleteSurface(const QStringList & arguments);
+
+	static int sheer(const QStringList & arguments);
+	static int sheerD(const QStringList & arguments);
+
+	static int flipSurface(const QStringList & arguments);
+	static int flipSurfacePoint(const QStringList & arguments);
+	static int flipSurfaceCentral(const QStringList & arguments);
+
+	static int copySurface(const QStringList & arguments);
+	static int copySurfaceMirror(const QStringList & arguments);
+
+	static int insertRow(const QStringList & arguments);
+	static int duplicateRow(const QStringList & arguments);
+	static int deleteRow(const QStringList & arguments);
+	static int insertColumn(const QStringList & arguments);
+	static int duplicateColumn(const QStringList & arguments);
+	static int deleteColumn(const QStringList & arguments);
+
+	static int matePoints(const QStringList & arguments);
+
+	static int help(const QStringList & arguments);
 
 public:
 	//std::unordered_map<QString, std::function<void(const QStringList & arguments)>> functions;

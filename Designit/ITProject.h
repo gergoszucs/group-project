@@ -97,7 +97,28 @@ public:
 	void deleteSurface(const int surfaceID);
 	void addSurface();
 
+	void sheer(const int surfaceID, const int orginI, const int orginJ, const int refI, const int refJ, const float diff, PLANE p);
+	void sheerD(const int surfaceID, const int orginI, const int orginJ, const float diff, PLANE p);
+
+	void flipSurface(const int surfaceID, const int x, const int y, const int z, PLANE plane);
+	void flipSurfacePoint(const int surfaceID, const int orginI, const int orginJ, PLANE plane);
+	void flipSurfaceCentral(const int surfaceID, PLANE plane);
+
+	void copySurface(const int surfaceID, const int x, const int y, const int z);
+
+	void insertRow(const int surfaceID, const int i);
+	void duplicateRow(const int surfaceID, const int i);
+	void deleteRow(const int surfaceID, const int i);
+
+	void insertColumn(const int surfaceID, const int j);
+	void duplicateColumn(const int surfaceID, const int j);
+	void deleteColumn(const int surfaceID, const int j);
+
+	void matePoints(const int baseSurfaceID, const int baseI, const int baseJ, const int targetSurfaceID, const int targetI, const int targetJ);
+
 	void createNewTrajectoryCurve(const int k);
+
+	void synchronizeSurfaceVectorsFromControl();
 
 	// Admin methods.
 	void currentDateTime(char * currentTime);
