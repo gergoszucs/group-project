@@ -635,6 +635,16 @@ void Designit::on_collapseAllButton_clicked()
 	ui.jsonTreeView->collapseAll();
 }
 
+void Designit::on_actionUndo_triggered()
+{
+	undoRedo.undo();
+}
+
+void Designit::on_actionRedo_triggered()
+{
+	undoRedo.redo();
+}
+
 void Designit::on_expandAllButton_clicked()
 {
 	ui.jsonTreeView->expandAll();
@@ -1976,7 +1986,7 @@ void Designit::handleCommand()
 	
 	if (functions.find(arguments[0].toUtf8().constData()) != functions.end())
 	{
-		int returnCode = functions[arguments[0].toUtf8().constData()](arguments);
+		int returnCode = functions[arguments[0].toUtf8().constData()](arguments, true);
 
 		switch (returnCode)
 		{
@@ -2006,6 +2016,24 @@ void Designit::handleCommand()
 			break;
 		default:
 			break;
+		}
+	}
+	else {
+		w->statusBar()->showMessage(QObject::tr("Unknown command"));
+	}
+}
+
+void Designit::executeCommand(QString message, QStringList arguments, const bool reg)
+{
+	if (functions.find(arguments[0].toUtf8().constData()) != functions.end())
+	{
+		if (functions[arguments[0].toUtf8().constData()](arguments, reg) == 0)
+		{
+			appendStatusTableWidget(message, QString("DONE"));
+		}
+		else
+		{
+			appendStatusTableWidget(message, QString("Unspecified error"));
 		}
 	}
 	else {
@@ -2055,7 +2083,6 @@ bool Designit::parsePlane(QString str, PLANE & p)
 	return true;
 }
 
-// TODO: import spreadsheet functions for moveIT spreadsheet
 void Designit::showSpreadsheet()
 {
 	if (MY_RUN_MODE == MYGUI)
@@ -2806,7 +2833,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 			{
 				commandPointer = 0;
 			} 
-			else if (commandPointer >= commandMemory.size() - 1)  \
+			else if (commandPointer >= commandMemory.size() - 1)
 			{
 				commandPointer = commandMemory.size() - 1;
 			}
@@ -2815,7 +2842,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 				commandPointer++;
 			}
 
-			ui.commandLine->setText(commandMemory[commandPointer]);
+			if (commandMemory.size() != 0) ui.commandLine->setText(commandMemory[commandPointer]);
 
 			return true;
 
@@ -2827,7 +2854,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 			{
 				commandPointer = 0;
 			}
-			else if (commandPointer > commandMemory.size() - 1)  \
+			else if (commandPointer > commandMemory.size() - 1)
 			{
 				commandPointer = commandMemory.size() - 1;
 			}
@@ -2836,7 +2863,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 				commandPointer--;
 			}
 
-			ui.commandLine->setText(commandMemory[commandPointer]);
+			if (commandMemory.size() != 0) ui.commandLine->setText(commandMemory[commandPointer]);
 			
 			return true;
 
@@ -2853,7 +2880,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 	}
 }
 
-int Designit::testFunction(const QStringList & arguments)
+int Designit::testFunction(const QStringList & arguments, const bool reg)
 {
 	for (int i = 0; i < arguments.size(); i++)
 	{
@@ -2866,7 +2893,7 @@ int Designit::testFunction(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::setPoint(const QStringList & arguments)
+int Designit::setPoint(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 7)
 	{
@@ -2892,7 +2919,20 @@ int Designit::setPoint(const QStringList & arguments)
 
 	try
 	{
+		Point3 tmp = project->getPointData(i, j, k);
+
 		project->setPoint(i,j,k,posX,posY,posZ, true);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(tmp.x);
+			revCommand[5] = QString::number(tmp.y);
+			revCommand[6] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -2903,7 +2943,7 @@ int Designit::setPoint(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::movePoint(const QStringList & arguments)
+int Designit::movePoint(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 7)
 	{
@@ -2930,6 +2970,17 @@ int Designit::movePoint(const QStringList & arguments)
 	try
 	{
 		project->movePoint(i, j, k, posX, posY, posZ, true);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(-posX);
+			revCommand[5] = QString::number(-posY);
+			revCommand[6] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -2944,7 +2995,7 @@ int Designit::movePoint(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::rotatePoint(const QStringList & arguments)
+int Designit::rotatePoint(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 9)
 	{
@@ -2979,6 +3030,15 @@ int Designit::rotatePoint(const QStringList & arguments)
 	try
 	{
 		project->rotatePoint(surfaceID, i, j, posX, posY, posZ, angle, p, true);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[7] = "-" + arguments[7];
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -2993,7 +3053,7 @@ int Designit::rotatePoint(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::setColumn(const QStringList & arguments)
+int Designit::setColumn(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 6)
 	{
@@ -3032,7 +3092,7 @@ int Designit::setColumn(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::moveColumn(const QStringList & arguments)
+int Designit::moveColumn(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 6)
 	{
@@ -3071,7 +3131,7 @@ int Designit::moveColumn(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::rotateColumn(const QStringList & arguments)
+int Designit::rotateColumn(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 8)
 	{
@@ -3118,7 +3178,7 @@ int Designit::rotateColumn(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::setRow(const QStringList & arguments)
+int Designit::setRow(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 6)
 	{
@@ -3157,7 +3217,7 @@ int Designit::setRow(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::moveRow(const QStringList & arguments)
+int Designit::moveRow(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 6)
 	{
@@ -3196,7 +3256,7 @@ int Designit::moveRow(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::rotateRow(const QStringList & arguments)
+int Designit::rotateRow(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 8)
 	{
@@ -3243,7 +3303,7 @@ int Designit::rotateRow(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::setSurface(const QStringList & arguments)
+int Designit::setSurface(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 5)
 	{
@@ -3280,7 +3340,7 @@ int Designit::setSurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::moveSurface(const QStringList & arguments)
+int Designit::moveSurface(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 5)
 	{
@@ -3317,7 +3377,7 @@ int Designit::moveSurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::rotateSurface(const QStringList & arguments)
+int Designit::rotateSurface(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 7)
 	{
@@ -3361,7 +3421,7 @@ int Designit::rotateSurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::rotateSurfaceCentral(const QStringList & arguments)
+int Designit::rotateSurfaceCentral(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 4)
 	{
@@ -3399,7 +3459,7 @@ int Designit::rotateSurfaceCentral(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::resizeSurface(const QStringList & arguments)
+int Designit::resizeSurface(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3432,7 +3492,7 @@ int Designit::resizeSurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::addSurface(const QStringList & arguments)
+int Designit::addSurface(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 1)
 	{
@@ -3456,7 +3516,7 @@ int Designit::addSurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::deleteSurface(const QStringList & arguments)
+int Designit::deleteSurface(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 2)
 	{
@@ -3488,7 +3548,7 @@ int Designit::deleteSurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::sheer(const QStringList & arguments)
+int Designit::sheer(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 8)
 	{
@@ -3532,7 +3592,7 @@ int Designit::sheer(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::sheerD(const QStringList & arguments)
+int Designit::sheerD(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 6)
 	{
@@ -3572,7 +3632,7 @@ int Designit::sheerD(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::flipSurface(const QStringList & arguments)
+int Designit::flipSurface(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 6)
 	{
@@ -3612,7 +3672,7 @@ int Designit::flipSurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::flipSurfacePoint(const QStringList & arguments)
+int Designit::flipSurfacePoint(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 5)
 	{
@@ -3649,7 +3709,7 @@ int Designit::flipSurfacePoint(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::flipSurfaceCentral(const QStringList & arguments)
+int Designit::flipSurfaceCentral(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3682,7 +3742,7 @@ int Designit::flipSurfaceCentral(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::copySurface(const QStringList & arguments)
+int Designit::copySurface(const QStringList & arguments, const bool reg)
 {
 	int surfaceID;
 	float x, y, z;
@@ -3729,7 +3789,7 @@ int Designit::copySurface(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::copySurfaceMirror(const QStringList & arguments)
+int Designit::copySurfaceMirror(const QStringList & arguments, const bool reg)
 {
 	int surfaceID;
 	float x, y, z;
@@ -3783,7 +3843,7 @@ int Designit::copySurfaceMirror(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::insertRow(const QStringList & arguments)
+int Designit::insertRow(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3815,7 +3875,7 @@ int Designit::insertRow(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::duplicateRow(const QStringList & arguments)
+int Designit::duplicateRow(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3847,7 +3907,7 @@ int Designit::duplicateRow(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::deleteRow(const QStringList & arguments)
+int Designit::deleteRow(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3879,7 +3939,7 @@ int Designit::deleteRow(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::insertColumn(const QStringList & arguments)
+int Designit::insertColumn(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3911,7 +3971,7 @@ int Designit::insertColumn(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::duplicateColumn(const QStringList & arguments)
+int Designit::duplicateColumn(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3943,7 +4003,7 @@ int Designit::duplicateColumn(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::deleteColumn(const QStringList & arguments)
+int Designit::deleteColumn(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 3)
 	{
@@ -3975,7 +4035,7 @@ int Designit::deleteColumn(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::matePoints(const QStringList & arguments)
+int Designit::matePoints(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 7)
 	{
@@ -4016,7 +4076,7 @@ int Designit::matePoints(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::help(const QStringList & arguments)
+int Designit::help(const QStringList & arguments, const bool reg)
 {
 	QMessageBox::StandardButton reply;
 

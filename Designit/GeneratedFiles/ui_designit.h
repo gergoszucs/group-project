@@ -87,6 +87,8 @@ public:
     QAction *actionMeasure_distance;
     QAction *actionCentred_rotate;
     QAction *action_Flexit;
+    QAction *actionUndo;
+    QAction *actionRedo;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout_2;
     QSplitter *splitter;
@@ -349,6 +351,16 @@ public:
         QIcon icon32;
         icon32.addFile(QStringLiteral("Resources/flexit.ico"), QSize(), QIcon::Normal, QIcon::Off);
         action_Flexit->setIcon(icon32);
+        actionUndo = new QAction(DesignitClass);
+        actionUndo->setObjectName(QStringLiteral("actionUndo"));
+        QIcon icon33;
+        icon33.addFile(QStringLiteral("Resources/undo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionUndo->setIcon(icon33);
+        actionRedo = new QAction(DesignitClass);
+        actionRedo->setObjectName(QStringLiteral("actionRedo"));
+        QIcon icon34;
+        icon34.addFile(QStringLiteral("Resources/redo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionRedo->setIcon(icon34);
         centralWidget = new QWidget(DesignitClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout_2 = new QHBoxLayout(centralWidget);
@@ -559,7 +571,7 @@ public:
         editingTools->addItem(SurfaceTools, QStringLiteral("Surface Tools"));
         TrajectoryTools = new QWidget();
         TrajectoryTools->setObjectName(QStringLiteral("TrajectoryTools"));
-        TrajectoryTools->setGeometry(QRect(0, 0, 218, 418));
+        TrajectoryTools->setGeometry(QRect(0, 0, 304, 659));
         horizontalLayout_7 = new QHBoxLayout(TrajectoryTools);
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
@@ -721,6 +733,8 @@ public:
         mainToolBar->addAction(actionClose);
         mainToolBar->addAction(actionExit);
         mainToolBar->addAction(actionReset_all_views);
+        mainToolBar->addAction(actionUndo);
+        mainToolBar->addAction(actionRedo);
         mainToolBar->addAction(action_Flexit);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionNew_surface);
@@ -820,6 +834,16 @@ public:
 #ifndef QT_NO_TOOLTIP
         action_Flexit->setToolTip(QApplication::translate("DesignitClass", "Open the current project in Flexit", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
+        actionUndo->setText(QApplication::translate("DesignitClass", "Undo", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionUndo->setToolTip(QApplication::translate("DesignitClass", "Undo last action.", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionUndo->setShortcut(QApplication::translate("DesignitClass", "Ctrl+Z", Q_NULLPTR));
+        actionRedo->setText(QApplication::translate("DesignitClass", "Redo", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionRedo->setToolTip(QApplication::translate("DesignitClass", "Redo action.", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionRedo->setShortcut(QApplication::translate("DesignitClass", "Ctrl+Y", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_statusWindow), QApplication::translate("DesignitClass", "Status window", Q_NULLPTR));
         collapseAllButton->setText(QApplication::translate("DesignitClass", "Collapse All", Q_NULLPTR));
         expandAllButton->setText(QApplication::translate("DesignitClass", "Expand All", Q_NULLPTR));

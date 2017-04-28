@@ -307,8 +307,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>218</width>
-          <height>418</height>
+          <width>304</width>
+          <height>659</height>
          </rect>
         </property>
         <attribute name="label">
@@ -510,6 +510,8 @@
    <addaction name="actionClose"/>
    <addaction name="actionExit"/>
    <addaction name="actionReset_all_views"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
    <addaction name="action_Flexit"/>
    <addaction name="separator"/>
    <addaction name="actionNew_surface"/>
@@ -897,6 +899,36 @@
    </property>
    <property name="toolTip">
     <string>Open the current project in Flexit</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/undo_icon.png</normaloff>Resources/undo_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo last action.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/redo_icon.png</normaloff>Resources/redo_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="toolTip">
+    <string>Redo action.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
    </property>
   </action>
  </widget>

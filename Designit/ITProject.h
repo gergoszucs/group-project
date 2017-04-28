@@ -18,6 +18,16 @@ using namespace rapidjson;
 // Forward declarations.
 class ITSurface;
 
+struct Point3
+{
+public:
+	float x, y, z;
+
+	Point3() : x(0), y(0), z(0) {}
+
+	Point3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+};
+
 class ITProject
 {
 protected:
@@ -115,6 +125,8 @@ public:
 	void deleteColumn(const int surfaceID, const int j);
 
 	void matePoints(const int baseSurfaceID, const int baseI, const int baseJ, const int targetSurfaceID, const int targetI, const int targetJ);
+
+	Point3 getPointData(const int surfaceID, const int i, const int j);
 
 	void createNewTrajectoryCurve(const int k);
 

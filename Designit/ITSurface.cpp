@@ -132,7 +132,7 @@ int ITSurface::sizeY()
 
 ITPoint * ITSurface::getControlPoint(const int i, const int j)
 {
-	if ((i > sizeX()) || (j > sizeY())) throw std::exception("OUT OF RANGE");
+	if ((i > sizeX()) || (j > sizeY())) throw std::exception("NO_POINT");
 
 	return _MyControlPoints->at(i).at(j);
 }

@@ -799,6 +799,17 @@ void ITProject::matePoints(const int baseSurfaceID, const int baseI, const int b
 	w->updateAllTabs();
 }
 
+Point3 ITProject::getPointData(const int surfaceID, const int i, const int j)
+{
+	Point3 tmp;
+
+	tmp.x = getSurface(surfaceID)->getControlPoint(i, j)->get_X();
+	tmp.y = getSurface(surfaceID)->getControlPoint(i, j)->get_Y();
+	tmp.z = getSurface(surfaceID)->getControlPoint(i, j)->get_Z();
+
+	return tmp;
+}
+
 void ITProject::synchronizeSurfaceVectorsFromControl()
 {
 	for (int k = 0; k < _MySurfaces->size(); k++)
@@ -1089,10 +1100,14 @@ void ITProject::set_IsActiveControlSurfaces(bool b) { _IsActiveControlSurfaces =
 
 ITSurface* ITProject::getSurface( const int k ) 
 { 
+	if ((k >= _MySurfaces->size()) || (k < 0)) throw std::exception("NO_SURFACE");
+
 	return _MySurfaces->at(k); 
 };
 
 ITSurface* ITProject::getBaseSurface(const int k)
 {
+	if ((k >= _MyBaseSurfaces->size()) || (k < 0)) throw std::exception("NO_SURFACE");
+
 	return _MyBaseSurfaces->at(k);
 };
