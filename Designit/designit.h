@@ -135,15 +135,18 @@ private:
 
 	static int setColumn(const QStringList & arguments);
 	static int moveColumn(const QStringList & arguments);
+	static int rotateColumn(const QStringList & arguments);
 
 	static int setRow(const QStringList & arguments);
 	static int moveRow(const QStringList & arguments);
+	static int rotateRow(const QStringList & arguments);
 
 	static int setSurface(const QStringList & arguments);
 	static int moveSurface(const QStringList & arguments);
 	static int rotateSurface(const QStringList & arguments);
 	
 	static int rotateSurfaceCentral(const QStringList & arguments);
+	static int resizeSurface(const QStringList & arguments);
 	static int addSurface(const QStringList & arguments);
 	static int deleteSurface(const QStringList & arguments);
 

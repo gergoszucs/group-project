@@ -81,15 +81,18 @@ public:
 
 	void setColumn(const int surfaceID, const int j, const float posX, const float posY, const float posZ);
 	void moveColumn(const int surfaceID, const int j, const float dX, const float dY, const float dZ);
+	void rotateColumn(const int surfaceID, const int j, const float x, const float y, const float z, const float angle, PLANE p);
 
 	void setRow(const int surfaceID, const int i, const float posX, const float posY, const float posZ);
 	void moveRow(const int surfaceID, const int i, const float dX, const float dY, const float dZ);
+	void rotateRow(const int surfaceID, const int i, const float x, const float y, const float z, const float angle, PLANE p);
 
 	void setSurface(const int surfaceID, const float posX, const float posY, const float posZ);
 	void moveSurface(const int surfaceID, const float dX, const float dY, const float dZ);
 	void rotateSurface(const int surfaceID, const float x, const float y, const float z, const float angle, PLANE p);
 	
 	void rotateSurfaceCentral(const int surfaceID, const float angle, PLANE p);
+	void resizeSurface(const int surfaceID, const float factor);
 	
 	void deleteSurface(const int surfaceID);
 	void addSurface();

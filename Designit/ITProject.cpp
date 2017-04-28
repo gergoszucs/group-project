@@ -193,6 +193,22 @@ void ITProject::moveColumn(const int surfaceID, const int j, const float dX, con
 	setColumn(surfaceID, j, centerX + dX, centerY + dY, centerY + dY);
 }
 
+void ITProject::rotateColumn(const int surfaceID, const int j, const float x, const float y, const float z, const float angle, PLANE p)
+{
+	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+
+	if (j > getSurface(surfaceID)->sizeY()) throw std::exception("No row in surface");
+
+	for (int i = 0; i < getSurface(surfaceID)->sizeX(); i++)
+	{
+		rotatePoint(surfaceID, i, j, x, y, z, angle, p, false);
+	}
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
 void ITProject::setRow(const int surfaceID, const int i, const float posX, const float posY, const float posZ)
 {
 	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
@@ -240,6 +256,22 @@ void ITProject::moveRow(const int surfaceID, const int i, const float dX, const 
 	centerZ = orgin->get_Z();
 
 	setRow(surfaceID, i, centerX + dX, centerY + dY, centerY + dY);
+}
+
+void ITProject::rotateRow(const int surfaceID, const int i, const float x, const float y, const float z, const float angle, PLANE p)
+{
+	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+
+	if (i > getSurface(surfaceID)->sizeX()) throw std::exception("No row in surface");
+
+	for (int j = 0; j < getSurface(surfaceID)->sizeY(); j++)
+	{
+		rotatePoint(surfaceID, i, j, x, y, z, angle, p, false);
+	}
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
 }
 
 void ITProject::setSurface(const int surfaceID, const float posX, const float posY, const float posZ)
@@ -301,6 +333,34 @@ void ITProject::rotateSurfaceCentral(const int surfaceID, const float angle, PLA
 	_MySurfaces->at(surfaceID)->getCenter(x, y, z);
 
 	_MySurfaces->at(surfaceID)->rotateAround(x, y, z, angle, p);
+
+	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
+
+	w->updateAllTabs();
+}
+
+void ITProject::resizeSurface(const int surfaceID, const float factor)
+{
+	if (surfaceID > _MySurfaces->size()) throw std::exception("No surface with id: " + surfaceID);
+
+	//set position of center of surface; compute vector of diffrance between orgin point and rest of column
+	float centerX, centerY, centerZ, diffX, diffY, diffZ;
+
+	getSurface(surfaceID)->getCenter(centerX, centerY, centerZ);
+
+	for (int i = 0; i < getSurface(surfaceID)->sizeX(); i++)
+	{
+		for (int j = 0; j < getSurface(surfaceID)->sizeY(); j++)
+		{
+			ITPoint* tmp = getSurface(surfaceID)->getControlPoint(i, j);
+
+			diffX = tmp->get_X() - centerX;
+			diffY = tmp->get_Y() - centerY;
+			diffZ = tmp->get_Z() - centerZ;
+
+			setPoint(surfaceID, i, j, centerX + factor * diffX, centerY + factor * diffY, centerZ + factor * diffZ, false);
+		}
+	}
 
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 

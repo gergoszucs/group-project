@@ -97,6 +97,9 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	functions.emplace("moveColumn", &Designit::moveColumn);
 	functions.emplace("moveRow", &Designit::moveRow);
 	functions.emplace("moveSurface", &Designit::moveSurface);
+	functions.emplace("rotateColumn", &Designit::rotateColumn);
+	functions.emplace("rotateRow", &Designit::rotateRow);
+	functions.emplace("resizeSurface", &Designit::resizeSurface);
 
 	ui.commandLine->installEventFilter(this);
 }
@@ -2992,6 +2995,64 @@ int Designit::moveColumn(const QStringList & arguments)
 	return 0;
 }
 
+int Designit::rotateColumn(const QStringList & arguments)
+{
+	if (arguments.size() != 8)
+	{
+		return 1;
+	}
+
+	int surfaceID, j;
+	float posX, posY, posZ, angle;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	angle = arguments[6].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angle);
+
+	QString tmpStr = arguments[7].toLower();
+
+	if (tmpStr == "xy")
+	{
+		p = XY;
+	}
+	else if (tmpStr == "xz")
+	{
+		p = XZ;
+	}
+	else if (tmpStr == "yz")
+	{
+		p = YZ;
+	}
+	else
+	{
+		return 2;
+	}
+
+	try
+	{
+		project->rotateColumn(surfaceID, j, posX, posY, posZ, angle, p);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
 int Designit::setRow(const QStringList & arguments)
 {
 	if (arguments.size() != 6)
@@ -3050,6 +3111,64 @@ int Designit::moveRow(const QStringList & arguments)
 	try
 	{
 		project->moveRow(surfaceID, i, posX, posY, posZ);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::rotateRow(const QStringList & arguments)
+{
+	if (arguments.size() != 8)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	float posX, posY, posZ, angle;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	angle = arguments[6].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angle);
+
+	QString tmpStr = arguments[7].toLower();
+
+	if (tmpStr == "xy")
+	{
+		p = XY;
+	}
+	else if (tmpStr == "xz")
+	{
+		p = XZ;
+	}
+	else if (tmpStr == "yz")
+	{
+		p = YZ;
+	}
+	else
+	{
+		return 2;
+	}
+
+	try
+	{
+		project->rotateRow(surfaceID, i, posX, posY, posZ, angle, p);
 	}
 	catch (std::exception& e) {
 		return 99;
@@ -3216,6 +3335,33 @@ int Designit::rotateSurfaceCentral(const QStringList & arguments)
 	try
 	{
 		project->rotateSurfaceCentral(surfaceID, angle, p);
+	}
+	catch (std::exception& e) {
+		return 99;
+	}
+
+	return 0;
+}
+
+int Designit::resizeSurface(const QStringList & arguments)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float factor;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	factor = arguments[2].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->resizeSurface(surfaceID, factor);
 	}
 	catch (std::exception& e) {
 		return 99;
