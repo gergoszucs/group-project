@@ -132,9 +132,348 @@ int ITSurface::sizeY()
 
 ITPoint * ITSurface::getControlPoint(const int i, const int j)
 {
-	if ((i > sizeX()) || (j > sizeY())) throw std::exception("OUT OF RANGE");
+	if ((i >= sizeX()) || (j >= sizeY())) throw std::exception("NO_POINT");
 
 	return _MyControlPoints->at(i).at(j);
+}
+
+ITSurface * ITSurface::getCopyTranslated(const int k, const float x, const float y, const float z)
+{
+	ITSurface *s = new ITSurface();
+
+	s->set_NoOfInterpolatedPointsU(20);
+	s->set_NoOfInterpolatedPointsV(20);
+
+	float centerX, centerY, centerZ;
+
+	getCenter(centerX, centerY, centerZ);
+
+	for (int i = 0; i < sizeX(); i++)
+	{
+		std::vector <ITControlPoint *> v_dummy;
+
+		for (int j = 0; j < sizeY(); j++)
+		{
+			float diffX = getControlPoint(i, j)->get_X() - centerX;
+			float diffY = getControlPoint(i, j)->get_Y() - centerY;
+			float diffZ = getControlPoint(i, j)->get_Z() - centerZ;
+
+			ITControlPoint *p = new ITControlPoint(diffX + x, diffY + y, diffZ + z);
+
+			p->set_K(k);
+			p->set_I(i);
+			p->set_J(j);
+
+			v_dummy.push_back(p);
+		}
+
+		s->get_MyControlPoints()->push_back(v_dummy);
+	}
+
+	return s;
+}
+
+void ITSurface::addRow(const int i)
+{
+	if ((i >= sizeX() - 1) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	// Create a new vector.
+	std::vector <ITControlPoint *> dummy_v;
+
+	// Loop over columns.
+	for (int j = 0; j < sizeY(); j++)
+	{
+		float x = 0.5 * (getControlPoint(i + 1, j)->get_X() - getControlPoint(i, j)->get_X()) + getControlPoint(i, j)->get_X();
+		float y = 0.5 * (getControlPoint(i + 1, j)->get_Y() - getControlPoint(i, j)->get_Y()) + getControlPoint(i, j)->get_Y();
+		float z = 0.5 * (getControlPoint(i + 1, j)->get_Z() - getControlPoint(i, j)->get_Z()) + getControlPoint(i, j)->get_Z();
+
+		ITControlPoint *p = new ITControlPoint(x, y, z);
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		dummy_v.push_back(p);
+	}
+
+	// Insert the row.
+	std::vector < std::vector <ITControlPoint*> >::iterator it = _MyControlPoints->begin();
+	_MyControlPoints->insert(it + i + 1, dummy_v);
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::addRow(const int i, std::vector<ITControlPoint*>& row)
+{
+	if ((i > sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+	if (row.size() != sizeY()) { throw std::exception("SIZE_MISMATCH"); }
+
+	std::vector < std::vector <ITControlPoint*> >::iterator it = _MyControlPoints->begin();
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	if (i == sizeX())
+	{
+		_MyControlPoints->push_back(row);
+	}
+	else
+	{
+		_MyControlPoints->insert(it + i, row);
+	}
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::duplicateRow(const int i)
+{
+	if ((i >= sizeX() - 1) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	// Create a new vector.
+	std::vector <ITControlPoint *> dummy_v;
+
+	// Loop over columns.
+	for (int j = 0; j < sizeY(); j++)
+	{
+		float x = getControlPoint(i, j)->get_X();
+		float y = getControlPoint(i, j)->get_Y();
+		float z = getControlPoint(i, j)->get_Z();
+
+		ITControlPoint *p = new ITControlPoint(x, y, z);
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		dummy_v.push_back(p);
+	}
+
+	// Insert the row.
+	std::vector < std::vector <ITControlPoint*> >::iterator it = _MyControlPoints->begin();
+	_MyControlPoints->insert(it + i + 1, dummy_v);
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::deleteRow(const int i)
+{
+	if ((i >= sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	// Loop over columns. delete controlPoints
+	for (int j = sizeY() - 1; j >= 0 ; j--)
+	{
+		delete getControlPoint(i, j);
+	}
+
+	std::vector < std::vector <ITControlPoint*> >::iterator it = _MyControlPoints->begin();
+	_MyControlPoints->erase(it + i);
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::getRowCopy(const int i, std::vector<ITControlPoint*>& row)
+{
+	if ((i >= sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+	row.erase(row.begin(), row.end());
+
+	row.resize(sizeY());
+
+	for (int j = 0; j < sizeY(); j++)
+	{
+		ITPoint * pSource = getControlPoint(i, j);
+
+		ITControlPoint * p = new ITControlPoint(pSource->get_X(), pSource->get_Y(), pSource->get_Z());
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		row[j] = p;
+	}
+}
+
+void ITSurface::addColumn(const int j)
+{
+	if ((j >= sizeY() - 1) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	// Create a new vector.
+	std::vector <ITControlPoint *> dummy_v;
+
+	// Loop over rows.
+	for (int i = 0; i < sizeX(); i++)
+	{
+		std::vector <ITControlPoint*>::iterator it = _MyControlPoints->at(i).begin();
+
+		float x = 0.5 * (getControlPoint(i, j + 1)->get_X() - getControlPoint(i, j)->get_X()) + getControlPoint(i, j)->get_X();
+		float y = 0.5 * (getControlPoint(i, j + 1)->get_Y() - getControlPoint(i, j)->get_Y()) + getControlPoint(i, j)->get_Y();
+		float z = 0.5 * (getControlPoint(i, j + 1)->get_Z() - getControlPoint(i, j)->get_Z()) + getControlPoint(i, j)->get_Z();
+
+		ITControlPoint *p = new ITControlPoint(x, y, z);
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		_MyControlPoints->at(i).insert(it + j + 1, p);
+	}
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::addColumn(const int j, std::vector<ITControlPoint*>& column)
+{
+	if ((j > sizeY()) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+
+	if (column.size() != sizeX()) { throw std::exception("SIZE_MISMATCH"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	// Create a new vector.
+	std::vector <ITControlPoint *> dummy_v;
+
+	// Loop over rows.
+	for (int i = 0; i < sizeX(); i++)
+	{
+		std::vector <ITControlPoint*>::iterator it = _MyControlPoints->at(i).begin();
+
+		if (j == sizeY())
+		{
+			_MyControlPoints->at(i).push_back(column[i]);
+		}
+		else
+		{
+			_MyControlPoints->at(i).insert(it + j, column[i]);
+		}
+	}
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::duplicateColumn(const int j)
+{
+	if ((j >= sizeY() - 1) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	// Create a new vector.
+	std::vector <ITControlPoint *> dummy_v;
+
+	// Loop over rows.
+	for (int i = 0; i < sizeX(); i++)
+	{
+		std::vector <ITControlPoint*>::iterator it = _MyControlPoints->at(i).begin();
+
+		float x = getControlPoint(i, j)->get_X();
+		float y = getControlPoint(i, j)->get_Y();
+		float z = getControlPoint(i, j)->get_Z();
+
+		ITControlPoint *p = new ITControlPoint(x, y, z);
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		_MyControlPoints->at(i).insert(it + j + 1, p);
+	}
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::deleteColumn(const int j)
+{
+	if ((j >= sizeY()) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	for (int i = 0; i < sizeX(); i++)
+	{
+		std::vector <ITControlPoint*>::iterator it = _MyControlPoints->at(i).begin();
+
+		delete getControlPoint(i, j);
+
+		_MyControlPoints->at(i).erase(it + j);
+	}
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::getColumnCopy(const int j, std::vector<ITControlPoint*>& column)
+{
+	if ((j >= sizeY()) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+
+	column.erase(column.begin(), column.end());
+
+	column.resize(sizeX());
+
+	for (int i = 0; i < sizeX(); i++)
+	{
+		ITPoint * pSource = getControlPoint(i, j);
+
+		ITControlPoint * p = new ITControlPoint(pSource->get_X(), pSource->get_Y(), pSource->get_Z());
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		column[i] = p;
+	}
+}
+
+void ITSurface::reassignIdentifiers(const unsigned int k)
+{
+	for (int i = 0; i < sizeX(); i++)
+	{
+		for (int j = 0; j < sizeY(); j++)
+		{
+			ITPoint* p = getControlPoint(i, j);
+			p->set_K(k);
+			p->set_I(i);
+			p->set_J(j);
+		}
+	}
+}
+
+ITSurface * ITSurface::getCopy(const int k)
+{
+	ITSurface *s = new ITSurface();
+
+	s->set_NoOfInterpolatedPointsU(20);
+	s->set_NoOfInterpolatedPointsV(20);
+
+	for (int i = 0; i < sizeX(); i++)
+	{
+		std::vector <ITControlPoint *> v_dummy;
+
+		for (int j = 0; j < sizeY(); j++)
+		{
+			float x = getControlPoint(i, j)->get_X();
+			float y = getControlPoint(i, j)->get_Y();
+			float z = getControlPoint(i, j)->get_Z();
+
+			ITControlPoint *p = new ITControlPoint(x, y, z);
+
+			p->set_K(k);
+			p->set_I(i);
+			p->set_J(j);
+
+			v_dummy.push_back(p);
+		}
+
+		s->get_MyControlPoints()->push_back(v_dummy);
+	}
+
+	return s;
 }
 
 void ITSurface::propagateGeometry(int k)
@@ -529,7 +868,6 @@ void ITSurface::computeUPowerMatrix()
 	set_UPowerMatrix(upm);
 }
 
-
 void ITSurface::computeVPowerMatrix()
 {
 	int c = get_MyControlPoints()->at(0).size();
@@ -669,6 +1007,49 @@ void ITSurface::computeInterpolatedPoints()
 		_MyInterpolatedNormals->push_back(v_dummy_normals);
 	}
 
+}
+
+void ITSurface::getCenter(float& x, float& y, float& z)
+{
+	int sizeX = this->sizeX();
+	int sizeY = this->sizeY();
+
+	int i = 0;
+	int j = 0;
+
+	x = 0;
+	y = 0;
+	z = 0;
+
+	for (i = 0; i < sizeX; i++ )
+	{
+		for (j = 0; j < sizeY; j++)
+		{
+			x += getControlPoint(i, j)->get_X();
+			y += getControlPoint(i, j)->get_Y();
+			z += getControlPoint(i, j)->get_Z();
+		}
+	}
+
+	x /= (i*j);
+	y /= (i*j);
+	z /= (i*j);
+}
+
+void ITSurface::rotateAround(const float x, const float y, const float z, const float angle, PLANE p)
+{
+	ITPoint center(x, y, z);
+
+	int sizeX = this->sizeX();
+	int sizeY = this->sizeY();
+
+	for (int i = 0; i < sizeX; i++)
+	{
+		for (int j = 0; j < sizeY; j++)
+		{
+			getControlPoint(i, j)->rotateAround(center, angle, p);
+		}
+	}
 }
 
 // Accessors.

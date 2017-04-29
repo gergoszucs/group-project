@@ -84,9 +84,54 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.trajectoryCurveB->set_MyChar('B');
 
 	//populate command list
+	functions.emplace("help", &Designit::help);
 	functions.emplace("testFunction", &Designit::testFunction);
-	functions.emplace("movePoint", &Designit::movePoint);
+
 	functions.emplace("setPoint", &Designit::setPoint);
+	functions.emplace("movePoint", &Designit::movePoint);
+	functions.emplace("rotatePoint", &Designit::rotatePoint);
+
+	functions.emplace("setRow", &Designit::setRow);
+	functions.emplace("moveRow", &Designit::moveRow);
+	functions.emplace("rotateRow", &Designit::rotateRow);
+
+	functions.emplace("setColumn", &Designit::setColumn);
+	functions.emplace("moveColumn", &Designit::moveColumn);
+	functions.emplace("rotateColumn", &Designit::rotateColumn);
+
+	functions.emplace("setSurface", &Designit::setSurface);
+	functions.emplace("moveSurface", &Designit::moveSurface);
+	functions.emplace("rotateSurface", &Designit::rotateSurface);
+	functions.emplace("rotateSurfaceCentral", &Designit::rotateSurfaceCentral);
+
+	functions.emplace("addSurface", &Designit::addSurface);
+	functions.emplace("deleteSurface", &Designit::deleteSurface);
+	
+	functions.emplace("resizeSurface", &Designit::resizeSurface);
+
+	functions.emplace("sheer", &Designit::sheer);
+	functions.emplace("sheerD", &Designit::sheerD);
+
+	functions.emplace("flipSurface", &Designit::flipSurface);
+	functions.emplace("flipSurfacePoint", &Designit::flipSurfacePoint);
+	functions.emplace("flipSurfaceCentral", &Designit::flipSurfaceCentral);
+
+	functions.emplace("copySurface", &Designit::copySurface);
+	functions.emplace("copySurfaceMirror", &Designit::copySurfaceMirror);
+
+	functions.emplace("insertRow", &Designit::insertRow);
+	functions.emplace("duplicateRow", &Designit::duplicateRow);
+	functions.emplace("deleteRow", &Designit::deleteRow);
+
+	functions.emplace("insertColumn", &Designit::insertColumn);
+	functions.emplace("duplicateColumn", &Designit::duplicateColumn);
+	functions.emplace("deleteColumn", &Designit::deleteColumn);
+
+	functions.emplace("matePoints", &Designit::matePoints);
+
+	systemFunctions.emplace("redoSurfaceDelete", &Designit::redoSurfaceDelete);
+	systemFunctions.emplace("redoRowDelete", &Designit::redoRowDelete);
+	systemFunctions.emplace("redoColumnDelete", &Designit::redoColumnDelete);
 
 	ui.commandLine->installEventFilter(this);
 }
@@ -349,7 +394,6 @@ void Designit::keyPressEvent(QKeyEvent *event)
 
 	// Call the base class method.
 	QMainWindow::keyPressEvent(event);
-
 }
 
 void Designit::on_actionInterpolated_points_density_U_triggered()
@@ -412,6 +456,9 @@ void Designit::updateAllTabs()
 
 	// Update Gaussian view.
 	ui.myGaussianView->updateGL();
+
+	w->updateSpreadsheet();
+	w->updateTrajectorySpreadsheet();
 }
 
 bool Designit::checkExitWithUnsavedData()
@@ -604,6 +651,16 @@ void Designit::on_collapseAllButton_clicked()
 	ui.jsonTreeView->collapseAll();
 }
 
+void Designit::on_actionUndo_triggered()
+{
+	undoRedo.undo();
+}
+
+void Designit::on_actionRedo_triggered()
+{
+	undoRedo.redo();
+}
+
 void Designit::on_expandAllButton_clicked()
 {
 	ui.jsonTreeView->expandAll();
@@ -770,7 +827,7 @@ void Designit::on_actionNew_surface_triggered()
 
 	project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
 
-	createNewTrajectoryCurve(k);
+	project->createNewTrajectoryCurve(k);
 
 	updateSpreadsheet();
 	updateTrajectorySpreadsheet();
@@ -1945,7 +2002,7 @@ void Designit::handleCommand()
 	
 	if (functions.find(arguments[0].toUtf8().constData()) != functions.end())
 	{
-		int returnCode = functions[arguments[0].toUtf8().constData()](arguments);
+		int returnCode = functions[arguments[0].toUtf8().constData()](arguments, true);
 
 		switch (returnCode)
 		{
@@ -1957,6 +2014,20 @@ void Designit::handleCommand()
 			break;
 		case 2:
 			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Wrong arguments of function"));
+			break;
+		case 3:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("No surface with specified ID"));
+			break;
+		case 4:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("No point in surface"));
+			break;
+		case 5:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("No column in surface"));
+			break;
+		case 6:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("No row in surface"));
+			break;
+		case 98:
 			break;
 		case 99:
 			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Unspecified error"));
@@ -1970,12 +2041,92 @@ void Designit::handleCommand()
 	}
 }
 
+void Designit::executeCommand(QString message, QStringList arguments, const bool reg)
+{
+	std::string command = arguments[0].toUtf8().constData();
+
+	if (functions.find(command) != functions.end())
+	{
+		int retCode = functions[command](arguments, reg);
+
+		if (retCode == 0)
+		{
+			appendStatusTableWidget(message, QString("DONE"));
+		}
+		else if (retCode == 98)
+		{
+
+		}
+		else
+		{
+			appendStatusTableWidget(message, QString("Unspecified error"));
+		}
+	}
+	else if (systemFunctions.find(command) != systemFunctions.end())
+	{
+		int retCode = systemFunctions[command](arguments, reg);
+
+		if (retCode == 0)
+		{
+			appendStatusTableWidget(message, QString("DONE"));
+		}
+		else if (retCode == 98)
+		{
+
+		}
+		else
+		{
+			appendStatusTableWidget(message, QString("Unspecified error"));
+		}
+	}
+	else 
+	{
+		w->statusBar()->showMessage(QObject::tr("Unknown command"));
+	}
+}
+
 void Designit::resetCommandMemory()
 {
 	commandPointer = -1;
 }
 
-// TODO: import spreadsheet functions for moveIT spreadsheet
+QString Designit::getCommandList()
+{
+	std::stringstream ss;
+
+	for (auto kv : functions) {
+		ss << kv.first << std::endl;
+	}
+
+	QString QStr = QString::fromStdString(ss.str());
+
+	return QStr;
+}
+
+bool Designit::parsePlane(QString str, PLANE & p)
+{
+	str.toLower();
+
+	if ((str == "xy") || (str == "yx"))
+	{
+		p = XY;
+	}
+	else if ((str == "xz") || (str == "zx"))
+	{
+		p = XZ;
+	}
+	else if ((str == "yz") || (str == "zy"))
+	{
+		p = YZ;
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
 void Designit::showSpreadsheet()
 {
 	if (MY_RUN_MODE == MYGUI)
@@ -2305,7 +2456,7 @@ void Designit::updateSpreadsheet()
 void Designit::updateTrajectorySpreadsheet()
 {
 	// Update the output table tab.
-	if (MY_RUN_MODE == MYGUI)
+	if ((MY_RUN_MODE == MYGUI) && (project->get_MySurfaces()->size() != 0))
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet");
 
@@ -2715,6 +2866,24 @@ void Designit::toolBoxTabChanged( int index )
 
 bool Designit::eventFilter(QObject *obj, QEvent *event)
 {
+	if (event->type() == QEvent::KeyPress)
+	{
+		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+		if (keyEvent->key() == Qt::Key_Z && (keyEvent->modifiers() & Qt::ControlModifier))
+		{
+			undoRedo.undo();
+
+			return true;
+		}
+		else if (keyEvent->key() == Qt::Key_Y && (keyEvent->modifiers() & Qt::ControlModifier))
+		{
+			undoRedo.redo();
+
+			return true;
+		}
+	}
+
 	if ((event->type() == QEvent::KeyPress) && (obj == ui.commandLine))
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
@@ -2726,7 +2895,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 			{
 				commandPointer = 0;
 			} 
-			else if (commandPointer >= commandMemory.size() - 1)  \
+			else if (commandPointer >= commandMemory.size() - 1)
 			{
 				commandPointer = commandMemory.size() - 1;
 			}
@@ -2735,7 +2904,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 				commandPointer++;
 			}
 
-			ui.commandLine->setText(commandMemory[commandPointer]);
+			if (commandMemory.size() != 0) ui.commandLine->setText(commandMemory[commandPointer]);
 
 			return true;
 
@@ -2747,7 +2916,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 			{
 				commandPointer = 0;
 			}
-			else if (commandPointer > commandMemory.size() - 1)  \
+			else if (commandPointer > commandMemory.size() - 1)
 			{
 				commandPointer = commandMemory.size() - 1;
 			}
@@ -2756,7 +2925,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 				commandPointer--;
 			}
 
-			ui.commandLine->setText(commandMemory[commandPointer]);
+			if (commandMemory.size() != 0) ui.commandLine->setText(commandMemory[commandPointer]);
 			
 			return true;
 
@@ -2773,7 +2942,7 @@ bool Designit::eventFilter(QObject *obj, QEvent *event)
 	}
 }
 
-int Designit::testFunction(const QStringList & arguments)
+int Designit::testFunction(const QStringList & arguments, const bool reg)
 {
 	for (int i = 0; i < arguments.size(); i++)
 	{
@@ -2786,7 +2955,7 @@ int Designit::testFunction(const QStringList & arguments)
 	return 0;
 }
 
-int Designit::setPoint(const QStringList & arguments)
+int Designit::setPoint(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 7)
 	{
@@ -2812,16 +2981,31 @@ int Designit::setPoint(const QStringList & arguments)
 
 	try
 	{
-		project->setPoint(i,j,k,posX,posY,posZ);
+		Point3 tmp = project->getPointData(i, j, k);
+
+		project->setPoint(i,j,k,posX,posY,posZ, true);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(tmp.x);
+			revCommand[5] = QString::number(tmp.y);
+			revCommand[6] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
 		return 99;
 	}
 	
 	return 0;
 }
 
-int Designit::movePoint(const QStringList & arguments)
+int Designit::movePoint(const QStringList & arguments, const bool reg)
 {
 	if (arguments.size() != 7)
 	{
@@ -2847,82 +3031,1494 @@ int Designit::movePoint(const QStringList & arguments)
 
 	try
 	{
-		project->movePoint(i, j, k, posX, posY, posZ);
+		project->movePoint(i, j, k, posX, posY, posZ, true);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(-posX);
+			revCommand[5] = QString::number(-posY);
+			revCommand[6] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
 		return 99;
 	}
+
+	project->synchronizeSurfaceVectorsFromControl();
 
 	return 0;
 }
 
-void Designit::createNewTrajectoryCurve(const int k)
+int Designit::rotatePoint(const QStringList & arguments, const bool reg)
 {
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Creating new trajectory curve");
-
-	// Instanciate the ITTrajectoryCurve curves.
-	ITTrajectoryCurve* cx = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cy = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cz = new ITTrajectoryCurve();
-
-	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
-	// Note that the ordinal of each segment end point is stored in the x instance variable of the ITPoint object.
-	for (int i = 0; i < 4; i++)
+	if (arguments.size() != 9)
 	{
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "translation segment %i", i);
-
-		cx->addSegment(i*5.0, 0.0, 0.0, 20 * i, 0.0, 0.0, (i + 1)*5.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cy->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cz->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		return 1;
 	}
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Finished translation segments");
+	int surfaceID, i, j;
+	float posX, posY, posZ, angle, angleDeg;
+	PLANE p;
+	bool status;
 
-	// Compute the m0 and m1 tangent vectors for each of the segments in the translation curves.
-	cx->computeMySegmentEndTangentVectors();
-	cy->computeMySegmentEndTangentVectors();
-	cz->computeMySegmentEndTangentVectors();
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	j = arguments[3].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[5].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[6].toFloat(&status);
+	if (!status) return 2;
 
-	// Push the translation curves into the surface.
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cx);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cy);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cz);
+	angleDeg = arguments[7].toFloat(&status);
+	if (!status) return 2;
 
-	// Instanciate the ITTrajectoryCurve curves.
-	ITTrajectoryCurve* cr = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cp = new ITTrajectoryCurve();
-	ITTrajectoryCurve* cyaw = new ITTrajectoryCurve();
+	angle = DEG_TO_RAD(angleDeg);
 
-	// Note that the loop omits the last point (if there are N points, then there are N-1 segments).
-	for (int i = 0; i < 4; i++)
+	if (! parsePlane(arguments[8], p)) return 2;
+
+	try
 	{
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "rotation segment %i", i);
+		project->rotatePoint(surfaceID, i, j, posX, posY, posZ, angle, p, true);
 
-		cr->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cp->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
-		cyaw->addSegment(0.0, 0.0, 0.0, 20 * i, 0.0, 0.0, 0.0, 0.0, 0.0, 20 * (i + 1), 0.0, 0.0);
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[7] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
 	}
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Finished rotation segments");
+	project->synchronizeSurfaceVectorsFromControl();
 
-	// Compute the m0 and m1 tangent vectors for each of the segments in the translation curves.
-	cr->computeMySegmentEndTangentVectors();
-	cp->computeMySegmentEndTangentVectors();
-	cyaw->computeMySegmentEndTangentVectors();
+	return 0;
+}
 
-	// Push the translation curves into the surface.
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cr);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cp);
-	project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->push_back(cyaw);
+int Designit::setColumn(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
 
-	// Centre of rotation point.
-	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_X(0.0);
-	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Y(0.0);
-	project->get_MySurfaces()->at(k)->get_MyCentreOfRotationPoint()->set_Z(0.0);
+	int surfaceID, j;
+	float posX, posY, posZ;
+	bool status;
 
-	// Finally update the project maxKeyFrame instance variable.
-	// Set it to the end key frame of the last segment of the z trajectory of the last surface.
-	project->set_MaxKeyFrame(project->get_MySurfaces()->back()->get_MyTrajectoryCurves()->back()->get_MyTrajectoryCurveSegments()->back()->get_EndKeyFrame());
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
 
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Max key frame: %i", project->get_MaxKeyFrame());
+	try
+	{
+		Point3 tmp = project->getPointData(surfaceID, 0, j);
+
+		project->setColumn(surfaceID, j, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(tmp.x);
+			revCommand[4] = QString::number(tmp.y);
+			revCommand[5] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::moveColumn(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID, j;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->moveColumn(surfaceID, j, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(-posX);
+			revCommand[4] = QString::number(-posY);
+			revCommand[5] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::rotateColumn(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 8)
+	{
+		return 1;
+	}
+
+	int surfaceID, j;
+	float posX, posY, posZ, angle, angleDeg;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	angleDeg = arguments[6].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angleDeg);
+
+	if (!parsePlane(arguments[7], p)) return 2;
+
+	try
+	{
+		project->rotateColumn(surfaceID, j, posX, posY, posZ, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[6] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::setRow(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		Point3 tmp = project->getPointData(surfaceID, i, 0);
+
+		project->setRow(surfaceID, i, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(tmp.x);
+			revCommand[4] = QString::number(tmp.y);
+			revCommand[5] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::moveRow(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->moveRow(surfaceID, i, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(-posX);
+			revCommand[4] = QString::number(-posY);
+			revCommand[5] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::rotateRow(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 8)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	float posX, posY, posZ, angle, angleDeg;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	angleDeg = arguments[6].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angleDeg);
+
+	if (!parsePlane(arguments[7], p)) return 2;
+
+	try
+	{
+		project->rotateRow(surfaceID, i, posX, posY, posZ, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[6] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::setSurface(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 5)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[2].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[4].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		Point3 tmp = project->getSurfaceCenter(surfaceID);
+
+		project->setSurface(surfaceID, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(tmp.x);
+			revCommand[3] = QString::number(tmp.y);
+			revCommand[4] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::moveSurface(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 5)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float posX, posY, posZ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	posX = arguments[2].toFloat(&status);
+	if (!status) return 2;
+	posY = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	posZ = arguments[4].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->moveSurface(surfaceID, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(-posX);
+			revCommand[3] = QString::number(-posY);
+			revCommand[4] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::rotateSurface(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 7)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float x, y, z, angle, angleDeg;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	x = arguments[2].toFloat(&status);
+	if (!status) return 2;
+	y = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	z = arguments[4].toFloat(&status);
+	if (!status) return 2;
+	angleDeg = arguments[5].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angleDeg);
+
+	if (!parsePlane(arguments[6], p)) return 2;
+
+	try
+	{
+		project->rotateSurface(surfaceID, x, y, z, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[5] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::rotateSurfaceCentral(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 4)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float angle, angleDeg;
+	bool status;
+	PLANE p;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	angleDeg = arguments[2].toFloat(&status);
+	if (!status) return 2;
+
+	angle = DEG_TO_RAD(angleDeg);
+
+	if (!parsePlane(arguments[3], p)) return 2;
+
+	try
+	{
+		project->rotateSurfaceCentral(surfaceID, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::resizeSurface(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float factor;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	factor = arguments[2].toFloat(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->resizeSurface(surfaceID, factor);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(1 / factor);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::addSurface(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 1)
+	{
+		return 1;
+	}
+
+	try
+	{
+		project->addSurface();
+
+		int surfaceID = project->get_MySurfaces()->size() - 1;
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteSurface");
+			revCommand.push_back(QString::number(surfaceID));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::deleteSurface(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float angle;
+	bool status;
+	PLANE p;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+		auto tmp = project->getSurface(surfaceID);
+		auto tmpBase = project->getBaseSurface(surfaceID);
+
+		project->deleteSurface(surfaceID);
+
+		w->undoRedo.registerSurface(tmp, tmpBase);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("redoSurfaceDelete");
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::sheer(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 8)
+	{
+		return 1;
+	}
+
+	int surfaceID, i, j, refI, refJ;
+	float diff;
+	bool status;
+	PLANE p;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	j = arguments[3].toInt(&status);
+	if (!status) return 2;
+	refI = arguments[4].toInt(&status);
+	if (!status) return 2;
+	refJ = arguments[5].toInt(&status);
+	if (!status) return 2;
+	diff = arguments[6].toFloat(&status);
+	if (!status) return 2;
+
+	if (!parsePlane(arguments[7], p)) return 2;
+
+	try
+	{
+		project->sheer(surfaceID, i, j, refI, refJ, diff, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[6] = QString::number(-diff);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::sheerD(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID, i, j;
+	float diff;
+	bool status;
+	PLANE p;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	j = arguments[3].toInt(&status);
+	if (!status) return 2;
+	diff = arguments[4].toFloat(&status);
+	if (!status) return 2;
+
+	if (!parsePlane(arguments[5], p)) return 2;
+
+	try
+	{
+		project->sheerD(surfaceID, i, j, diff, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(-diff);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::flipSurface(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 6)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	float x, y, z;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	x = arguments[2].toFloat(&status);
+	if (!status) return 2;
+	y = arguments[3].toFloat(&status);
+	if (!status) return 2;
+	z = arguments[4].toFloat(&status);
+	if (!status) return 2;
+
+	if (!parsePlane(arguments[5], p)) return 2;
+
+	try
+	{
+		project->flipSurface(surfaceID, x, y, z, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::flipSurfacePoint(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 5)
+	{
+		return 1;
+	}
+
+	int surfaceID, i, j;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	j = arguments[3].toInt(&status);
+	if (!status) return 2;
+
+	if (!parsePlane(arguments[4], p)) return 2;
+
+	try
+	{
+		project->flipSurfacePoint(surfaceID, i, j, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::flipSurfaceCentral(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID;
+	PLANE p;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	if (!parsePlane(arguments[2], p)) return 2;
+
+	try
+	{
+		project->flipSurfaceCentral(surfaceID, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::copySurface(const QStringList & arguments, const bool reg)
+{
+	int surfaceID;
+	float x, y, z;
+	bool status;
+
+	if (arguments.size() == 5)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		x = arguments[2].toFloat(&status);
+		if (!status) return 2;
+		y = arguments[3].toFloat(&status);
+		if (!status) return 2;
+		z = arguments[4].toFloat(&status);
+		if (!status) return 2;
+	}
+	else if (arguments.size() == 2)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		x = 1.0;
+		y = 1.0;
+		z = 1.0;
+	}
+	else
+	{
+		return 1;
+	}
+
+	try
+	{
+		project->copySurface(surfaceID, x, y, z);
+
+		int surfaceID = project->get_MySurfaces()->size() - 1;
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteSurface");
+			revCommand.push_back(QString::number(surfaceID));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::copySurfaceMirror(const QStringList & arguments, const bool reg)
+{
+	int surfaceID;
+	float x, y, z;
+	PLANE p;
+	bool status;
+
+	if (arguments.size() == 6)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		x = arguments[2].toFloat(&status);
+		if (!status) return 2;
+		y = arguments[3].toFloat(&status);
+		if (!status) return 2;
+		z = arguments[4].toFloat(&status);
+		if (!status) return 2;
+		if (!parsePlane(arguments[5], p)) return 2;
+	}
+	else if (arguments.size() == 2)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		x = 1.0;
+		y = 1.0;
+		z = 1.0;
+		p = XZ;
+	}
+	else
+	{
+		return 1;
+	}
+
+	try
+	{
+		project->copySurface(surfaceID, x, y, z);
+
+		int k = project->get_MySurfaces()->size() - 1;
+
+		project->flipSurfaceCentral(k, p);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteSurface");
+			revCommand.push_back(QString::number(k));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::insertRow(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->insertRow(surfaceID, i);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteRow");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(i + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::duplicateRow(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->duplicateRow(surfaceID, i);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteRow");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(i + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::deleteRow(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID, i;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+		if ((i >= project->getSurface(surfaceID)->sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+		if (project->getSurface(surfaceID)->sizeX() == 1)
+		{
+			QStringList com;
+
+			com.push_back("deleteSurface");
+			com.push_back(QString::number(surfaceID));
+
+			w->executeCommand(com[0], com, true);
+
+			throw std::exception("NO_APPEND");
+		}
+		else
+		{
+			std::vector<ITControlPoint*> tmp;
+
+			project->getSurface(surfaceID)->getRowCopy(i, tmp);
+
+
+			project->deleteRow(surfaceID, i);
+
+			w->undoRedo.registerRow(surfaceID, i, tmp);
+
+			if (reg)
+			{
+				QStringList arg;
+
+				arg.push_back("deleteRow");
+				arg.push_back(QString::number(surfaceID));
+				arg.push_back(QString::number(i));
+
+				QStringList revCommand;
+
+				revCommand.push_back("redoRowDelete");
+
+				w->undoRedo.registerCommand(arg, revCommand);
+			}
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		if (strcmp(e.what(), "NO_APPEND") == 0) { return 98; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::insertColumn(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID, j;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->insertColumn(surfaceID, j);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteColumn");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(j + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::duplicateColumn(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID, j;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		project->duplicateColumn(surfaceID, j);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteColumn");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(j + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::deleteColumn(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	int surfaceID, j;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	j = arguments[2].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+		if ((j >= project->getSurface(surfaceID)->sizeY()) || (j < 0)) { throw std::exception("NO_ROW"); }
+
+		if (project->getSurface(surfaceID)->sizeY() == 1)
+		{
+			QStringList com;
+
+			com.push_back("deleteSurface");
+			com.push_back(QString::number(surfaceID));
+
+			w->executeCommand(com[0], com, true);
+
+			throw std::exception("NO_APPEND");
+		}
+		else
+		{
+			std::vector<ITControlPoint*> tmp;
+
+			project->getSurface(surfaceID)->getColumnCopy(j, tmp);
+
+			project->deleteColumn(surfaceID, j);
+
+			w->undoRedo.registerColumn(surfaceID, j, tmp);
+
+			if (reg)
+			{
+				QStringList revCommand;
+
+				revCommand.push_back("redoColumnDelete");
+
+				w->undoRedo.registerCommand(arguments, revCommand);
+			}
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		if (strcmp(e.what(), "NO_APPEND") == 0) { return 98; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::matePoints(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 7)
+	{
+		return 1;
+	}
+
+	int surfaceID, i, j;
+	int targetSurfaceID, targetI, targetJ;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	i = arguments[2].toInt(&status);
+	if (!status) return 2;
+	j = arguments[3].toInt(&status);
+	if (!status) return 2;
+	targetSurfaceID = arguments[4].toInt(&status);
+	if (!status) return 2;
+	targetI = arguments[5].toInt(&status);
+	if (!status) return 2;
+	targetJ = arguments[6].toInt(&status);
+	if (!status) return 2;
+
+	try
+	{
+		Point3 tmp = project->getPointData(targetSurfaceID, targetI, targetJ);
+
+		project->matePoints(surfaceID, i, j, targetSurfaceID, targetI, targetJ);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("setPoint");
+			revCommand.push_back(QString::number(targetSurfaceID));
+			revCommand.push_back(QString::number(targetI));
+			revCommand.push_back(QString::number(targetJ));
+			revCommand.push_back(QString::number(tmp.x));
+			revCommand.push_back(QString::number(tmp.y));
+			revCommand.push_back(QString::number(tmp.z));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::help(const QStringList & arguments, const bool reg)
+{
+	QMessageBox::StandardButton reply;
+
+	QMessageBox msgBox;
+	msgBox.setText("List of avaible commands");
+	msgBox.setInformativeText(w->getCommandList());
+	msgBox.exec();
+
+	return 0;
+}
+
+int Designit::redoSurfaceDelete(const QStringList & arguments, const bool reg)
+{
+	w->undoRedo.redoSurfaceDelete(project);
+
+	w->updateAllTabs();
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::redoRowDelete(const QStringList & arguments, const bool reg)
+{
+	w->undoRedo.redoRowDelete(project);
+
+	w->updateAllTabs();
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::redoColumnDelete(const QStringList & arguments, const bool reg)
+{
+	w->undoRedo.redoColumnDelete(project);
+
+	w->updateAllTabs();
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
 }

@@ -1,14 +1,32 @@
 #pragma once
 
+#include <stdarg.h>     // va_list, va_start, va_arg, va_end
+#include <QDebug>       // qDebug.
+#include <time.h>		// time, localtime, strftime
+#include <iostream>		// For cerr.
+#include <vector>
+
 #include "rapidjson/document.h" // will include "rapidjson/rapidjson.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 
+#include "Enums.h"
+
 using namespace rapidjson;
 
 // Forward declarations.
 class ITSurface;
+
+struct Point3
+{
+public:
+	float x, y, z;
+
+	Point3() : x(0), y(0), z(0) {}
+
+	Point3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+};
 
 class ITProject
 {
@@ -67,8 +85,53 @@ public:
 	ITProject(void);
 	~ITProject(void);
 
-	void setPoint(const int surfaceID, const int i, const int j, const float posX, const float posY, const float posZ);
-	void movePoint(const int surfaceID, const int i, const int j, const float dX, const float dY, const float dZ);
+	void setPoint(const int surfaceID, const int i, const int j, const float posX, const float posY, const float posZ, bool update);
+	void movePoint(const int surfaceID, const int i, const int j, const float dX, const float dY, const float dZ, bool update);
+	void rotatePoint(const int surfaceID, const int i, const int j, const float x, const float y, const float z, const float angle, PLANE p, bool update);
+
+	void setColumn(const int surfaceID, const int j, const float posX, const float posY, const float posZ);
+	void moveColumn(const int surfaceID, const int j, const float dX, const float dY, const float dZ);
+	void rotateColumn(const int surfaceID, const int j, const float x, const float y, const float z, const float angle, PLANE p);
+
+	void setRow(const int surfaceID, const int i, const float posX, const float posY, const float posZ);
+	void moveRow(const int surfaceID, const int i, const float dX, const float dY, const float dZ);
+	void rotateRow(const int surfaceID, const int i, const float x, const float y, const float z, const float angle, PLANE p);
+
+	void setSurface(const int surfaceID, const float posX, const float posY, const float posZ);
+	void moveSurface(const int surfaceID, const float dX, const float dY, const float dZ);
+	void rotateSurface(const int surfaceID, const float x, const float y, const float z, const float angle, PLANE p);
+	
+	void rotateSurfaceCentral(const int surfaceID, const float angle, PLANE p);
+	void resizeSurface(const int surfaceID, const float factor);
+	
+	void deleteSurface(const int surfaceID);
+	void addSurface();
+
+	void sheer(const int surfaceID, const int orginI, const int orginJ, const int refI, const int refJ, const float diff, PLANE p);
+	void sheerD(const int surfaceID, const int orginI, const int orginJ, const float diff, PLANE p);
+
+	void flipSurface(const int surfaceID, const int x, const int y, const int z, PLANE plane);
+	void flipSurfacePoint(const int surfaceID, const int orginI, const int orginJ, PLANE plane);
+	void flipSurfaceCentral(const int surfaceID, PLANE plane);
+
+	void copySurface(const int surfaceID, const int x, const int y, const int z);
+
+	void insertRow(const int surfaceID, const int i);
+	void duplicateRow(const int surfaceID, const int i);
+	void deleteRow(const int surfaceID, const int i);
+
+	void insertColumn(const int surfaceID, const int j);
+	void duplicateColumn(const int surfaceID, const int j);
+	void deleteColumn(const int surfaceID, const int j);
+
+	void matePoints(const int baseSurfaceID, const int baseI, const int baseJ, const int targetSurfaceID, const int targetI, const int targetJ);
+
+	Point3 getPointData(const int surfaceID, const int i, const int j);
+	Point3 getSurfaceCenter(const int surfaceID);
+
+	void createNewTrajectoryCurve(const int k);
+
+	void synchronizeSurfaceVectorsFromControl();
 
 	// Admin methods.
 	void currentDateTime(char * currentTime);
@@ -178,4 +241,6 @@ public:
 	void set_IsActiveControlSurfaces(bool b);
 
 	ITSurface* getSurface(const int k);
+
+	ITSurface* getBaseSurface(const int k);
 };

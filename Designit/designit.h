@@ -12,6 +12,8 @@
 #include <QUrlQuery>
 #include <unordered_map>
 #include <functional>
+#include "Enums.h"
+#include "undoRedoSystem.h"
 
 class Designit : public QMainWindow
 {
@@ -30,7 +32,9 @@ public:
 
 	void sendHTTPRequest(QString actionKey, QString actionValue, float elapsedTimeSecs, int totalProblemSize, QString fileNameWithPath);
 
-	public slots:
+	UndoRedoSystem undoRedo;
+
+public slots:
 
 	void on_actionOpen_triggered();
 	void on_actionExit_triggered();
@@ -82,11 +86,31 @@ public:
 	void on_collapseAllButton_clicked();
 	void on_expandAllButton_clicked();
 
+	void on_actionUndo_triggered();
+	void on_actionRedo_triggered();
+
 	void userHasEnteredTextData();
 
 	void toolBoxTabChanged(int index);
 
 	void handleCommand();
+
+	void executeCommand(QString message, QStringList arguments, const bool reg);
+
+	/**
+	* @fn	static bool Designit::parsePlane(QString str, PLANE & p);
+	*
+	* @brief	Parses plane string.
+	* 
+	* @param str	String to be parsed.
+	* @param p		Variable parsed plane will be hold in.
+	*
+	* @return		Bool status of operations (true if success).
+	*
+	* @author	Pawel Zybura
+	* @date		28.04.2017
+	*/
+	static bool parsePlane(QString str, PLANE & p);
 
 	void showSpreadsheet();
 	void updateSpreadsheet();
@@ -118,6 +142,8 @@ public:
 
 	void resetCommandMemory();
 
+	QString getCommandList();
+
 private:
 	Ui::DesignitClass ui;
 
@@ -126,15 +152,57 @@ private:
 	void closeProject();
 	void closeEvent(QCloseEvent *bar);
 
-	static int testFunction(const QStringList & arguments);
-	static int setPoint(const QStringList & arguments);
-	static int movePoint(const QStringList & arguments);
+	static int testFunction(const QStringList & arguments, const bool reg);
+	
+	static int setPoint(const QStringList & arguments, const bool reg);
+	static int movePoint(const QStringList & arguments, const bool reg);
+	static int rotatePoint(const QStringList & arguments, const bool reg);
 
-	void createNewTrajectoryCurve( const int k );
+	static int setColumn(const QStringList & arguments, const bool reg);
+	static int moveColumn(const QStringList & arguments, const bool reg);
+	static int rotateColumn(const QStringList & arguments, const bool reg);
+
+	static int setRow(const QStringList & arguments, const bool reg);
+	static int moveRow(const QStringList & arguments, const bool reg);
+	static int rotateRow(const QStringList & arguments, const bool reg);
+
+	static int setSurface(const QStringList & arguments, const bool reg);
+	static int moveSurface(const QStringList & arguments, const bool reg);
+	static int rotateSurface(const QStringList & arguments, const bool reg);
+	
+	static int rotateSurfaceCentral(const QStringList & arguments, const bool reg);
+	static int resizeSurface(const QStringList & arguments, const bool reg);
+	static int addSurface(const QStringList & arguments, const bool reg);
+	static int deleteSurface(const QStringList & arguments, const bool reg);
+
+	static int sheer(const QStringList & arguments, const bool reg);
+	static int sheerD(const QStringList & arguments, const bool reg);
+
+	static int flipSurface(const QStringList & arguments, const bool reg);
+	static int flipSurfacePoint(const QStringList & arguments, const bool reg);
+	static int flipSurfaceCentral(const QStringList & arguments, const bool reg);
+
+	static int copySurface(const QStringList & arguments, const bool reg);
+	static int copySurfaceMirror(const QStringList & arguments, const bool reg);
+
+	static int insertRow(const QStringList & arguments, const bool reg);
+	static int duplicateRow(const QStringList & arguments, const bool reg);
+	static int deleteRow(const QStringList & arguments, const bool reg);
+	static int insertColumn(const QStringList & arguments, const bool reg);
+	static int duplicateColumn(const QStringList & arguments, const bool reg);
+	static int deleteColumn(const QStringList & arguments, const bool reg);
+
+	static int matePoints(const QStringList & arguments, const bool reg);
+
+	static int help(const QStringList & arguments, const bool reg);
+
+	static int redoSurfaceDelete(const QStringList & arguments, const bool reg);
+	static int redoRowDelete(const QStringList & arguments, const bool reg);
+	static int redoColumnDelete(const QStringList & arguments, const bool reg);
 
 public:
-	//std::unordered_map<QString, std::function<void(const QStringList & arguments)>> functions;
-	std::unordered_map<std::string, std::function<int(const QStringList & arguments)>> functions;
+	std::unordered_map<std::string, std::function<int(const QStringList & arguments, const bool reg)>> functions;
+	std::unordered_map<std::string, std::function<int(const QStringList & arguments, const bool reg)>> systemFunctions;
 	std::vector< QString > commandMemory;
 	int commandPointer = -1;
 };

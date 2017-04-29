@@ -2303,6 +2303,14 @@ void MyXYView::drawMyInterpolatedPointsNet()
 			}
 			glEnd();
 		}
+
+		std::cout << project->get_MySurfaces()->size() << endl;
+
+		auto tmp = project->get_MySurfaces()->at(k);
+		auto tmp1 = project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints();
+		auto tmp2 = project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(0);
+		auto tmp3 = project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(0).size();
+
 		// Next the curves of constant v
 		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyInterpolatedPoints()->at(0).size(); i++) // i counts columns.
 		{

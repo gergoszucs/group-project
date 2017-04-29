@@ -10,6 +10,9 @@
 #define PI 4 * atan( 1.0 )
 #define G -9.81
 
+#define DEG_TO_RAD(x) x / 180 * PI
+#define RAD_TO_DEG(x) x * 180 / PI
+
 extern Designit* w;
 extern ITProject* project;
 extern bool IsScrutiny;

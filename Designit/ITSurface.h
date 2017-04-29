@@ -3,6 +3,7 @@
 #include <vector>
 #include <Eigen/Dense>
 #include "rapidjson/document.h" // https://github.com/miloyip/rapidjson
+#include "Enums.h"
 
 // Forward declarations.
 class ITPoint;
@@ -71,6 +72,25 @@ public:
 	int sizeX();
 	int sizeY();
 	ITPoint * getControlPoint(const int i, const int j);
+	void getCenter(float& x, float& y, float& z);
+	void rotateAround(const float x, const float y, const float z, const float angle, PLANE p);
+
+	ITSurface * getCopy(const int k);
+	ITSurface * getCopyTranslated(const int k, const float x, const float y, const float z);
+
+	void addRow(const int i);
+	void addRow(const int i, std::vector<ITControlPoint*>& row);
+	void duplicateRow(const int i);
+	void deleteRow(const int i);
+	void getRowCopy(const int i, std::vector<ITControlPoint*>& row);
+
+	void addColumn(const int j);
+	void addColumn(const int j, std::vector<ITControlPoint*>& column);
+	void duplicateColumn(const int j);
+	void deleteColumn(const int j);
+	void getColumnCopy(const int j, std::vector<ITControlPoint*>& column);
+
+	void reassignIdentifiers(const unsigned int k);
 
 	// Utilities.
 	void manageComputationOfInterpolatedPoints();
