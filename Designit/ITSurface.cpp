@@ -132,7 +132,7 @@ int ITSurface::sizeY()
 
 ITPoint * ITSurface::getControlPoint(const int i, const int j)
 {
-	if ((i > sizeX()) || (j > sizeY())) throw std::exception("NO_POINT");
+	if ((i >= sizeX()) || (j >= sizeY())) throw std::exception("NO_POINT");
 
 	return _MyControlPoints->at(i).at(j);
 }
@@ -202,16 +202,30 @@ void ITSurface::addRow(const int i)
 	_MyControlPoints->insert(it + i + 1, dummy_v);
 
 	// Re-assign the _K, _I and _J variables.
-	for (int i = 0; i < sizeX(); i++)
+	reassignIdentifiers(k);
+}
+
+void ITSurface::addRow(const int i, std::vector<ITControlPoint*>& row)
+{
+	if ((i > sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+	if (row.size() != sizeY()) { throw std::exception("SIZE_MISMATCH"); }
+
+	std::vector < std::vector <ITControlPoint*> >::iterator it = _MyControlPoints->begin();
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	if (i == sizeX())
 	{
-		for (int j = 0; j < sizeY(); j++)
-		{
-			ITPoint* p = getControlPoint(i,j);
-			p->set_K(k);
-			p->set_I(i);
-			p->set_J(j);
-		}
+		_MyControlPoints->push_back(row);
 	}
+	else
+	{
+		_MyControlPoints->insert(it + i, row);
+	}
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
 }
 
 void ITSurface::duplicateRow(const int i)
@@ -243,16 +257,7 @@ void ITSurface::duplicateRow(const int i)
 	_MyControlPoints->insert(it + i + 1, dummy_v);
 
 	// Re-assign the _K, _I and _J variables.
-	for (int i = 0; i < sizeX(); i++)
-	{
-		for (int j = 0; j < sizeY(); j++)
-		{
-			ITPoint* p = getControlPoint(i, j);
-			p->set_K(k);
-			p->set_I(i);
-			p->set_J(j);
-		}
-	}
+	reassignIdentifiers(k);
 }
 
 void ITSurface::deleteRow(const int i)
@@ -271,15 +276,27 @@ void ITSurface::deleteRow(const int i)
 	_MyControlPoints->erase(it + i);
 
 	// Re-assign the _K, _I and _J variables.
-	for (int i = 0; i < sizeX(); i++)
+	reassignIdentifiers(k);
+}
+
+void ITSurface::getRowCopy(const int i, std::vector<ITControlPoint*>& row)
+{
+	if ((i >= sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+	row.erase(row.begin(), row.end());
+
+	row.resize(sizeY());
+
+	for (int j = 0; j < sizeY(); j++)
 	{
-		for (int j = 0; j < sizeY(); j++)
-		{
-			ITPoint* p = getControlPoint(i, j);
-			p->set_K(k);
-			p->set_I(i);
-			p->set_J(j);
-		}
+		ITPoint * pSource = getControlPoint(i, j);
+
+		ITControlPoint * p = new ITControlPoint(pSource->get_X(), pSource->get_Y(), pSource->get_Z());
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		row[j] = p;
 	}
 }
 
@@ -310,16 +327,37 @@ void ITSurface::addColumn(const int j)
 	}
 
 	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::addColumn(const int j, std::vector<ITControlPoint*>& column)
+{
+	if ((j > sizeY()) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+
+	if (column.size() != sizeX()) { throw std::exception("SIZE_MISMATCH"); }
+
+	int k = getControlPoint(0, 0)->get_K();
+
+	// Create a new vector.
+	std::vector <ITControlPoint *> dummy_v;
+
+	// Loop over rows.
 	for (int i = 0; i < sizeX(); i++)
 	{
-		for (int j = 0; j < sizeY(); j++)
+		std::vector <ITControlPoint*>::iterator it = _MyControlPoints->at(i).begin();
+
+		if (j == sizeY())
 		{
-			ITPoint* p = getControlPoint(i, j);
-			p->set_K(k);
-			p->set_I(i);
-			p->set_J(j);
+			_MyControlPoints->at(i).push_back(column[i]);
+		}
+		else
+		{
+			_MyControlPoints->at(i).insert(it + j, column[i]);
 		}
 	}
+
+	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
 }
 
 void ITSurface::duplicateColumn(const int j)
@@ -349,16 +387,7 @@ void ITSurface::duplicateColumn(const int j)
 	}
 
 	// Re-assign the _K, _I and _J variables.
-	for (int i = 0; i < sizeX(); i++)
-	{
-		for (int j = 0; j < sizeY(); j++)
-		{
-			ITPoint* p = getControlPoint(i, j);
-			p->set_K(k);
-			p->set_I(i);
-			p->set_J(j);
-		}
-	}
+	reassignIdentifiers(k);
 }
 
 void ITSurface::deleteColumn(const int j)
@@ -377,6 +406,32 @@ void ITSurface::deleteColumn(const int j)
 	}
 
 	// Re-assign the _K, _I and _J variables.
+	reassignIdentifiers(k);
+}
+
+void ITSurface::getColumnCopy(const int j, std::vector<ITControlPoint*>& column)
+{
+	if ((j >= sizeY()) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+
+	column.erase(column.begin(), column.end());
+
+	column.resize(sizeX());
+
+	for (int i = 0; i < sizeX(); i++)
+	{
+		ITPoint * pSource = getControlPoint(i, j);
+
+		ITControlPoint * p = new ITControlPoint(pSource->get_X(), pSource->get_Y(), pSource->get_Z());
+
+		p->set_U(0.0);
+		p->set_V(0.0);
+
+		column[i] = p;
+	}
+}
+
+void ITSurface::reassignIdentifiers(const unsigned int k)
+{
 	for (int i = 0; i < sizeX(); i++)
 	{
 		for (int j = 0; j < sizeY(); j++)

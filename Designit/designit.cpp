@@ -86,35 +86,52 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	//populate command list
 	functions.emplace("help", &Designit::help);
 	functions.emplace("testFunction", &Designit::testFunction);
-	functions.emplace("movePoint", &Designit::movePoint);
+
 	functions.emplace("setPoint", &Designit::setPoint);
+	functions.emplace("movePoint", &Designit::movePoint);
+	functions.emplace("rotatePoint", &Designit::rotatePoint);
+
+	functions.emplace("setRow", &Designit::setRow);
+	functions.emplace("moveRow", &Designit::moveRow);
+	functions.emplace("rotateRow", &Designit::rotateRow);
+
+	functions.emplace("setColumn", &Designit::setColumn);
+	functions.emplace("moveColumn", &Designit::moveColumn);
+	functions.emplace("rotateColumn", &Designit::rotateColumn);
+
+	functions.emplace("setSurface", &Designit::setSurface);
+	functions.emplace("moveSurface", &Designit::moveSurface);
 	functions.emplace("rotateSurface", &Designit::rotateSurface);
 	functions.emplace("rotateSurfaceCentral", &Designit::rotateSurfaceCentral);
+
 	functions.emplace("addSurface", &Designit::addSurface);
-	functions.emplace("rotatePoint", &Designit::rotatePoint);
-	functions.emplace("setColumn", &Designit::setColumn);
-	functions.emplace("setRow", &Designit::setRow);
-	functions.emplace("setSurface", &Designit::setSurface);
-	functions.emplace("moveColumn", &Designit::moveColumn);
-	functions.emplace("moveRow", &Designit::moveRow);
-	functions.emplace("moveSurface", &Designit::moveSurface);
-	functions.emplace("rotateColumn", &Designit::rotateColumn);
-	functions.emplace("rotateRow", &Designit::rotateRow);
+	functions.emplace("deleteSurface", &Designit::deleteSurface);
+	
 	functions.emplace("resizeSurface", &Designit::resizeSurface);
-	functions.emplace("sheerD", &Designit::sheerD);
+
 	functions.emplace("sheer", &Designit::sheer);
+	functions.emplace("sheerD", &Designit::sheerD);
+
 	functions.emplace("flipSurface", &Designit::flipSurface);
 	functions.emplace("flipSurfacePoint", &Designit::flipSurfacePoint);
 	functions.emplace("flipSurfaceCentral", &Designit::flipSurfaceCentral);
+
 	functions.emplace("copySurface", &Designit::copySurface);
 	functions.emplace("copySurfaceMirror", &Designit::copySurfaceMirror);
+
 	functions.emplace("insertRow", &Designit::insertRow);
 	functions.emplace("duplicateRow", &Designit::duplicateRow);
 	functions.emplace("deleteRow", &Designit::deleteRow);
+
 	functions.emplace("insertColumn", &Designit::insertColumn);
 	functions.emplace("duplicateColumn", &Designit::duplicateColumn);
 	functions.emplace("deleteColumn", &Designit::deleteColumn);
+
 	functions.emplace("matePoints", &Designit::matePoints);
+
+	systemFunctions.emplace("redoSurfaceDelete", &Designit::redoSurfaceDelete);
+	systemFunctions.emplace("redoRowDelete", &Designit::redoRowDelete);
+	systemFunctions.emplace("redoColumnDelete", &Designit::redoColumnDelete);
 
 	ui.commandLine->installEventFilter(this);
 }
@@ -377,7 +394,6 @@ void Designit::keyPressEvent(QKeyEvent *event)
 
 	// Call the base class method.
 	QMainWindow::keyPressEvent(event);
-
 }
 
 void Designit::on_actionInterpolated_points_density_U_triggered()
@@ -2025,9 +2041,13 @@ void Designit::handleCommand()
 
 void Designit::executeCommand(QString message, QStringList arguments, const bool reg)
 {
-	if (functions.find(arguments[0].toUtf8().constData()) != functions.end())
+	std::string command = arguments[0].toUtf8().constData();
+
+	if (functions.find(command) != functions.end())
 	{
-		if (functions[arguments[0].toUtf8().constData()](arguments, reg) == 0)
+		int retCode = functions[command](arguments, reg);
+
+		if (retCode == 0)
 		{
 			appendStatusTableWidget(message, QString("DONE"));
 		}
@@ -2036,7 +2056,19 @@ void Designit::executeCommand(QString message, QStringList arguments, const bool
 			appendStatusTableWidget(message, QString("Unspecified error"));
 		}
 	}
-	else {
+	else if (systemFunctions.find(command) != systemFunctions.end())
+	{
+		if (systemFunctions[command](arguments, reg) == 0)
+		{
+			appendStatusTableWidget(message, QString("DONE"));
+		}
+		else
+		{
+			appendStatusTableWidget(message, QString("Unspecified error"));
+		}
+	}
+	else 
+	{
 		w->statusBar()->showMessage(QObject::tr("Unknown command"));
 	}
 }
@@ -2412,7 +2444,7 @@ void Designit::updateSpreadsheet()
 void Designit::updateTrajectorySpreadsheet()
 {
 	// Update the output table tab.
-	if (MY_RUN_MODE == MYGUI)
+	if ((MY_RUN_MODE == MYGUI) && (project->get_MySurfaces()->size() != 0))
 	{
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet");
 
@@ -2822,6 +2854,24 @@ void Designit::toolBoxTabChanged( int index )
 
 bool Designit::eventFilter(QObject *obj, QEvent *event)
 {
+	if (event->type() == QEvent::KeyPress)
+	{
+		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+		if (keyEvent->key() == Qt::Key_Z && (keyEvent->modifiers() & Qt::ControlModifier))
+		{
+			undoRedo.undo();
+
+			return true;
+		}
+		else if (keyEvent->key() == Qt::Key_Y && (keyEvent->modifiers() & Qt::ControlModifier))
+		{
+			undoRedo.redo();
+
+			return true;
+		}
+	}
+
 	if ((event->type() == QEvent::KeyPress) && (obj == ui.commandLine))
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
@@ -3003,7 +3053,7 @@ int Designit::rotatePoint(const QStringList & arguments, const bool reg)
 	}
 
 	int surfaceID, i, j;
-	float posX, posY, posZ, angle;
+	float posX, posY, posZ, angle, angleDeg;
 	PLANE p;
 	bool status;
 
@@ -3020,10 +3070,10 @@ int Designit::rotatePoint(const QStringList & arguments, const bool reg)
 	posZ = arguments[6].toFloat(&status);
 	if (!status) return 2;
 
-	angle = arguments[7].toFloat(&status);
+	angleDeg = arguments[7].toFloat(&status);
 	if (!status) return 2;
 
-	angle = DEG_TO_RAD(angle);
+	angle = DEG_TO_RAD(angleDeg);
 
 	if (! parsePlane(arguments[8], p)) return 2;
 
@@ -3035,7 +3085,7 @@ int Designit::rotatePoint(const QStringList & arguments, const bool reg)
 		{
 			QStringList revCommand = arguments;
 
-			revCommand[7] = "-" + arguments[7];
+			revCommand[7] = QString::number(-angleDeg);
 
 			w->undoRedo.registerCommand(arguments, revCommand);
 		}
@@ -3077,7 +3127,20 @@ int Designit::setColumn(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		Point3 tmp = project->getPointData(surfaceID, 0, j);
+
 		project->setColumn(surfaceID, j, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(tmp.x);
+			revCommand[4] = QString::number(tmp.y);
+			revCommand[5] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3117,6 +3180,17 @@ int Designit::moveColumn(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->moveColumn(surfaceID, j, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(-posX);
+			revCommand[4] = QString::number(-posY);
+			revCommand[5] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3139,7 +3213,7 @@ int Designit::rotateColumn(const QStringList & arguments, const bool reg)
 	}
 
 	int surfaceID, j;
-	float posX, posY, posZ, angle;
+	float posX, posY, posZ, angle, angleDeg;
 	PLANE p;
 	bool status;
 
@@ -3154,16 +3228,25 @@ int Designit::rotateColumn(const QStringList & arguments, const bool reg)
 	posZ = arguments[5].toFloat(&status);
 	if (!status) return 2;
 
-	angle = arguments[6].toFloat(&status);
+	angleDeg = arguments[6].toFloat(&status);
 	if (!status) return 2;
 
-	angle = DEG_TO_RAD(angle);
+	angle = DEG_TO_RAD(angleDeg);
 
 	if (!parsePlane(arguments[7], p)) return 2;
 
 	try
 	{
 		project->rotateColumn(surfaceID, j, posX, posY, posZ, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[6] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3202,7 +3285,20 @@ int Designit::setRow(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		Point3 tmp = project->getPointData(surfaceID, i, 0);
+
 		project->setRow(surfaceID, i, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(tmp.x);
+			revCommand[4] = QString::number(tmp.y);
+			revCommand[5] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3242,6 +3338,17 @@ int Designit::moveRow(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->moveRow(surfaceID, i, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[3] = QString::number(-posX);
+			revCommand[4] = QString::number(-posY);
+			revCommand[5] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3264,7 +3371,7 @@ int Designit::rotateRow(const QStringList & arguments, const bool reg)
 	}
 
 	int surfaceID, i;
-	float posX, posY, posZ, angle;
+	float posX, posY, posZ, angle, angleDeg;
 	PLANE p;
 	bool status;
 
@@ -3279,16 +3386,25 @@ int Designit::rotateRow(const QStringList & arguments, const bool reg)
 	posZ = arguments[5].toFloat(&status);
 	if (!status) return 2;
 
-	angle = arguments[6].toFloat(&status);
+	angleDeg = arguments[6].toFloat(&status);
 	if (!status) return 2;
 
-	angle = DEG_TO_RAD(angle);
+	angle = DEG_TO_RAD(angleDeg);
 
 	if (!parsePlane(arguments[7], p)) return 2;
 
 	try
 	{
 		project->rotateRow(surfaceID, i, posX, posY, posZ, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[6] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3325,7 +3441,20 @@ int Designit::setSurface(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		Point3 tmp = project->getSurfaceCenter(surfaceID);
+
 		project->setSurface(surfaceID, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(tmp.x);
+			revCommand[3] = QString::number(tmp.y);
+			revCommand[4] = QString::number(tmp.z);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3363,6 +3492,17 @@ int Designit::moveSurface(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->moveSurface(surfaceID, posX, posY, posZ);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(-posX);
+			revCommand[3] = QString::number(-posY);
+			revCommand[4] = QString::number(-posZ);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3385,7 +3525,7 @@ int Designit::rotateSurface(const QStringList & arguments, const bool reg)
 	}
 
 	int surfaceID;
-	float x, y, z, angle;
+	float x, y, z, angle, angleDeg;
 	PLANE p;
 	bool status;
 
@@ -3397,16 +3537,25 @@ int Designit::rotateSurface(const QStringList & arguments, const bool reg)
 	if (!status) return 2;
 	z = arguments[4].toFloat(&status);
 	if (!status) return 2;
-	angle = arguments[5].toFloat(&status);
+	angleDeg = arguments[5].toFloat(&status);
 	if (!status) return 2;
 
-	angle = DEG_TO_RAD(angle);
+	angle = DEG_TO_RAD(angleDeg);
 
 	if (!parsePlane(arguments[6], p)) return 2;
 
 	try
 	{
 		project->rotateSurface(surfaceID, x, y, z, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[5] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3429,22 +3578,31 @@ int Designit::rotateSurfaceCentral(const QStringList & arguments, const bool reg
 	}
 
 	int surfaceID;
-	float angle;
+	float angle, angleDeg;
 	bool status;
 	PLANE p;
 
 	surfaceID = arguments[1].toInt(&status);
 	if (!status) return 2;
-	angle = arguments[2].toFloat(&status);
+	angleDeg = arguments[2].toFloat(&status);
 	if (!status) return 2;
 
-	angle = DEG_TO_RAD(angle);
+	angle = DEG_TO_RAD(angleDeg);
 
-	if (!parsePlane(arguments[6], p)) return 2;
+	if (!parsePlane(arguments[3], p)) return 2;
 
 	try
 	{
 		project->rotateSurfaceCentral(surfaceID, angle, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(-angleDeg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3478,6 +3636,15 @@ int Designit::resizeSurface(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->resizeSurface(surfaceID, factor);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(1 / factor);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3502,6 +3669,18 @@ int Designit::addSurface(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->addSurface();
+
+		int surfaceID = project->get_MySurfaces()->size() - 1;
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteSurface");
+			revCommand.push_back(QString::number(surfaceID));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3533,7 +3712,23 @@ int Designit::deleteSurface(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+		auto tmp = project->getSurface(surfaceID);
+		auto tmpBase = project->getBaseSurface(surfaceID);
+
 		project->deleteSurface(surfaceID);
+
+		w->undoRedo.registerSurface(tmp, tmpBase);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("redoSurfaceDelete");
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3578,6 +3773,15 @@ int Designit::sheer(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->sheer(surfaceID, i, j, refI, refJ, diff, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[6] = QString::number(-diff);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3618,6 +3822,15 @@ int Designit::sheerD(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->sheerD(surfaceID, i, j, diff, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(-diff);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3658,6 +3871,13 @@ int Designit::flipSurface(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->flipSurface(surfaceID, x, y, z, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3695,6 +3915,13 @@ int Designit::flipSurfacePoint(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->flipSurfacePoint(surfaceID, i, j, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3728,6 +3955,13 @@ int Designit::flipSurfaceCentral(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->flipSurfaceCentral(surfaceID, p);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3775,6 +4009,18 @@ int Designit::copySurface(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->copySurface(surfaceID, x, y, z);
+
+		int surfaceID = project->get_MySurfaces()->size() - 1;
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteSurface");
+			revCommand.push_back(QString::number(surfaceID));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3829,6 +4075,16 @@ int Designit::copySurfaceMirror(const QStringList & arguments, const bool reg)
 		int k = project->get_MySurfaces()->size() - 1;
 
 		project->flipSurfaceCentral(k, p);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteSurface");
+			revCommand.push_back(QString::number(k));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3861,6 +4117,17 @@ int Designit::insertRow(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->insertRow(surfaceID, i);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteRow");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(i + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3893,6 +4160,17 @@ int Designit::duplicateRow(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->duplicateRow(surfaceID, i);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteRow");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(i + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3924,7 +4202,32 @@ int Designit::deleteRow(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+		if ((i >= project->getSurface(surfaceID)->sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
+
+		std::vector<ITControlPoint*> tmp;
+
+		project->getSurface(surfaceID)->getRowCopy(i, tmp);
+
+
 		project->deleteRow(surfaceID, i);
+
+		w->undoRedo.registerRow(surfaceID, i, tmp);
+
+		if (reg)
+		{
+			QStringList arg;
+
+			arg.push_back("deleteRow");
+			arg.push_back(QString::number(surfaceID));
+			arg.push_back(QString::number(i));
+
+			QStringList revCommand;
+
+			revCommand.push_back("redoRowDelete");
+
+			w->undoRedo.registerCommand(arg, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3957,6 +4260,17 @@ int Designit::insertColumn(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->insertColumn(surfaceID, j);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteColumn");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(j + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -3989,6 +4303,17 @@ int Designit::duplicateColumn(const QStringList & arguments, const bool reg)
 	try
 	{
 		project->duplicateColumn(surfaceID, j);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("deleteColumn");
+			revCommand.push_back(QString::number(surfaceID));
+			revCommand.push_back(QString::number(j + 1));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -4020,7 +4345,25 @@ int Designit::deleteColumn(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+		if ((j >= project->getSurface(surfaceID)->sizeY()) || (j < 0)) { throw std::exception("NO_ROW"); }
+
+		std::vector<ITControlPoint*> tmp;
+
+		project->getSurface(surfaceID)->getColumnCopy(j, tmp);
+
 		project->deleteColumn(surfaceID, j);
+
+		w->undoRedo.registerColumn(surfaceID, j, tmp);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("redoColumnDelete");
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -4061,7 +4404,24 @@ int Designit::matePoints(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		Point3 tmp = project->getPointData(targetSurfaceID, targetI, targetJ);
+
 		project->matePoints(surfaceID, i, j, targetSurfaceID, targetI, targetJ);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("setPoint");
+			revCommand.push_back(QString::number(targetSurfaceID));
+			revCommand.push_back(QString::number(targetI));
+			revCommand.push_back(QString::number(targetJ));
+			revCommand.push_back(QString::number(tmp.x));
+			revCommand.push_back(QString::number(tmp.y));
+			revCommand.push_back(QString::number(tmp.z));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
 	}
 	catch (std::exception& e) {
 		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
@@ -4084,6 +4444,39 @@ int Designit::help(const QStringList & arguments, const bool reg)
 	msgBox.setText("List of avaible commands");
 	msgBox.setInformativeText(w->getCommandList());
 	msgBox.exec();
+
+	return 0;
+}
+
+int Designit::redoSurfaceDelete(const QStringList & arguments, const bool reg)
+{
+	w->undoRedo.redoSurfaceDelete(project);
+
+	w->updateAllTabs();
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::redoRowDelete(const QStringList & arguments, const bool reg)
+{
+	w->undoRedo.redoRowDelete(project);
+
+	w->updateAllTabs();
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::redoColumnDelete(const QStringList & arguments, const bool reg)
+{
+	w->undoRedo.redoColumnDelete(project);
+
+	w->updateAllTabs();
+
+	project->synchronizeSurfaceVectorsFromControl();
 
 	return 0;
 }

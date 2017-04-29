@@ -34,7 +34,7 @@ public:
 
 	UndoRedoSystem undoRedo;
 
-	public slots:
+public slots:
 
 	void on_actionOpen_triggered();
 	void on_actionExit_triggered();
@@ -196,9 +196,13 @@ private:
 
 	static int help(const QStringList & arguments, const bool reg);
 
+	static int redoSurfaceDelete(const QStringList & arguments, const bool reg);
+	static int redoRowDelete(const QStringList & arguments, const bool reg);
+	static int redoColumnDelete(const QStringList & arguments, const bool reg);
+
 public:
-	//std::unordered_map<QString, std::function<void(const QStringList & arguments)>> functions;
 	std::unordered_map<std::string, std::function<int(const QStringList & arguments, const bool reg)>> functions;
+	std::unordered_map<std::string, std::function<int(const QStringList & arguments, const bool reg)>> systemFunctions;
 	std::vector< QString > commandMemory;
 	int commandPointer = -1;
 };

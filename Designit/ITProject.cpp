@@ -665,6 +665,8 @@ void ITProject::copySurface(const int surfaceID, const int x, const int y, const
 	get_MySurfaces()->push_back( getSurface(surfaceID)->getCopyTranslated(k, x, y, z) );
 	get_MyBaseSurfaces()->push_back( getBaseSurface(surfaceID)->getCopyTranslated(k, x, y, z) );
 	
+	createNewTrajectoryCurve(k);
+
 	IsDataLoaded = true;
 	UnsavedChanges = true;
 
@@ -801,11 +803,28 @@ void ITProject::matePoints(const int baseSurfaceID, const int baseI, const int b
 
 Point3 ITProject::getPointData(const int surfaceID, const int i, const int j)
 {
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_POINT");
+
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_POINT");
+
 	Point3 tmp;
 
 	tmp.x = getSurface(surfaceID)->getControlPoint(i, j)->get_X();
 	tmp.y = getSurface(surfaceID)->getControlPoint(i, j)->get_Y();
 	tmp.z = getSurface(surfaceID)->getControlPoint(i, j)->get_Z();
+
+	return tmp;
+}
+
+Point3 ITProject::getSurfaceCenter(const int surfaceID)
+{
+	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
+
+	Point3 tmp;
+
+	getSurface(surfaceID)->getCenter(tmp.x, tmp.y, tmp.z);
 
 	return tmp;
 }

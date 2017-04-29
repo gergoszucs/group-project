@@ -79,12 +79,18 @@ public:
 	ITSurface * getCopyTranslated(const int k, const float x, const float y, const float z);
 
 	void addRow(const int i);
+	void addRow(const int i, std::vector<ITControlPoint*>& row);
 	void duplicateRow(const int i);
 	void deleteRow(const int i);
+	void getRowCopy(const int i, std::vector<ITControlPoint*>& row);
 
 	void addColumn(const int j);
+	void addColumn(const int j, std::vector<ITControlPoint*>& column);
 	void duplicateColumn(const int j);
 	void deleteColumn(const int j);
+	void getColumnCopy(const int j, std::vector<ITControlPoint*>& column);
+
+	void reassignIdentifiers(const unsigned int k);
 
 	// Utilities.
 	void manageComputationOfInterpolatedPoints();
