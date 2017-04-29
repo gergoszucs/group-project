@@ -2027,6 +2027,8 @@ void Designit::handleCommand()
 		case 6:
 			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("No row in surface"));
 			break;
+		case 98:
+			break;
 		case 99:
 			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Unspecified error"));
 			break;
@@ -2051,6 +2053,10 @@ void Designit::executeCommand(QString message, QStringList arguments, const bool
 		{
 			appendStatusTableWidget(message, QString("DONE"));
 		}
+		else if (retCode == 98)
+		{
+
+		}
 		else
 		{
 			appendStatusTableWidget(message, QString("Unspecified error"));
@@ -2058,9 +2064,15 @@ void Designit::executeCommand(QString message, QStringList arguments, const bool
 	}
 	else if (systemFunctions.find(command) != systemFunctions.end())
 	{
-		if (systemFunctions[command](arguments, reg) == 0)
+		int retCode = systemFunctions[command](arguments, reg);
+
+		if (retCode == 0)
 		{
 			appendStatusTableWidget(message, QString("DONE"));
+		}
+		else if (retCode == 98)
+		{
+
 		}
 		else
 		{
@@ -4205,28 +4217,42 @@ int Designit::deleteRow(const QStringList & arguments, const bool reg)
 		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 		if ((i >= project->getSurface(surfaceID)->sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
 
-		std::vector<ITControlPoint*> tmp;
-
-		project->getSurface(surfaceID)->getRowCopy(i, tmp);
-
-
-		project->deleteRow(surfaceID, i);
-
-		w->undoRedo.registerRow(surfaceID, i, tmp);
-
-		if (reg)
+		if (project->getSurface(surfaceID)->sizeX() == 1)
 		{
-			QStringList arg;
+			QStringList com;
 
-			arg.push_back("deleteRow");
-			arg.push_back(QString::number(surfaceID));
-			arg.push_back(QString::number(i));
+			com.push_back("deleteSurface");
+			com.push_back(QString::number(surfaceID));
 
-			QStringList revCommand;
+			w->executeCommand(com[0], com, true);
 
-			revCommand.push_back("redoRowDelete");
+			throw std::exception("NO_APPEND");
+		}
+		else
+		{
+			std::vector<ITControlPoint*> tmp;
 
-			w->undoRedo.registerCommand(arg, revCommand);
+			project->getSurface(surfaceID)->getRowCopy(i, tmp);
+
+
+			project->deleteRow(surfaceID, i);
+
+			w->undoRedo.registerRow(surfaceID, i, tmp);
+
+			if (reg)
+			{
+				QStringList arg;
+
+				arg.push_back("deleteRow");
+				arg.push_back(QString::number(surfaceID));
+				arg.push_back(QString::number(i));
+
+				QStringList revCommand;
+
+				revCommand.push_back("redoRowDelete");
+
+				w->undoRedo.registerCommand(arg, revCommand);
+			}
 		}
 	}
 	catch (std::exception& e) {
@@ -4234,6 +4260,7 @@ int Designit::deleteRow(const QStringList & arguments, const bool reg)
 		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
 		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
 		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		if (strcmp(e.what(), "NO_APPEND") == 0) { return 98; }
 		return 99;
 	}
 
@@ -4348,21 +4375,35 @@ int Designit::deleteColumn(const QStringList & arguments, const bool reg)
 		if ((surfaceID >= project->get_MySurfaces()->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 		if ((j >= project->getSurface(surfaceID)->sizeY()) || (j < 0)) { throw std::exception("NO_ROW"); }
 
-		std::vector<ITControlPoint*> tmp;
-
-		project->getSurface(surfaceID)->getColumnCopy(j, tmp);
-
-		project->deleteColumn(surfaceID, j);
-
-		w->undoRedo.registerColumn(surfaceID, j, tmp);
-
-		if (reg)
+		if (project->getSurface(surfaceID)->sizeY() == 1)
 		{
-			QStringList revCommand;
+			QStringList com;
 
-			revCommand.push_back("redoColumnDelete");
+			com.push_back("deleteSurface");
+			com.push_back(QString::number(surfaceID));
 
-			w->undoRedo.registerCommand(arguments, revCommand);
+			w->executeCommand(com[0], com, true);
+
+			throw std::exception("NO_APPEND");
+		}
+		else
+		{
+			std::vector<ITControlPoint*> tmp;
+
+			project->getSurface(surfaceID)->getColumnCopy(j, tmp);
+
+			project->deleteColumn(surfaceID, j);
+
+			w->undoRedo.registerColumn(surfaceID, j, tmp);
+
+			if (reg)
+			{
+				QStringList revCommand;
+
+				revCommand.push_back("redoColumnDelete");
+
+				w->undoRedo.registerCommand(arguments, revCommand);
+			}
 		}
 	}
 	catch (std::exception& e) {
@@ -4370,6 +4411,7 @@ int Designit::deleteColumn(const QStringList & arguments, const bool reg)
 		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
 		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
 		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		if (strcmp(e.what(), "NO_APPEND") == 0) { return 98; }
 		return 99;
 	}
 

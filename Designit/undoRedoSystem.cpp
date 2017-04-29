@@ -91,6 +91,7 @@ void UndoRedoSystem::redoSurfaceDelete(ITProject* p)
 	for (int k = 0; k < p->get_MySurfaces()->size(); k++)
 	{
 		p->getSurface(k)->reassignIdentifiers(k);
+		p->getSurface(k)->manageComputationOfInterpolatedPoints();
 	}
 
 	deletedSurfaces.pop_back();
@@ -126,6 +127,7 @@ void UndoRedoSystem::redoRowDelete(ITProject* p)
 	p->getBaseSurface(surfaceID)->addRow(rowID, tmp);
 
 	p->getSurface(surfaceID)->reassignIdentifiers(surfaceID);
+	p->getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
 	deletedRows.pop_back();
 }
@@ -160,6 +162,7 @@ void UndoRedoSystem::redoColumnDelete(ITProject* p)
 	p->getBaseSurface(surfaceID)->addColumn(columnID, tmp);
 
 	p->getSurface(surfaceID)->reassignIdentifiers(surfaceID);
+	p->getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
 	deletedColumns.pop_back();
 }
