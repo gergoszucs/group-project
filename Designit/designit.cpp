@@ -688,35 +688,37 @@ void Designit::on_actionSave_As_triggered()
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), d.append("/Data"), tr("JSON Files (*.json *.JSON);;Text Files (*.txt);;C++ Files (*.cpp *.h)"));
 
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly))
-	{
-		QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
-		return;
+	if (!fileName.isEmpty() && !fileName.isNull()) {
+		QFile file(fileName);
+		if (!file.open(QIODevice::WriteOnly))
+		{
+			QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+			return;
+		}
+
+		// Close the file.
+		file.close();
+
+		// OK, the file is there, so let's start writing to the file.
+		// Get a char * from the file name.
+		QByteArray latin1BAFilenameString = fileName.toLatin1();
+
+		// Write the project to the file.
+		ITIO::writeMyProjectToFile(latin1BAFilenameString.data());
+
+		// Set status message.
+		QString str1 = QString("File %1 saved successfully.").arg(fileName);
+		w->statusBar()->showMessage(str1);
+
+		// Show status log entry
+		appendStatusTableWidget(QString("File"), QString("Saved"));
+
+		// Send the HTTP request.
+		sendHTTPRequest(QString("File"), QString("Saved"), 0.0, 0, DataFileNameWithPath);
+
+		// Finally set flags.
+		UnsavedChanges = false;
 	}
-
-	// Close the file.
-	file.close();
-
-	// OK, the file is there, so let's start writing to the file.
-	// Get a char * from the file name.
-	QByteArray latin1BAFilenameString = fileName.toLatin1();
-
-	// Write the project to the file.
-	ITIO::writeMyProjectToFile(latin1BAFilenameString.data());
-
-	// Set status message.
-	QString str1 = QString("File %1 saved successfully.").arg(fileName);
-	w->statusBar()->showMessage(str1);
-
-	// Show status log entry
-	appendStatusTableWidget(QString("File"), QString("Saved"));
-
-	// Send the HTTP request.
-	sendHTTPRequest(QString("File"), QString("Saved"), 0.0, 0, DataFileNameWithPath);
-
-	// Finally set flags.
-	UnsavedChanges = false;
 }
 
 void Designit::on_actionDelete_surface_triggered()
