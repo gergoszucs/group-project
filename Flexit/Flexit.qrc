@@ -1,4 +1,23 @@
 <RCC>
-    <qresource prefix="Flexit">
+    <qresource>
+		<file>Resources/about.png</file>
+		<file>Resources/blackDot.png</file>
+		<file>Resources/icon_close.png</file>
+		<file>Resources/icon_cuda.png</file>
+		<file>Resources/icon_dryrun.png</file>
+		<file>Resources/icon_email.png</file>
+		<file>Resources/icon_exit.png</file>
+		<file>Resources/icon_help.png</file>
+		<file>Resources/icon_open.png</file>
+		<file>Resources/icon_pause.png</file>
+		<file>Resources/icon_replay.png</file>
+		<file>Resources/icon_reset.jpg</file>
+		<file>Resources/icon_reset.png</file>
+		<file>Resources/icon_save.png</file>
+		<file>Resources/icon_step.png</file>
+		<file>Resources/icon_stop.png</file>
+		<file>Resources/icon_test.png</file>
+		<file>Resources/icon_trim.png</file>
+		<file>Resources/icon_web.png</file>
     </qresource>
 </RCC>
