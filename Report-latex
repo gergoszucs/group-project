@@ -1,0 +1,340 @@
+\documentclass[a4paper, 11pt, article]{report}
+\usepackage{graphicx}
+\usepackage{nomencl}
+\usepackage[onehalfspacing]{setspace}
+\usepackage[font={small,it}]{caption}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{breqn}
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+
+
+\begin{document}
+\pagenumbering{roman}
+   
+    \begin{titlepage}
+        \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+       
+        \center
+        \textsc{\LARGE Cranfield University}\\[1.5cm]
+        \textsc{\Large MSc in Computational and Software Techniques in Engineering 2016/2017}\\[0.5cm]
+        \textsc{\large Software Engineering in Technical Computing}\\[0.5cm]
+        \textsc{\large School of Aerospace, Transport and Manufacturing}\\[0.5cm]
+       
+        \HRule \\[0.4cm]
+        {\huge \bfseries Applications in Practical  \\[0.5cm]
+       High End Computing}\\[0.4cm]
+        \HRule \\[1.5cm]
+       
+        \begin{minipage}{0.4\textwidth}
+            \begin{flushleft} \large
+                \emph{Authors:}\\
+                Piotr \textsc{Kazmierczak} \\
+                 Xin \textsc{Lu} \\
+                  Pawel \textsc{Zybura} \\ 
+                   Gergo \textsc{Szusc} \\
+                    Andreas \textsc{Schmidhofer} \\
+            \end{flushleft}
+        \end{minipage}
+        ~
+        \begin{minipage}{0.4\textwidth}
+            \begin{flushright} \large
+                \emph{Supervisors:}
+                \\ Dr  Irene \textsc{Moulitsas}
+              
+            \end{flushright}
+        \end{minipage}\\[1cm]
+       
+        
+       
+        \vfill
+        {\large \today}
+        \clearpage
+    \end{titlepage}
+ 
+    \tableofcontents
+    \newpage
+    
+    \begin{abstract}
+   Some fancy content 
+    
+   \end{abstract}
+    \pagenumbering{arabic}
+   
+   \chapter{Organization Work}
+   
+   \section{Trello}
+   
+   \section{GitHub}
+   
+   \chapter{CAD Implementation}
+   
+   There are many CAD programs but the most popular program in the world is Autodesk Autodesk.
+
+Autocad allows you to design two- and three-dimensional coordinate systems and save drawings to a DWG file.
+
+DWG files are a standard for CAD applications. Unfortunately due to the fact that it is a closed binary format reserved by Autodesk, Autocad is required for DWG files. Fortunately, you can also use breaking monopoly programming libraries created by other companies such as Open Design Alliance (formerly OpenDWG).
+
+Autodesk has released a number of specialized overlays such as AutoCAD Electrical, AutoCAD Mechanical, Mechanical Desktop, Architectural Desktop, and Civil Design that require AutoCAD to be the "engine" that manages their work.
+
+In addition, it has provided many programming interfaces for writing custom extensions for Autocad.
+
+With the release of new versions of programming, software development has also changed, while languages have lost some of their value. As a result, Autocad has developed a complete set of interfaces to work with overlays.
+
+\section{AutoLisp}
+
+It is a variation of the Lisp script language adapted for Autocad to automate repetitive operations and increase productivity.
+
+For example, calculating the total length of all lines in a drawing - imagine how long it would take to count that.
+
+The great advantage of Autolisp is that you do not need much programming knowledge to use it. Even a beginner Autocad user can help him create a simple algorithm that will save him hours or days of work.
+
+Another advantage is its portability, as its Autocad did not develop it by moving its attention to another VisualLisp language, it was implemented in the same form in most "clones", so the application written in Autolisp should equally work on Autocad as on Intellicada. DOES AGREE.
+
+AutoLisp also has disqualification defects as a professional writing tongue overlays.
+
+Has access only to the limited functionality of Autocad.
+
+It is a scripting language which on the one hand can be considered as an advantage (no special programming environment is needed) and on the other hand, it is a big disadvantage. Because the scripting language is interpreted during execution, so extensions in it are characterized by slow action.
+
+The entire application code written in AutoLispie is visible to anyone who opens code files which is a big minus for commercial programs, no one wants his hard work to be used illegally by others.
+
+In summary, AutoLisp is rather an enhancement for engineers wishing to accelerate the tedious task of writing applications for sale.
+
+
+Code example:
+\newline
+\newline
+[code language="cpp"] (defun c:myline () \newline
+(prompt "Pick the points to draw line.") \newline
+(if (and (setq p1 (getpoint "First line point.")) \newline
+(setq p2 (getpoint p1 "Second line point.")) \newline
+) \newline
+(command "._line" p1 p2 "") \newline
+) \newline
+(princ) \newline
+) \newline
+(prompt "Type myline to run function.") \newline
+(princ) \newline
+[/code] \newline
+
+\section{VisualLisp}
+
+VisualLisp was designed as an extension of AutoLisp functionality. Its capabilities are much more powerful than AutoLisp, Has access to the Autocada object model. In addition, the development environment has been implemented in Autocad so no longer need to use external editors (as opposed to AutoLisp).
+
+It was introduced in the Autocad version 14 as a paid add-on that was introduced in the Autocad 200 version permanently. But since then, it has not been much developed by Autodesk, which has focused its efforts on more powerful programming interfaces.
+
+VisualLisp as AutoLisp continues to reproduce most of its limitations and is therefore suitable for professional use.
+
+\section{DCL}
+   
+   With the help of AutoLisp and VisualLisp, one can not fail to mention the Dialog Control Language (DCL), which makes it easy to build dialog boxes with simple tags.
+
+Although DCL has very limited capabilities, no language support is available from the Autocad command line.
+
+Code example:
+\newline
+\newline
+[code language="css"] helloWorld : dialog { \newline
+label = "Okno hello world"; \newline
+: text { \newline
+key = "hello world"; \newline
+} \newline
+ok_only; \newline
+} \newline
+[/code] \newline
+This code is saved in a DCL file and then executed with the help of "lispa":
+
+[code language="css"] (setq helloWorld (load_dialog "helloWorld.dcl")) \newline
+(new_dialog "helloWorld" helloWorld) \newline
+(start_dialog) \newline
+(unload_dialog helloWorld) \newline
+[/code] \newline
+
+\section{VBA}
+
+Visual Basic for Application is derived from Microsoft Visual Basic and used in many different applications, including Autocad. In Autocad obtains access to objects via the ActiveX interface.
+
+ActiveX Automotion was introduced to Autocad at the same time as VisualLisp.
+
+No further development of VisualLisp can be attributed to the fact that VBA had the advantage over it in the form of a built-in dialog box.
+
+In 2007, Microsoft stopped supporting Autodesk in distributing this technology, encouraging developers to use the .Net API.
+
+Autodesk has pushed out unauthorized Microsoft support to 2010, currently no longer has the development environment for VBA, and the language is no longer being developed.
+
+\section{ADS}
+
+Autocad Development System is a set of libraries written in C language. This interface allows you to create applications for Autocad in C and C ++.
+
+An external programming environment and programming expertise is needed to create an overlay using ADS.
+
+Compared to previous technologies, the speed of C / C ++ programming is increasing significantly, and the possibilities of application development are almost unlimited. You can not only insert parameterized blocks, but also "plug" into Autocad message loops or overwrite the default functionality of built-in functions.
+
+The big plus of this technology was until recently that most of the "clones" implemented various variants, most of the functions overlapped - so when typing the overlay was very likely that without major problems (separate compilation with the appropriate CAD libraries) progam It will work on Autocad and Intellicad. Obviously, in the "clones" implementations of subsequent interfaces appear, but they have a long delay in relation to the Autodesk original.
+
+The basic data structure in ADS is resbuf, which contains messages about the type of data contained in it, values written in union form, and pointer to the next resbuf element.
+\newline
+\newline
+[code language="cpp"] union ads_u_val { \newline
+ads_real rreal; \newline
+ads_real rpoint[3]; \newline
+short rint; \newline
+char *rstring; \newline
+long rlname[2]; \newline
+long rlong; \newline
+struct ads_binary rbinary; \newline
+struct resbuf { struct resbuf *rbnext; \newline
+short restype; \newline
+union ads_u_val resval;\newline
+[/code] \newline
+ \newline
+ Data is saved as reselection strings and DXF-based objects (which are also modified with Autocad versions).
+ \newline
+ Example code inserting a line in ADS:
+ \newline
+ \newline
+ [code language="cpp"] resbuf * entlist=ads_buildlist(RTDXF0, "line", // object type \newline
+8, "Layer", // Layer name \newline
+6, "dashdot", //line type: dashdot, continuous etc. \newline
+62, 0, // Color number, values from 0 to 255 \newline
+48, 1, //scale of line \newline
+10, p1, // first point \newline
+11, p2, // last point \newline
+RTNONE); \newline
+ads_entmake(entlist); //adding "line" object to drawing \newline
+[/code] \newline
+\newline
+ 
+ \section{ObjectARX}
+ Autocad Runtime eXtension is an API that is the next stage in extending Autocad functionality, which includes a set of libraries and C ++ header files. All SDKs can be downloaded for free from Autodesk sites.
+
+ObjectARX is the most powerful of all available interfaces, contains all the elements that are available in ADS and develops them with additional functionality.
+
+The performance of this technology is the same as the performance of Autocad's own functions, and Autodesk's use of Autocad extensions such as Autodesk MAP and Architectural Desktop can also be attributed to Autodesk.
+
+Of course, Autocad treading on the heels of the competition is trying to make portability portable. Clones based on the DWGDirect library of the Open Design Alliance have the ability to use the ObjectARX-DRX emulation API (eg Intellicad since version 7, previous versions only implemented ADS).
+
+Some say that ObjectARX is the hardest interface for a programmer although I would bet that it is easier than ADS. However, to get started with it requires knowledge of programming in C ++ and an external development environment (eg Microsoft Visual Studio).
+
+Code example:
+
+[code language="cpp"] //collecting database from the drawing \newline
+AcDbDatabase* pDB = acdbHostApplicationServices()->workingDatabase(); 
+//gets the right container for the object being drawn \newline
+AcDbBlockTable *pBlockTable = NULL; \newline
+pDB->getSymbolTable(pBlockTable, AcDb::kForRead); 
+//Wewnątrz BlockTable otwieramy ModelSpace do zapisu \newline
+AcDbBlockTableRecord* pBlockTableRecord = NULL; \newline
+pBlockTable\(->\)getAt(ACDB_MODEL_SPACE, pBlockTableRecord, AcDb::kForWrite); 
+//closing block table \newline
+pBlockTable->close();
+//declining points of line \newline
+AcGePoint3d p1(1.0, 1.0, 0.0);
+AcGePoint3d p2(10.0, 10.0, 0.0);
+//Tworzymy instancje linii \newline
+AcDbLine *pLine = new AcDbLine(p1, p2);
+//locating line \newline
+AcDbObjectId lineId = AcDbObjectId::kNull; \newline
+pBlockTableRecord\(->\)appendAcDbEntity(lineId, pLine);
+//To finish the operation it is needed to clean it up so close the ModelSpace and the created object \newline
+pBlockTableRecord\(->\)close(); \newline
+pLine\(->\)close(); \newline
+[/code] \newline
+
+   \section{DWG}
+   
+   DWG - a proprietary binary file format created by AutoCAD.
+This format was created by Autodesk to support AutoCAD software and derivative programs. Two- and three-dimensional models are written in this format. The owner of the format, Autodesk, distributes it and changes it once every few years with the release of the new version of AutoCAD.
+DWG format with ASCII variant - DXF has become de facto standard format for CAD design.
+
+The proprietary format DWG is currently the most used file format in CAD, becoming a de facto standard, without other alternative extended, forcing many users to use this software in a dominant position on the part of the owner company Autodesk.
+There exists the OpenDWG library, to access and manipulate data stored in DWG format, which is developed by reverse engineering by an association of manufacturers of CAD software with the intention of supporting their products. As OpenDWG's license does not allow the usage in free software projects, the FSF wants to create an alternative to OpenDWG.
+
+
+\subsection{DWG Support in Freemium and Free Software}
+As neither RealDWG nor DWGdirect are licensed on terms that are compatible with free software licenses like the GNU GPL, in 2008 the Free Software Foundation asserted the need for an open replacement for the DWG format. Therefore, the FSF placed the goal 'Replacement for OpenDWG libraries in 10th place on their High Priority Free Software Projects list. Forked in late 2009 from libDWG as GNU LibreDWG project it can read most parts of DWG files from version R13 up to 2004. But as the libreDWG library is released under the GNU GPLv3 it can't be used by most targeted FOSS graphic software, like FreeCAD, LibreCAD and Blender, due to a GPLv2/GPLv3 license incompatibility. Due to this struggles in September 2013, the original project LibDWG re-forked its code from LibreDWG. A GPLv2 licensed alternative is the libdxfrw project, which can read simple DWGs. 
+FreeCAD is a free and open-source application that can work with the DWG files by utilizing the proprietary Teigha file converter for .dwg and .dxf files from the Open Design Alliance. 
+LibreCAD is a free and open-source 2D CAD application that can open DWG and DXF files using your own library.
+Teigha Viewer is a freeware stand-alone viewer for .dwg and .dgn files built on the Teigha development platform from the Open Design Alliance. It runs on Windows, Linux, MacOS and Android operating systems.
+Autodesk DWG TrueView is a freeware stand-alone DWG viewer with DWG TrueConvert software included, built on the same viewing engine as AutoCAD software. The freeware Autodesk Design Review software adds a possibility to open DWG files in Design Review to take advantage of measure and markup capabilities, sheet set organization, and status tracking.
+DraftSight is a freemium CAD software from Dassault Systèmes that lets users create, edit and view DWG files. It runs on Linux, Mac and Windows operating systems. 
+DWG files can be displayed online by ShareCAD, a free online viewer. This service also offers a free IFrame plug-in for viewing DWG files at a site.
+
+\subsection{LibDWG – free access to DWG}
+
+This is a library to allow reading data from a DWG file. That's a very important acquisiton, which may improve a lot the ability of the free software comunity to develop more features in the field of computer technical drawing (CAD).
+The DWG structure is very complicated, it seems to be crafted so that none can easily understand it. That's a strong reason to not use it, and that's also why we do not provide the writing feature in the library. One should use LibDWG mainly to read such files, filtering them to some other format, free and usable.
+It's easy to figure out the intention to create something like a filter, which takes a DWG file and transform it to one (or several) of the open alternatives (whenever there be one). It is a long way to reach this goal.
+
+
+   
+   \section{DXF}
+   
+   It is one of the most popular formats in which you can read 2D as well as 3D elements. Specification of the same template format by Autodesk and a fundamental basis for the exchange of information between AutoCAD and 3D Studio. Over time, the ten format spread and began to be shared by others. Its popularity is related to the copyright related to its sharing in the documentation. DXF is an ASCII text file, so you can improve every save and memorize capability on any hardware and system platform. The downside to this is the relatively large file size compared to its binary DWG counterpart, as well as greater read and write time for the file.
+   
+   
+   The internal organization of the DXF file is very simple. It consists of pairs of lines in which the odd always contains a "code" defining the meaning of "value" in the next even number. "Code" is always a string that can be converted to an integer. "Value" is a string whose meaning is interpreted accordingly to the preceding "code".
+The structure of a typical DXF file consists of the following sections:
+\begin{itemize}
+\item HEADER - general information about the drawing, can be found in it, such as the name of the program that wrote this file (always on the "code" code of the appropriate meaning and followed by "values").
+\item TABLES - a section that describes the special elements of the drawing that have their names and are organized into tables:
+\begin{itemize}
+\item Linetype (LTYPE) table - An array with line type definitions,
+\item Layer table - an array with drawing layer definitions,
+\item Text style (STYLE) table - an array with the font type definitions,
+\item View table - An array with definitions of saved 3D view settings,
+\item User Coordinate System (UCS) table - table with saved locale coordinate system settings,
+\item Viewport configuration (VPORT) table - table with drawing window settings (viewports),
+\item Drawing manager (DWGMGR) table - table reserved for future use,
+\end{itemize}
+\item BLOCKS - definitions of drawing blocks, ie repetitive elements composed of many basic elements,
+\item ENTITIES - the most important section of a file - describes the shape and properties of all the basic elements that comprise the drawing,
+\item END OF FILE - end of file tag
+
+\end{itemize}
+
+The above items are specific to drawings created by Autodesk programs. Files from third-party applications often only contain ENTITIES, which is fully acceptable.
+DXF files saved by AutoCAD sometimes contain data in encoded form. This applies to solids and surfaces created using the Spatial ACIS modeling system, which is part of AutoCAD. This is a clear breakthrough in DXF's "openness" policy so far and has limited access to drawings by third-party programs.
+   
+   \begingroup
+\renewcommand{\section}[2]{}%
+\begin{thebibliography}{1}
+
+\bibitem{c1} D. Mukunoki, D. Takahashi. Optimization of Sparse Matrix-Vector Multiplica-tion for CRS Format on NVIDIA Kepler Architecture GPUs.ComputationalScience and Its Applications - ICCSA 2013, 7975:211–223, 2013
+
+\bibitem{c2} CUBLAS Library v.7.0,http://docs.nvidia.com/cuda/cublas/.
+
+\bibitem{c3} NVIDIA Co. Whitepaper-NVIDIA’s Next Generation CUDA Compute Archi-tecture Kepler GK110,http://www.nvidia.com/NVIDIA-Kepler-GK110-Architecture-Whitepaper.pdf. 
+
+\bibitem{c4} K. Kourtis, G. Goumas, N. Koziris. Exploiting Compression Opportunities toImprove SpMxV Performance on Shared Memory Systems.ACM Trans. Archit.Code Optim., 7(3):1544–3566, 2010.
+
+\bibitem{c5} A. Dziekonski, A. Lamecki, M. Mrozowski. Tuning A Hybrid GPU-CPU V-cycleMultilevel Preconditioner for Solving Large Real and Complex Systems of FEMEquations.Antennas and Wireless Propagation Letters, IEEE, 10:619–622, 2011.
+
+\bibitem{c6} https://www.cise.ufl.edu/research/sparse/
+matrices/
+
+\bibitem{c7} http://math.nist.gov/MatrixMarket/
+
+\bibitem{c8} Z. Bai, J. Demmel, J. Dongarra, A. Ruhe, H. van der Vorst.Templates for the So-lution of Algebraic Eigenvalue Problems: A Practical Guide. SIAM, Philadelphia,PA, 2000.
+
+\bibitem{c9} N. Bell, M. Garland. Efficient Sparse Matrix–Vector Multiplication on CUDA.Raport instytutowy, NVIDIA Co., 2008.
+
+\bibitem{c10} http://www.nvidia.com/object/cuda_home_new.html
+
+\bibitem{c11} NVIDIA Co. Computed Unified Device Architectrure, 
+
+\bibitem{c12} I.Reguly,M.Giles, Efficient sparse matrix-vector multiplication
+on cache-based GPUs.
+
+\bibitem{c13} A. Dziekonski, A. Lamecki, and M. Mrozowski. A memory efficient and fast sparse matrix vector product on a GPU. Progress In Electromagnetic Research, 2011.
+
+
+\end{thebibliography}
+\endgroup
+   
+   \end{document}
