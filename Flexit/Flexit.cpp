@@ -250,6 +250,8 @@ void Flexit::loadData(QString fileNameWithPath)
 		project->set_MyGust(g);
 	}
 
+	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, latin1BAFileNameWithPathString.data());
+
 	// Try to read the Velocity Field History data.
 	ITIO::readMyVelocityFieldHistoryFromFile(latin1BAFileNameWithPathString.data());
 

@@ -26,6 +26,7 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.setupUi(this);
 
 	QIcon icon = QIcon("Resources/blackDot.png");
+	ui.action_Flexit->setEnabled(false);
 
 	// Default display OpenGL axes enabled.
 	//ui.actionAxes->setIcon( icon );
@@ -137,7 +138,9 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 }
 
 void Designit::on_action_Flexit_triggered() {
-	QString fileName = "autosave.json";
+
+	QString fileName = "/autosave.json";
+	fileName = QDir::currentPath().append(fileName);
 
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly))
@@ -166,7 +169,9 @@ void Designit::on_action_Flexit_triggered() {
 	// Send the HTTP request.
 	sendHTTPRequest(QString("File"), QString("Saved"), 0.0, 0, DataFileNameWithPath);
 
-	system("Flexit.exe autosave.json");
+	std::string launch = "Flexit.exe " + fileName.toStdString();
+
+	system(launch.c_str());
 }
 
 void Designit::on_actionOpen_triggered()
@@ -177,6 +182,7 @@ void Designit::on_actionOpen_triggered()
 	{
 		if (!UnsavedChanges)
 		{
+			ui.action_Flexit->setEnabled(true);
 			QString d = QDir::currentPath();
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionOpen_triggered. Current path: %s", d.toStdString().c_str());
 			QString fileNameWithPath = QFileDialog::getOpenFileName(this, tr("Open File"), d.append("/Data"), tr("JSON Files (*.json *.JSON);;Text Files (*.txt);;C++ Files (*.cpp *.h)"));
@@ -532,6 +538,7 @@ void Designit::closeProject()
 	// Send the HTTP request.
 	sendHTTPRequest(QString("File"), QString("Closed"), 0.0, 0, DataFileNameWithPath);
 
+	ui.action_Flexit->setEnabled(false);
 }
 
 void Designit::on_actionExit_triggered()
