@@ -136,6 +136,7 @@ public:
 	void createNewTrajectoryCurve(const int k);
 
 	void synchronizeSurfaceVectorsFromControl();
+	void manageComputationOfInterpolatedPoints();
 
 	// Admin methods.
 	void currentDateTime(char * currentTime);

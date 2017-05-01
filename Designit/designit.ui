@@ -307,8 +307,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>218</width>
-          <height>418</height>
+          <width>304</width>
+          <height>659</height>
          </rect>
         </property>
         <attribute name="label">
@@ -431,16 +431,12 @@
     </property>
     <addaction name="actionDrag"/>
     <addaction name="actionCentred_rotate"/>
-    <addaction name="actionDrag_row"/>
-    <addaction name="actionDrag_col"/>
-    <addaction name="actionDrag_all"/>
     <addaction name="separator"/>
-    <addaction name="actionRotate_all"/>
-    <addaction name="actionResize_all"/>
+    <addaction name="actionRotate"/>
+    <addaction name="actionResize"/>
     <addaction name="separator"/>
     <addaction name="actionShear"/>
-    <addaction name="actionPerspective"/>
-    <addaction name="actionFlip_horizontal"/>
+    <addaction name="actionFlip"/>
     <addaction name="actionCopy_surface"/>
     <addaction name="actionCopy_surface_mirror"/>
     <addaction name="separator"/>
@@ -518,16 +514,12 @@
    <addaction name="actionDelete_surface"/>
    <addaction name="separator"/>
    <addaction name="actionDrag"/>
+   <addaction name="actionRotate"/>
    <addaction name="actionCentred_rotate"/>
-   <addaction name="actionDrag_row"/>
-   <addaction name="actionDrag_col"/>
-   <addaction name="actionDrag_all"/>
-   <addaction name="actionResize_all"/>
    <addaction name="separator"/>
-   <addaction name="actionRotate_all"/>
    <addaction name="actionShear"/>
-   <addaction name="actionPerspective"/>
-   <addaction name="actionFlip_horizontal"/>
+   <addaction name="actionResize"/>
+   <addaction name="actionFlip"/>
    <addaction name="actionCopy_surface"/>
    <addaction name="actionCopy_surface_mirror"/>
    <addaction name="separator"/>
@@ -590,6 +582,9 @@
    <property name="text">
     <string>Drag</string>
    </property>
+   <property name="toolTip">
+    <string>Drag points</string>
+   </property>
   </action>
   <action name="actionNew_surface">
    <property name="icon">
@@ -600,36 +595,9 @@
     <string>New surface</string>
    </property>
   </action>
-  <action name="actionDrag_all">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_drag_all.png</normaloff>:/Resources/icon_drag_all.png</iconset>
-   </property>
-   <property name="text">
-    <string>Drag all</string>
-   </property>
-  </action>
   <action name="actionNormals">
    <property name="text">
     <string>Normals</string>
-   </property>
-  </action>
-  <action name="actionDrag_row">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_drag_row.png</normaloff>:/Resources/icon_drag_row.png</iconset>
-   </property>
-   <property name="text">
-    <string>Drag row</string>
-   </property>
-  </action>
-  <action name="actionDrag_col">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_drag_col.png</normaloff>:/Resources/icon_drag_col.png</iconset>
-   </property>
-   <property name="text">
-    <string>Drag col</string>
    </property>
   </action>
   <action name="actionInterpolated_points">
@@ -642,22 +610,28 @@
     <string>Control points</string>
    </property>
   </action>
-  <action name="actionRotate_all">
+  <action name="actionRotate">
    <property name="icon">
     <iconset resource="designit.qrc">
      <normaloff>:/Resources/icon_rotate_all.png</normaloff>:/Resources/icon_rotate_all.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate all</string>
+    <string>Rotate</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate points</string>
    </property>
   </action>
-  <action name="actionResize_all">
+  <action name="actionResize">
    <property name="icon">
     <iconset resource="designit.qrc">
      <normaloff>:/Resources/icon_resize_all.png</normaloff>:/Resources/icon_resize_all.png</iconset>
    </property>
    <property name="text">
-    <string>Resize all</string>
+    <string>Resize</string>
+   </property>
+   <property name="toolTip">
+    <string>Resize surfaces</string>
    </property>
   </action>
   <action name="actionShear">
@@ -669,15 +643,6 @@
     <string>Shear</string>
    </property>
   </action>
-  <action name="actionPerspective">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_perspective_all.png</normaloff>:/Resources/icon_perspective_all.png</iconset>
-   </property>
-   <property name="text">
-    <string>Perspective</string>
-   </property>
-  </action>
   <action name="actionPlayout_Test">
    <property name="icon">
     <iconset resource="designit.qrc">
@@ -687,13 +652,16 @@
     <string>Playout Test</string>
    </property>
   </action>
-  <action name="actionFlip_horizontal">
+  <action name="actionFlip">
    <property name="icon">
     <iconset resource="designit.qrc">
      <normaloff>:/Resources/icon_flip_horizontal.png</normaloff>:/Resources/icon_flip_horizontal.png</iconset>
    </property>
    <property name="text">
-    <string>Flip all horizontal</string>
+    <string>Flip surface</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip surface</string>
    </property>
   </action>
   <action name="actionClose">

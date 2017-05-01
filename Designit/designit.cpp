@@ -138,6 +138,11 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	systemFunctions.emplace("redoRowDelete", &Designit::redoRowDelete);
 	systemFunctions.emplace("redoColumnDelete", &Designit::redoColumnDelete);
 
+	systemFunctions.emplace("undoPointGroupMove", &Designit::undoPointGroupMove);
+	systemFunctions.emplace("undoPointGroupRotate", &Designit::undoPointGroupRotate);
+	systemFunctions.emplace("redoPointGroupMove", &Designit::redoPointGroupMove);
+	systemFunctions.emplace("redoPointGroupRotate", &Designit::redoPointGroupRotate);
+
 	ui.commandLine->installEventFilter(this);
 }
 
@@ -560,6 +565,9 @@ void Designit::closeProject()
 	// Send the HTTP request.
 	sendHTTPRequest(QString("File"), QString("Closed"), 0.0, 0, DataFileNameWithPath);
 
+	undoRedo.reset();
+	finishEditAllViews();
+
 	ui.action_Flexit->setEnabled(false);
 }
 
@@ -758,7 +766,7 @@ void Designit::on_actionDelete_surface_triggered()
 		this->ui.actionDelete_surface->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -878,7 +886,7 @@ void Designit::on_actionCopy_surface_triggered()
 		this->ui.actionCopy_surface->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -915,7 +923,7 @@ void Designit::on_actionDrag_triggered()
 		this->ui.actionDrag->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -923,120 +931,6 @@ void Designit::on_actionDrag_triggered()
 
 	// Finally force process events.
 	QApplication::processEvents();
-}
-
-void Designit::on_actionDrag_row_triggered()
-{
-	// Set all the buttons to "normal" icons.
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != DRAG_ROW)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = DRAG_ROW;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_drag_row_highlight.png");
-		this->ui.actionDrag_row->setIcon(icon);
-
-		IsHorizontalDragOnly = false;
-		IsVerticalDragOnly = false;
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_drag_row.png");
-		this->ui.actionDrag_row->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres.
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-
-}
-
-void Designit::on_actionDrag_col_triggered()
-{
-	// Set all the buttons to "normal" icons.
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != DRAG_COL)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = DRAG_COL;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_drag_col_highlight.png");
-		this->ui.actionDrag_col->setIcon(icon);
-
-		IsHorizontalDragOnly = false;
-		IsVerticalDragOnly = false;
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_drag_col.png");
-		this->ui.actionDrag_col->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres.
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-
-}
-
-void Designit::on_actionDrag_all_triggered()
-{
-	// Set all the buttons to "normal" icons.
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != DRAG_ALL)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = DRAG_ALL;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_drag_all_highlight.png");
-		this->ui.actionDrag_all->setIcon(icon);
-
-		IsHorizontalDragOnly = false;
-		IsVerticalDragOnly = false;
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_drag_all.png");
-		this->ui.actionDrag_all->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres.
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-
 }
 
 void Designit::resetModeButtons()
@@ -1045,29 +939,17 @@ void Designit::resetModeButtons()
 	QIcon icon1 = QIcon("Resources/icon_drag.png");
 	this->ui.actionDrag->setIcon(icon1);
 
-	QIcon icon2 = QIcon("Resources/icon_drag_row.png");
-	this->ui.actionDrag_row->setIcon(icon2);
-
-	QIcon icon3 = QIcon("Resources/icon_drag_col.png");
-	this->ui.actionDrag_col->setIcon(icon3);
-
-	QIcon icon4 = QIcon("Resources/icon_drag_all.png");
-	this->ui.actionDrag_all->setIcon(icon4);
-
 	QIcon icon5 = QIcon("Resources/icon_rotate_all.png");
-	this->ui.actionRotate_all->setIcon(icon5);
+	this->ui.actionRotate->setIcon(icon5);
 
 	QIcon icon6 = QIcon("Resources/icon_resize_all.png");
-	this->ui.actionResize_all->setIcon(icon6);
+	this->ui.actionResize->setIcon(icon6);
 
 	QIcon icon7 = QIcon("Resources/icon_shear.png");
 	this->ui.actionShear->setIcon(icon7);
 
-	QIcon icon8 = QIcon("Resources/icon_perspective_all.png");
-	this->ui.actionPerspective->setIcon(icon8);
-
 	QIcon icon9 = QIcon("Resources/icon_flip_horizontal.png");
-	this->ui.actionFlip_horizontal->setIcon(icon9);
+	this->ui.actionFlip->setIcon(icon9);
 
 	QIcon icon10 = QIcon("Resources/icon_copy.png");
 	this->ui.actionCopy_surface->setIcon(icon10);
@@ -1135,7 +1017,7 @@ void Designit::on_actionCopy_surface_mirror_triggered()
 		this->ui.actionCopy_surface_mirror->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Delete scratch point.
 		delete ui.myXYView->get_ScratchControlPoint();
@@ -1148,7 +1030,7 @@ void Designit::on_actionCopy_surface_mirror_triggered()
 	QApplication::processEvents();
 }
 
-void Designit::on_actionRotate_all_triggered()
+void Designit::on_actionRotate_triggered()
 {
 	resetModeButtons();
 
@@ -1159,7 +1041,7 @@ void Designit::on_actionRotate_all_triggered()
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_rotate_all_highlight.png");
-		this->ui.actionRotate_all->setIcon(icon);
+		this->ui.actionRotate->setIcon(icon);
 	}
 	else
 	{
@@ -1168,10 +1050,10 @@ void Designit::on_actionRotate_all_triggered()
 
 		// Reset the icon.
 		QIcon icon = QIcon("Resources/icon_rotate_all.png");
-		this->ui.actionRotate_all->setIcon(icon);
+		this->ui.actionRotate->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1204,7 +1086,7 @@ void Designit::on_actionInsert_row_triggered()
 		this->ui.actionInsert_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1237,7 +1119,7 @@ void Designit::on_actionMerge_surfaces_by_row_reverse_triggered()
 		this->ui.actionMerge_surfaces_by_row_reverse->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1271,7 +1153,7 @@ void Designit::on_actionMerge_surfaces_by_row_triggered()
 		this->ui.actionMerge_surfaces_by_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1306,7 +1188,7 @@ void Designit::on_actionMeasure_distance_triggered()
 		this->ui.actionMeasure_distance->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1504,7 +1386,7 @@ void Designit::on_actionMate_points_triggered()
 		this->ui.actionMate_points->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1538,7 +1420,7 @@ void Designit::on_actionInsert_col_triggered()
 		this->ui.actionInsert_col->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1571,7 +1453,7 @@ void Designit::on_actionDelete_row_triggered()
 		this->ui.actionDelete_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1605,7 +1487,7 @@ void Designit::on_actionDelete_col_triggered()
 		this->ui.actionDelete_col->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1638,7 +1520,7 @@ void Designit::on_actionDuplicate_row_triggered()
 		this->ui.actionDuplicate_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1672,7 +1554,7 @@ void Designit::on_actionDuplicate_col_triggered()
 		this->ui.actionDuplicate_col->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1682,30 +1564,25 @@ void Designit::on_actionDuplicate_col_triggered()
 	QApplication::processEvents();
 }
 
-void Designit::emptyFocusVectors()
+void Designit::finishEditAllViews()
 {
-	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-	{
-		int N = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size();
-		for (int n = 0; n < N; n++)
-		{
-			project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->pop_back();
-		}
-	}
+	ui.myXYView->finishEdit();
+	ui.myXZView->finishEdit();
+	ui.myYZView->finishEdit();
 }
 
-void Designit::on_actionResize_all_triggered()
+void Designit::on_actionResize_triggered()
 {
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != RESIZE_ALL)
+	if (MY_EDIT_MODE != RESIZE)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = RESIZE_ALL;
+		MY_EDIT_MODE = RESIZE;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_resize_all_highlight.png");
-		this->ui.actionResize_all->setIcon(icon);
+		this->ui.actionResize->setIcon(icon);
 	}
 	else
 	{
@@ -1714,10 +1591,10 @@ void Designit::on_actionResize_all_triggered()
 
 		// Reset the icon.
 		QIcon icon = QIcon("Resources/icon_Resize_all.png");
-		this->ui.actionResize_all->setIcon(icon);
+		this->ui.actionResize->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -1732,10 +1609,10 @@ void Designit::on_actionShear_triggered()
 {
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != SHEAR_ALL)
+	if (MY_EDIT_MODE != SHEAR)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = SHEAR_ALL;
+		MY_EDIT_MODE = SHEAR;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_shear_highlight.png");
@@ -1751,7 +1628,7 @@ void Designit::on_actionShear_triggered()
 		this->ui.actionShear->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -1761,40 +1638,7 @@ void Designit::on_actionShear_triggered()
 	QApplication::processEvents();
 }
 
-void Designit::on_actionPerspective_triggered()
-{
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != PERSPECTIVE_ALL)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = PERSPECTIVE_ALL;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_perspective_all_highlight.png");
-		this->ui.actionPerspective->setIcon(icon);
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_perspective_all.png");
-		this->ui.actionPerspective->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres).
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-}
-
-void Designit::on_actionFlip_horizontal_triggered()
+void Designit::on_actionFlip_triggered()
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionFlip_horizontal_triggered");
 
@@ -1807,7 +1651,7 @@ void Designit::on_actionFlip_horizontal_triggered()
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_flip_horizontal_highlight.png");
-		this->ui.actionFlip_horizontal->setIcon(icon);
+		this->ui.actionFlip->setIcon(icon);
 	}
 	else
 	{
@@ -1816,10 +1660,10 @@ void Designit::on_actionFlip_horizontal_triggered()
 
 		// Reset the icon.
 		QIcon icon = QIcon("Resources/icon_flip_horizontal.png");
-		this->ui.actionFlip_horizontal->setIcon(icon);
+		this->ui.actionFlip->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -1854,7 +1698,7 @@ void Designit::on_actionCentred_rotate_triggered()
 		this->ui.actionCentred_rotate->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -3731,10 +3575,10 @@ int Designit::deleteSurface(const QStringList & arguments, const bool reg)
 
 		project->deleteSurface(surfaceID);
 
-		w->undoRedo.registerSurface(tmp, tmpBase);
-
 		if (reg)
 		{
+			w->undoRedo.registerSurface(tmp, tmpBase);
+
 			QStringList revCommand;
 
 			revCommand.push_back("redoSurfaceDelete");
@@ -4234,7 +4078,6 @@ int Designit::deleteRow(const QStringList & arguments, const bool reg)
 
 			project->getSurface(surfaceID)->getRowCopy(i, tmp);
 
-
 			project->deleteRow(surfaceID, i);
 
 			w->undoRedo.registerRow(surfaceID, i, tmp);
@@ -4519,6 +4362,94 @@ int Designit::redoColumnDelete(const QStringList & arguments, const bool reg)
 	w->updateAllTabs();
 
 	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::undoPointGroupMove(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.undoGroupPointsMove(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+	
+	return 0;
+}
+
+int Designit::undoPointGroupRotate(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.undoGroupPointsRotate(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::redoPointGroupMove(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.redoGroupPointsMove(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::redoPointGroupRotate(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.redoGroupPointsRotate(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
 
 	return 0;
 }

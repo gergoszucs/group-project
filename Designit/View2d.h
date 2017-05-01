@@ -19,6 +19,7 @@ public:
 	void set_plane(PLANE p);
 
 	void setSceneParameters(float eyeX, float eyeY, float eyeZoom);
+	void finishEdit();
 
 protected:
 
@@ -40,33 +41,33 @@ private:
 	int yRot;
 	int zRot;
 
-	float eyeX;
-	float eyeY;
-	float eyeZoom;
+	float eyeX = 0.0;
+	float eyeY = 0.0;
+	float eyeZoom = 1.0;
 
 	int myWidth;
 	int myHeight;
 
 	QPoint lastPos;
 
-	bool primedForClick;
-
-	// bool drawDial = false;
-	// float dialCentreX, dialCentreY, dialAngle;
-	// float dialSize = 2;
+	bool primedForClick = false;
 
 	ITControlPoint *_ScratchControlPoint; // Used for MATCH_POINT mode.
-	bool scrachPointReady;
+	bool scrachPointReady = false;
 
-	bool singleSelect;
+	bool singleSelect = false;
 
-	PLANE _plane;
+	PLANE _plane = XY;
+
+	float angleRotated = 0.0;
+	float draggedX = 0.0;
+	float draggedY = 0.0;
+	float draggedZ = 0.0;
 
 	std::vector< ITControlPoint* > focusedPoints;
 	std::vector< ITControlPoint* > focusedPoints_light;
 
 	// Utility methods.
-	void finishEdit();
 	void findControlPointIndicesNearMouse(double posX, double posY, int *targetK, int *targetI, int *targetJ);
 	void getAxesPos(float& pX, float& pY, const int x, const int y);
 	void addFocusPoint(ITControlPoint* p);
@@ -82,5 +83,4 @@ private:
 	void drawMyGrids();
 	void drawMyScratchControlPoint();
 	void drawSphere(double r, int lats, int longs, float R, float GG, float B);
-	// void drawAngleDial();
 };

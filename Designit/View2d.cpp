@@ -37,12 +37,7 @@ View2d::View2d(QWidget *parent)
 		break;
 	}
 
-
 	setFocusPolicy(Qt::StrongFocus);
-
-	lastPos = QPoint(0, 0);
-
-	primedForClick = false;
 
 	// Instanciate the control point.
 	ITControlPoint *point = new ITControlPoint(0.0, 0.0, 0.0);
@@ -51,17 +46,6 @@ View2d::View2d(QWidget *parent)
 	get_ScratchControlPoint()->set_K(-1);
 	get_ScratchControlPoint()->set_I(-1);
 	get_ScratchControlPoint()->set_J(-1);
-
-	scrachPointReady = false;
-
-	_plane = XY;
-
-	_selectMode = POINT_M;
-	singleSelect = false;
-
-	eyeX = 0.0;
-	eyeY = 0.0;
-	eyeZoom = 1.0;
 
 	setMouseTracking(true);
 }
@@ -160,11 +144,6 @@ void View2d::draw()
 		{
 			drawMyGrids();
 		}
-
-		//if (drawDial)
-		//{
-		//	drawAngleDial();
-		//}
 
 		drawMyFocusControlPoints();
 		drawMyFocusControlPoints_light();
@@ -487,67 +466,6 @@ void View2d::drawSphere(double r, int lats, int longs, float R, float GG, float 
 	}
 }
 
-//void View2d::drawAngleDial()
-//{
-//	dialSize = glXYViewHalfExtent * 0.25;
-//
-//	float beginX = dialCentreX + dialSize;
-//	float beginY = dialCentreY;
-//
-//	float endX = dialCentreX + dialSize * cosf(dialAngle);
-//	float endY = dialCentreY + dialSize * sinf(dialAngle);
-//
-//	glBegin(GL_LINE_STRIP);
-//
-//	glVertex2f(beginX, beginY);
-//	glVertex2f(dialCentreX, dialCentreY);
-//	glVertex2f(endX, endY);
-//
-//	glEnd();
-//
-//	float angle = 0;
-//	float dAngle = 0.001;
-//
-//	float x = dialCentreX + dialSize * cosf(angle);
-//	float y = dialCentreY + dialSize * sinf(angle);
-//
-//	glBegin(GL_LINE_STRIP);
-//
-//	if (dialAngle > 0)
-//	{
-//		while (angle < dialAngle)
-//		{
-//			glVertex2f(x, y);
-//
-//			x = dialCentreX + 0.9 * dialSize * cosf(angle);
-//			y = dialCentreY + 0.9 * dialSize * sinf(angle);
-//
-//			angle += dAngle;
-//		}
-//	}
-//	else {
-//		dAngle = -dAngle;
-//
-//		while (angle > dialAngle)
-//		{
-//			glVertex2f(x, y);
-//
-//			x = dialCentreX + 0.9 * dialSize * cosf(angle);
-//			y = dialCentreY + 0.9 * dialSize * sinf(angle);
-//
-//			angle += dAngle;
-//		}
-//	}
-//
-//
-//	glEnd();
-//
-//	float textX = dialCentreX + dialSize * cosf(dialAngle / 2) * 1.2;
-//	float textY = dialCentreY + dialSize * sinf(dialAngle / 2) * 1.2;
-//
-//	renderText(textX, textY, 0, QString("%1 deg").arg(dialAngle * 180 / 3.14));
-//}
-
 // Event handling.
 void View2d::keyPressEvent(QKeyEvent * event)
 {
@@ -657,6 +575,7 @@ void View2d::mousePressEvent(QMouseEvent *event)
 		else if ((k > -1) && (i > -1) && (j > -1))
 		{
 			QMessageBox msgBox;
+			QStringList command, revCommand;
 
 			//handle click-based modes
 			switch (MY_EDIT_MODE)
@@ -670,41 +589,81 @@ void View2d::mousePressEvent(QMouseEvent *event)
 
 				ret = msgBox.exec();
 
+				command.push_back("flipSurfaceCentral");
+				command.push_back(QString::number(k));
+
 				switch (ret)
 				{
 				case 0:
 					project->flipSurfaceCentral(k, XY);
+					command.push_back("XY");
 					break;
 				case 1:
 					project->flipSurfaceCentral(k, YZ);
+					command.push_back("YZ");
 					break;
 				case 2:
 					project->flipSurfaceCentral(k, XZ);
+					command.push_back("XZ");
 					break;
 				}
+
+				w->undoRedo.registerCommand(command, command);
 
 				finishEdit();
 				break;
 			case COPY_SURFACE:
 				project->copySurface(k, 0, 0, 0);
 
+				command.push_back("copySurface");
+				command.push_back(QString::number(k));
+				command.push_back("0");
+				command.push_back("0");
+				command.push_back("0");
+
+				revCommand.push_back("deleteSurface");
+				revCommand.push_back(QString::number(k));
+
+				w->undoRedo.registerCommand(command, revCommand);
+
 				finishEdit();
 				break;
 			case DELETE_SURFACE:
+				auto tmp = project->getSurface(k);
+				auto tmpBase = project->getBaseSurface(k);
+
 				project->deleteSurface(k);
+
+				w->undoRedo.registerSurface(tmp, tmpBase);
+
+				command.push_back("deleteSurface");
+				command.push_back(QString::number(k));
+
+				revCommand.push_back("redoSurfaceDelete");
+
+				w->undoRedo.registerCommand(command, revCommand);
 
 				finishEdit();
 				break;
 			case INSERT_ROW:
 				if (i == project->getSurface(k)->sizeX() - 1)
 				{
-					// The user is trying to insert a row after the last row which is not possible, so display a warning dialogue.
 					QMessageBox::StandardButton reply;
 					reply = QMessageBox::warning(this, "Insert Row", "You cannot insert a row after the last row");
 				}
 				else
 				{
 					project->insertRow(k, i);
+
+					command.push_back("insertRow");
+					command.push_back(QString::number(k));
+					command.push_back(QString::number(i));
+
+					revCommand.push_back("deleteRow");
+					revCommand.push_back(QString::number(k));
+					revCommand.push_back(QString::number(i + 1));
+
+					w->undoRedo.registerCommand(command, revCommand);
 				}
 
 				finishEdit();
@@ -712,10 +671,23 @@ void View2d::mousePressEvent(QMouseEvent *event)
 			case DELETE_ROW:
 				project->deleteRow(k, i);
 
+				//TODO: undo command
+
 				finishEdit();
 				break;
 			case DUPLICATE_ROW:
+
 				project->duplicateRow(k, i);
+
+				command.push_back("duplicateRow");
+				command.push_back(QString::number(k));
+				command.push_back(QString::number(i));
+
+				revCommand.push_back("deleteRow");
+				revCommand.push_back(QString::number(k));
+				revCommand.push_back(QString::number(i + 1));
+
+				w->undoRedo.registerCommand(command, revCommand);
 
 				finishEdit();
 				break;
@@ -729,6 +701,16 @@ void View2d::mousePressEvent(QMouseEvent *event)
 				else
 				{
 					project->insertColumn(k, j);
+
+					command.push_back("insertColumn");
+					command.push_back(QString::number(k));
+					command.push_back(QString::number(j));
+
+					revCommand.push_back("deleteColumn");
+					revCommand.push_back(QString::number(k));
+					revCommand.push_back(QString::number(j + 1));
+
+					w->undoRedo.registerCommand(command, revCommand);
 				}
 
 				finishEdit();
@@ -736,10 +718,22 @@ void View2d::mousePressEvent(QMouseEvent *event)
 			case DELETE_COL:
 				project->deleteColumn(k, j);
 
+				//TODO: undo command
+
 				finishEdit();
 				break;
 			case DUPLICATE_COL:
 				project->duplicateColumn(k, j);
+
+				command.push_back("duplicateColumn");
+				command.push_back(QString::number(k));
+				command.push_back(QString::number(j));
+
+				revCommand.push_back("deleteColumn");
+				revCommand.push_back(QString::number(k));
+				revCommand.push_back(QString::number(j + 1));
+
+				w->undoRedo.registerCommand(command, revCommand);
 
 				finishEdit();
 				break;
@@ -755,6 +749,8 @@ void View2d::mousePressEvent(QMouseEvent *event)
 				else
 				{
 					project->matePoints(_ScratchControlPoint->get_K(), _ScratchControlPoint->get_I(), _ScratchControlPoint->get_J(), k, i, j);
+
+					//TODO: undo command
 
 					finishEdit();
 				}
@@ -784,6 +780,10 @@ void View2d::mousePressEvent(QMouseEvent *event)
 					project->flipSurfaceCentral(surfaceID, XZ);
 					break;
 				}
+
+				//TODO: undo command
+
+				finishEdit();
 				break;
 			case MERGE_SURFACES_BY_ROW:
 				finishEdit();
@@ -1088,9 +1088,13 @@ void View2d::mouseMoveEvent(QMouseEvent *event)
 					project->movePoint(it->get_K(), it->get_I(), it->get_J(), diffX, diffY, diffZ, false);
 				}
 
+				draggedX += diffX;
+				draggedY += diffY;
+				draggedZ += diffZ;
+
 				UnsavedChanges = true;
 			}
-			else if ((MY_EDIT_MODE == ROTATE) && (scrachPointReady))
+			else if ((MY_EDIT_MODE == ROTATE) && (scrachPointReady) && (focusedPoints.size() > 0))
 			{
 				float thetaOld = atan2(old_posY - _ScratchControlPoint->get_Y(), old_posX - _ScratchControlPoint->get_X());
 				float thetaNew = atan2(posY - _ScratchControlPoint->get_Y(), posX - _ScratchControlPoint->get_X());
@@ -1102,13 +1106,14 @@ void View2d::mouseMoveEvent(QMouseEvent *event)
 					project->rotatePoint(it->get_K(), it->get_I(), it->get_J(), _ScratchControlPoint->get_X(), _ScratchControlPoint->get_Y(), _ScratchControlPoint->get_Z(), dTheta, _plane, false);
 				}
 
+				angleRotated += dTheta;
+
 				UnsavedChanges = true;
-
-				////dialAngle += dTheta;
-
 			}
-			else if (MY_EDIT_MODE == RESIZE_ALL)
+			else if (MY_EDIT_MODE == RESIZE)
 			{
+				//TODO: undo command, implementation
+
 				//project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mouseMoveEvent. RESIZE_ALL");
 
 				//// Rotate the Focus points around the first point in the focus vector. 
@@ -1118,8 +1123,10 @@ void View2d::mouseMoveEvent(QMouseEvent *event)
 				//UnsavedChanges = true;
 				//w->setMyTextDataField(QString::number(get_EditValue()));
 			}
-			else if (MY_EDIT_MODE == SHEAR_ALL)
+			else if (MY_EDIT_MODE == SHEAR)
 			{
+				//TODO: undo command, implementation
+
 				/*project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mouseMoveEvent. SHEAR_ALL");
 
 				float dx = 0.001*(x - xold);
@@ -1134,6 +1141,8 @@ void View2d::mouseMoveEvent(QMouseEvent *event)
 			}
 			else if (MY_EDIT_MODE == CENTRED_ROTATE)
 			{
+				//TODO: undo command, implementation
+
 				//if (get_SecondClicksFinished())
 				//{
 				//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "Inside mouseMoveEvent. CENTRED_ROTATE");
@@ -1205,6 +1214,84 @@ void View2d::mouseReleaseEvent(QMouseEvent *event)
 	//{
 	//	drawDial = false;
 	//}
+
+	QStringList command, revCommand;
+	int id;
+
+	switch (MY_EDIT_MODE)
+	{
+	case DRAG:
+
+		if (focusedPoints.size() != 0)
+		{
+			id = w->undoRedo.registerPointsGroupMove(focusedPoints, draggedX, draggedY, draggedZ);
+
+			command.push_back(QString("redoPointGroupMove"));
+			command.push_back(QString::number(id));
+
+			revCommand.push_back(QString("undoPointGroupMove"));
+			revCommand.push_back(QString::number(id));
+
+			w->undoRedo.registerCommand(command, revCommand);
+		}
+
+		draggedX = 0.0;
+		draggedY = 0.0;
+		draggedZ = 0.0;
+		break;
+	case RESIZE:
+		break;
+	case ROTATE:
+		if (focusedPoints.size() != 0)
+		{
+			id = w->undoRedo.registerPointsGroupRotate(focusedPoints, angleRotated, _ScratchControlPoint->get_X(), _ScratchControlPoint->get_Y(), _ScratchControlPoint->get_Z(), _plane);
+
+			command.push_back(QString("redoPointGroupRotate"));
+			command.push_back(QString::number(id));
+
+			revCommand.push_back(QString("undoPointGroupRotate"));
+			revCommand.push_back(QString::number(id));
+
+			w->undoRedo.registerCommand(command, revCommand);
+		}
+
+		angleRotated = 0.0;
+		break;
+	case CENTRED_ROTATE:
+		break;
+	case SHEAR:
+		break;
+	case FLIP:
+		break;
+	case COPY_SURFACE:
+		break;
+	case DELETE_SURFACE:
+		break;
+	case INSERT_ROW:
+		break;
+	case DELETE_ROW:
+		break;
+	case DUPLICATE_ROW:
+		break;
+	case INSERT_COL:
+		break;
+	case DELETE_COL:
+		break;
+	case DUPLICATE_COL:
+		break;
+	case MATE_POINTS:
+		break;
+	case COPY_SURFACE_MIRROR:
+		break;
+	case MERGE_SURFACES_BY_ROW:
+		break;
+	case MERGE_SURFACES_BY_ROW_REVERSE:
+		break;
+	case MEASURE_DISTANCE:
+		break;
+	case DRAG_TRAJECTORY_POINT:
+		break;
+	}
 
 	for (int it = 0; it < project->get_MySurfaces()->size(); it++)
 	{
@@ -1460,6 +1547,11 @@ void View2d::finishEdit()
 	get_ScratchControlPoint()->set_J(-1);
 
 	scrachPointReady = false;
+
+	angleRotated = 0.0;
+	draggedX = 0.0;
+	draggedY = 0.0;
+	draggedZ = 0.0;
 
 	MY_EDIT_MODE = NONE;
 }

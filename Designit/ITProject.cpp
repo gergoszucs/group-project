@@ -862,6 +862,19 @@ void ITProject::synchronizeSurfaceVectorsFromControl()
 	}
 }
 
+void ITProject::manageComputationOfInterpolatedPoints()
+{
+	for (int i = 0; i < _MySurfaces->size(); i++)
+	{
+		_MySurfaces->at(i)->manageComputationOfInterpolatedPoints();
+	}
+
+	for (int i = 0; i < _MyBaseSurfaces->size(); i++)
+	{
+		_MyBaseSurfaces->at(i)->manageComputationOfInterpolatedPoints();
+	}
+}
+
 void ITProject::createNewTrajectoryCurve(const int k)
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Creating new trajectory curve");

@@ -160,10 +160,6 @@ void MyGLWidget::setViewOrtho(int width, int height)
 
 void MyGLWidget::draw()
 {
-	glTranslatef(centerX, centerY, centerZ);
-	drawSphere(1, 15, 15, 0.0, 1.0, 0.0);
-	glTranslatef(-centerX, -centerY, -centerZ);
-
 	if (IsDataLoaded)
 	{
 		drawMyAxes();
