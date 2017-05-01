@@ -26,6 +26,7 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.setupUi(this);
 
 	QIcon icon = QIcon("Resources/blackDot.png");
+	ui.action_Flexit->setEnabled(false);
 
 	// Default display OpenGL axes enabled.
 	//ui.actionAxes->setIcon( icon );
@@ -141,7 +142,9 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 }
 
 void Designit::on_action_Flexit_triggered() {
-	QString fileName = "autosave.json";
+
+	QString fileName = "/autosave.json";
+	fileName = QDir::currentPath().append(fileName);
 
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly))
@@ -170,7 +173,9 @@ void Designit::on_action_Flexit_triggered() {
 	// Send the HTTP request.
 	sendHTTPRequest(QString("File"), QString("Saved"), 0.0, 0, DataFileNameWithPath);
 
-	system("Flexit.exe autosave.json");
+	std::string launch = "Flexit.exe " + fileName.toStdString();
+
+	system(launch.c_str());
 }
 
 void Designit::on_actionOpen_triggered()
@@ -181,6 +186,7 @@ void Designit::on_actionOpen_triggered()
 	{
 		if (!UnsavedChanges)
 		{
+			ui.action_Flexit->setEnabled(true);
 			QString d = QDir::currentPath();
 			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionOpen_triggered. Current path: %s", d.toStdString().c_str());
 			QString fileNameWithPath = QFileDialog::getOpenFileName(this, tr("Open File"), d.append("/Data"), tr("JSON Files (*.json *.JSON);;Text Files (*.txt);;C++ Files (*.cpp *.h)"));
@@ -554,6 +560,7 @@ void Designit::closeProject()
 	// Send the HTTP request.
 	sendHTTPRequest(QString("File"), QString("Closed"), 0.0, 0, DataFileNameWithPath);
 
+	ui.action_Flexit->setEnabled(false);
 }
 
 void Designit::on_actionExit_triggered()
@@ -692,35 +699,37 @@ void Designit::on_actionSave_As_triggered()
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), d.append("/Data"), tr("JSON Files (*.json *.JSON);;Text Files (*.txt);;C++ Files (*.cpp *.h)"));
 
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly))
-	{
-		QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
-		return;
+	if (!fileName.isEmpty() && !fileName.isNull()) {
+		QFile file(fileName);
+		if (!file.open(QIODevice::WriteOnly))
+		{
+			QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+			return;
+		}
+
+		// Close the file.
+		file.close();
+
+		// OK, the file is there, so let's start writing to the file.
+		// Get a char * from the file name.
+		QByteArray latin1BAFilenameString = fileName.toLatin1();
+
+		// Write the project to the file.
+		ITIO::writeMyProjectToFile(latin1BAFilenameString.data());
+
+		// Set status message.
+		QString str1 = QString("File %1 saved successfully.").arg(fileName);
+		w->statusBar()->showMessage(str1);
+
+		// Show status log entry
+		appendStatusTableWidget(QString("File"), QString("Saved"));
+
+		// Send the HTTP request.
+		sendHTTPRequest(QString("File"), QString("Saved"), 0.0, 0, DataFileNameWithPath);
+
+		// Finally set flags.
+		UnsavedChanges = false;
 	}
-
-	// Close the file.
-	file.close();
-
-	// OK, the file is there, so let's start writing to the file.
-	// Get a char * from the file name.
-	QByteArray latin1BAFilenameString = fileName.toLatin1();
-
-	// Write the project to the file.
-	ITIO::writeMyProjectToFile(latin1BAFilenameString.data());
-
-	// Set status message.
-	QString str1 = QString("File %1 saved successfully.").arg(fileName);
-	w->statusBar()->showMessage(str1);
-
-	// Show status log entry
-	appendStatusTableWidget(QString("File"), QString("Saved"));
-
-	// Send the HTTP request.
-	sendHTTPRequest(QString("File"), QString("Saved"), 0.0, 0, DataFileNameWithPath);
-
-	// Finally set flags.
-	UnsavedChanges = false;
 }
 
 void Designit::on_actionDelete_surface_triggered()

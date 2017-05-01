@@ -557,8 +557,8 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_open.png</normaloff>Resources/icon_open.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_open.png</normaloff>:/Resources/icon_open.png</iconset>
    </property>
    <property name="text">
     <string>Open...</string>
@@ -566,8 +566,8 @@
   </action>
   <action name="actionSave_As">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_save.png</normaloff>Resources/icon_save.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_save.png</normaloff>:/Resources/icon_save.png</iconset>
    </property>
    <property name="text">
     <string>Save As ...</string>
@@ -575,8 +575,8 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_exit.png</normaloff>Resources/icon_exit.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_exit.png</normaloff>:/Resources/icon_exit.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -584,8 +584,8 @@
   </action>
   <action name="actionDrag">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_drag.png</normaloff>Resources/icon_drag.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_drag.png</normaloff>:/Resources/icon_drag.png</iconset>
    </property>
    <property name="text">
     <string>Drag</string>
@@ -593,8 +593,8 @@
   </action>
   <action name="actionNew_surface">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_new_surface.png</normaloff>Resources/icon_new_surface.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_new_surface.png</normaloff>:/Resources/icon_new_surface.png</iconset>
    </property>
    <property name="text">
     <string>New surface</string>
@@ -602,8 +602,8 @@
   </action>
   <action name="actionDrag_all">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_drag_all.png</normaloff>Resources/icon_drag_all.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_drag_all.png</normaloff>:/Resources/icon_drag_all.png</iconset>
    </property>
    <property name="text">
     <string>Drag all</string>
@@ -616,8 +616,8 @@
   </action>
   <action name="actionDrag_row">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_drag_row.png</normaloff>Resources/icon_drag_row.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_drag_row.png</normaloff>:/Resources/icon_drag_row.png</iconset>
    </property>
    <property name="text">
     <string>Drag row</string>
@@ -625,8 +625,8 @@
   </action>
   <action name="actionDrag_col">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_drag_col.png</normaloff>Resources/icon_drag_col.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_drag_col.png</normaloff>:/Resources/icon_drag_col.png</iconset>
    </property>
    <property name="text">
     <string>Drag col</string>
@@ -644,8 +644,8 @@
   </action>
   <action name="actionRotate_all">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_rotate_all.png</normaloff>Resources/icon_rotate_all.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_rotate_all.png</normaloff>:/Resources/icon_rotate_all.png</iconset>
    </property>
    <property name="text">
     <string>Rotate all</string>
@@ -653,8 +653,8 @@
   </action>
   <action name="actionResize_all">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_resize_all.png</normaloff>Resources/icon_resize_all.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_resize_all.png</normaloff>:/Resources/icon_resize_all.png</iconset>
    </property>
    <property name="text">
     <string>Resize all</string>
@@ -662,8 +662,8 @@
   </action>
   <action name="actionShear">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_shear.png</normaloff>Resources/icon_shear.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_shear.png</normaloff>:/Resources/icon_shear.png</iconset>
    </property>
    <property name="text">
     <string>Shear</string>
@@ -671,8 +671,8 @@
   </action>
   <action name="actionPerspective">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_perspective_all.png</normaloff>Resources/icon_perspective_all.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_perspective_all.png</normaloff>:/Resources/icon_perspective_all.png</iconset>
    </property>
    <property name="text">
     <string>Perspective</string>
@@ -680,8 +680,8 @@
   </action>
   <action name="actionPlayout_Test">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_test.png</normaloff>Resources/icon_test.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_test.png</normaloff>:/Resources/icon_test.png</iconset>
    </property>
    <property name="text">
     <string>Playout Test</string>
@@ -689,8 +689,8 @@
   </action>
   <action name="actionFlip_horizontal">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_flip_horizontal.png</normaloff>Resources/icon_flip_horizontal.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_flip_horizontal.png</normaloff>:/Resources/icon_flip_horizontal.png</iconset>
    </property>
    <property name="text">
     <string>Flip all horizontal</string>
@@ -698,8 +698,8 @@
   </action>
   <action name="actionClose">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_close.png</normaloff>Resources/icon_close.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_close.png</normaloff>:/Resources/icon_close.png</iconset>
    </property>
    <property name="text">
     <string>Close</string>
@@ -707,8 +707,8 @@
   </action>
   <action name="actionCopy_surface">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_copy.png</normaloff>Resources/icon_copy.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_copy.png</normaloff>:/Resources/icon_copy.png</iconset>
    </property>
    <property name="text">
     <string>Copy surface</string>
@@ -716,8 +716,8 @@
   </action>
   <action name="actionDelete_surface">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_delete_surface.png</normaloff>Resources/icon_delete_surface.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_delete_surface.png</normaloff>:/Resources/icon_delete_surface.png</iconset>
    </property>
    <property name="text">
     <string>Delete surface</string>
@@ -730,8 +730,8 @@
   </action>
   <action name="actionInsert_row">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_insert_row.png</normaloff>Resources/icon_insert_row.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_insert_row.png</normaloff>:/Resources/icon_insert_row.png</iconset>
    </property>
    <property name="text">
     <string>Insert row</string>
@@ -739,8 +739,8 @@
   </action>
   <action name="actionDelete_row">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_delete_row.png</normaloff>Resources/icon_delete_row.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_delete_row.png</normaloff>:/Resources/icon_delete_row.png</iconset>
    </property>
    <property name="text">
     <string>Delete row</string>
@@ -748,8 +748,8 @@
   </action>
   <action name="actionDuplicate_row">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_duplicate_row.png</normaloff>Resources/icon_duplicate_row.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_duplicate_row.png</normaloff>:/Resources/icon_duplicate_row.png</iconset>
    </property>
    <property name="text">
     <string>Duplicate row</string>
@@ -757,8 +757,8 @@
   </action>
   <action name="actionInsert_col">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_insert_column.png</normaloff>Resources/icon_insert_column.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_insert_column.png</normaloff>:/Resources/icon_insert_column.png</iconset>
    </property>
    <property name="text">
     <string>Insert col</string>
@@ -766,8 +766,8 @@
   </action>
   <action name="actionDelete_col">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_delete_column.png</normaloff>Resources/icon_delete_column.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_delete_column.png</normaloff>:/Resources/icon_delete_column.png</iconset>
    </property>
    <property name="text">
     <string>Delete col</string>
@@ -775,8 +775,8 @@
   </action>
   <action name="actionDuplicate_col">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_duplicate_column.png</normaloff>Resources/icon_duplicate_column.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_duplicate_column.png</normaloff>:/Resources/icon_duplicate_column.png</iconset>
    </property>
    <property name="text">
     <string>Duplicate col</string>
@@ -784,8 +784,8 @@
   </action>
   <action name="actionMate_points">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_mate_points.png</normaloff>Resources/icon_mate_points.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_mate_points.png</normaloff>:/Resources/icon_mate_points.png</iconset>
    </property>
    <property name="text">
     <string>Mate points</string>
@@ -796,8 +796,8 @@
   </action>
   <action name="actionCopy_surface_mirror">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_copy_mirror.png</normaloff>Resources/icon_copy_mirror.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_copy_mirror.png</normaloff>:/Resources/icon_copy_mirror.png</iconset>
    </property>
    <property name="text">
     <string>Copy surface mirror</string>
@@ -805,8 +805,8 @@
   </action>
   <action name="actionMerge_surfaces_by_row">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_merge_surfaces.png</normaloff>Resources/icon_merge_surfaces.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_merge_surfaces.png</normaloff>:/Resources/icon_merge_surfaces.png</iconset>
    </property>
    <property name="text">
     <string>Merge surfaces by row</string>
@@ -814,8 +814,8 @@
   </action>
   <action name="actionReset_all_views">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_reset_all_views.png</normaloff>Resources/icon_reset_all_views.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_reset_all_views.png</normaloff>:/Resources/icon_reset_all_views.png</iconset>
    </property>
    <property name="text">
     <string>Reset all views</string>
@@ -823,8 +823,8 @@
   </action>
   <action name="actionWeb_help">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_help.png</normaloff>Resources/icon_help.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_help.png</normaloff>:/Resources/icon_help.png</iconset>
    </property>
    <property name="text">
     <string>Web help ...</string>
@@ -837,8 +837,8 @@
   </action>
   <action name="actionGaussian_curvature">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_gaussian_curvature.png</normaloff>Resources/icon_gaussian_curvature.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_gaussian_curvature.png</normaloff>:/Resources/icon_gaussian_curvature.png</iconset>
    </property>
    <property name="text">
     <string>Gaussian curvature</string>
@@ -861,8 +861,8 @@
   </action>
   <action name="actionMerge_surfaces_by_row_reverse">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_merge_surfaces_reverse.png</normaloff>Resources/icon_merge_surfaces_reverse.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_merge_surfaces_reverse.png</normaloff>:/Resources/icon_merge_surfaces_reverse.png</iconset>
    </property>
    <property name="text">
     <string>Merge surfaces by row reverse</string>
@@ -870,8 +870,8 @@
   </action>
   <action name="actionMeasure_distance">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_measure_distance.png</normaloff>Resources/icon_measure_distance.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_measure_distance.png</normaloff>:/Resources/icon_measure_distance.png</iconset>
    </property>
    <property name="text">
     <string>Measure distance</string>
@@ -879,8 +879,8 @@
   </action>
   <action name="actionCentred_rotate">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/icon_centred_rotate.png</normaloff>Resources/icon_centred_rotate.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/icon_centred_rotate.png</normaloff>:/Resources/icon_centred_rotate.png</iconset>
    </property>
    <property name="text">
     <string>Centred rotate</string>
@@ -891,8 +891,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/flexit.ico</normaloff>Resources/flexit.ico</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/flexit.ico</normaloff>:/Resources/flexit.ico</iconset>
    </property>
    <property name="text">
     <string>action_Flexit</string>
@@ -903,8 +903,8 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/undo_icon.png</normaloff>Resources/undo_icon.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/undo_icon.png</normaloff>:/Resources/undo_icon.png</iconset>
    </property>
    <property name="text">
     <string>Undo</string>
@@ -918,8 +918,8 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset>
-     <normaloff>Resources/redo_icon.png</normaloff>Resources/redo_icon.png</iconset>
+    <iconset resource="designit.qrc">
+     <normaloff>:/Resources/redo_icon.png</normaloff>:/Resources/redo_icon.png</iconset>
    </property>
    <property name="text">
     <string>Redo</string>

@@ -1,1 +1,0 @@
-Add other linear system solving algorithms - LU decomposition, Successive overrelaxation
