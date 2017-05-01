@@ -72,6 +72,7 @@ public:
 	int sizeX();
 	int sizeY();
 	ITPoint * getControlPoint(const int i, const int j);
+	ITControlPoint * getPoint(const int i, const int j);
 	void getCenter(float& x, float& y, float& z);
 	void rotateAround(const float x, const float y, const float z, const float angle, PLANE p);
 

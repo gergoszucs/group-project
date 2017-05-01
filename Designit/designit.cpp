@@ -84,6 +84,10 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.trajectoryCurveB->set_MyCurveIndex(5);
 	ui.trajectoryCurveB->set_MyChar('B');
 
+	ui.myXYView->set_plane(XY);
+	ui.myXZView->set_plane(XZ);
+	ui.myYZView->set_plane(YZ);
+
 	//populate command list
 	functions.emplace("help", &Designit::help);
 	functions.emplace("testFunction", &Designit::testFunction);
@@ -297,9 +301,9 @@ void Designit::keyPressEvent(QKeyEvent *event)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "keyPressEvent");
 
 	// Get the focus widget.
-	QWidget *w = QApplication::focusWidget();
+	QWidget *wg = QApplication::focusWidget();
 
-	if (w == ui.mySpreadsheet)
+	if (wg == ui.mySpreadsheet)
 	{
 		// We are on the spreadsheet widget.
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "We are focused on the spreadsheet");
@@ -392,10 +396,26 @@ void Designit::keyPressEvent(QKeyEvent *event)
 			}
 		}
 	}
-	else
+	
+	if (event->key() == Qt::Key_Alt)
 	{
-		// We are on another widget.
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "We are focused on another widget");
+		switch (_selectMode)
+		{
+		case POINT_M:
+			_selectMode = ROW_M;
+			break;
+		case ROW_M:
+			_selectMode = COLUMN_M;
+			break;
+		case COLUMN_M:
+			_selectMode = SURFACE_M;
+			break;
+		case SURFACE_M:
+			_selectMode = POINT_M;
+			break;
+		}
+
+		w->updateAllTabs();
 	}
 
 	// Call the base class method.
@@ -454,6 +474,8 @@ void Designit::updateAllTabs()
 
 	// Update the main geometry OpenGL view.
 	ui.myGLWidget->repaint(); // update seems to only take effect when the used pans the opengl widget.
+	//ui.myGLWidget->updateGL();
+	//ui.myGLWidget->updateCustom();
 
 	// Update the output graphs.
 	ui.myXYView->update();
@@ -567,22 +589,11 @@ void Designit::on_actionAbout_triggered()
 void Designit::on_actionReset_all_views_triggered()
 {
 	// OpenGL view parameters.
-	glXYViewHalfExtent = 50.0;
-	glXYPanCentreX = 0.0;
-	glXYPanCentreY = 0.0;
-
-	glXZViewHalfExtent = 50.0;
-	glXZPanCentreX = 0.0;
-	glXZPanCentreY = 0.0;
-
-	glYZViewHalfExtent = 50.0;
-	glYZPanCentreX = 0.0;
-	glYZPanCentreY = 0.0;
-
-	gl3DViewHalfExtent = 50.0;
-	gl3DPanCentreX = 0.0;
-	gl3DPanCentreY = 0.0;
-
+	ui.myGLWidget->setDrawParameters(0.0, 0.0, 50.0);
+	
+	ui.myXYView->setSceneParameters(0.0, 0.0, 1.0);
+	ui.myYZView->setSceneParameters(0.0, 0.0, 1.0);
+	ui.myXZView->setSceneParameters(0.0, 0.0, 1.0);
 
 	// Drawing semaphores.
 	drawRotateXHorizontal = false;
@@ -1141,10 +1152,10 @@ void Designit::on_actionRotate_all_triggered()
 {
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != ROTATE_ALL)
+	if (MY_EDIT_MODE != ROTATE)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = ROTATE_ALL;
+		MY_EDIT_MODE = ROTATE;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_rotate_all_highlight.png");
@@ -1215,9 +1226,6 @@ void Designit::on_actionMerge_surfaces_by_row_reverse_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_merge_surfaces_reverse_highlight.png");
 		this->ui.actionMerge_surfaces_by_row_reverse->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1252,9 +1260,6 @@ void Designit::on_actionMerge_surfaces_by_row_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_merge_surfaces_highlight.png");
 		this->ui.actionMerge_surfaces_by_row->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1290,9 +1295,6 @@ void Designit::on_actionMeasure_distance_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_measure_distance_highlight.png");
 		this->ui.actionMeasure_distance->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1491,9 +1493,6 @@ void Designit::on_actionMate_points_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_mate_points_highlight.png");
 		this->ui.actionMate_points->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1801,10 +1800,10 @@ void Designit::on_actionFlip_horizontal_triggered()
 
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != FLIP_HORIZONTAL_ALL)
+	if (MY_EDIT_MODE != FLIP)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = FLIP_HORIZONTAL_ALL;
+		MY_EDIT_MODE = FLIP;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_flip_horizontal_highlight.png");
@@ -1844,14 +1843,6 @@ void Designit::on_actionCentred_rotate_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_centred_rotate_highlight.png");
 		this->ui.actionCentred_rotate->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
-		ui.myXYView->set_SecondClicksFinished(false);
-
-		ui.myXZView->set_PrimedForFirstClick(true);
-		ui.myXZView->set_PrimedForSecondClick(false);
-		ui.myXZView->set_SecondClicksFinished(false);
 	}
 	else
 	{
@@ -1977,24 +1968,24 @@ void Designit::userHasEnteredTextData()
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Return");
 
-	if (MY_EDIT_MODE == ROTATE_ALL)
-	{
-		float netAngleReds = ui.myEditTextDataField->text().toFloat() * PI / 180.0 - ui.myXYView->get_EditValue();
-		ui.myXYView->set_EditValue(netAngleReds);
-		ui.myXYView->rotateFocusPoints(netAngleReds);
+	//if (MY_EDIT_MODE == ROTATE_ALL)
+	//{
+	//	float netAngleReds = ui.myEditTextDataField->text().toFloat() * PI / 180.0 - ui.myXYView->get_EditValue();
+	//	ui.myXYView->set_EditValue(netAngleReds);
+	//	ui.myXYView->rotateFocusPoints(netAngleReds);
 
-		// Redraw other views.
-		updateAllTabs();
-	}
-	else if (MY_EDIT_MODE == SHEAR_ALL)
-	{
-		float netShearDistance = ui.myEditTextDataField->text().toFloat();
-		ui.myXYView->set_EditValue(netShearDistance);
-		ui.myXYView->shearFocusPoints(netShearDistance);
+	//	// Redraw other views.
+	//	updateAllTabs();
+	//}
+	//else if (MY_EDIT_MODE == SHEAR_ALL)
+	//{
+	//	float netShearDistance = ui.myEditTextDataField->text().toFloat();
+	//	ui.myXYView->set_EditValue(netShearDistance);
+	//	ui.myXYView->shearFocusPoints(netShearDistance);
 
-		// Redraw other views.
-		updateAllTabs();
-	}
+	//	// Redraw other views.
+	//	updateAllTabs();
+	//}
 }
 
 void Designit::handleCommand()

@@ -1,8 +1,11 @@
 #include "ITProject.h"
 #include "ITSurface.h"
+#include "ITControlPoint.h"
 #include "global.h"
 #include "ITTrajectoryCurve.h"
 #include "ITTrajectoryCurveSegment.h"
+
+#include <vector>
 
 using namespace rapidjson;
 
@@ -827,6 +830,17 @@ Point3 ITProject::getSurfaceCenter(const int surfaceID)
 	getSurface(surfaceID)->getCenter(tmp.x, tmp.y, tmp.z);
 
 	return tmp;
+}
+
+ITControlPoint * ITProject::getControlPoint(const unsigned int surfaceID, const unsigned int i, const unsigned int j)
+{
+	if (surfaceID >= _MySurfaces->size()) throw std::exception("NO_SURFACE");
+
+	if (i >= getSurface(surfaceID)->sizeX()) throw std::exception("NO_POINT");
+
+	if (j >= getSurface(surfaceID)->sizeY()) throw std::exception("NO_POINT");
+
+	return getSurface(surfaceID)->getPoint(i,j);
 }
 
 void ITProject::synchronizeSurfaceVectorsFromControl()

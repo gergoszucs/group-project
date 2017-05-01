@@ -13,6 +13,8 @@
 
 #include "Enums.h"
 
+class ITControlPoint;
+
 using namespace rapidjson;
 
 // Forward declarations.
@@ -128,6 +130,8 @@ public:
 
 	Point3 getPointData(const int surfaceID, const int i, const int j);
 	Point3 getSurfaceCenter(const int surfaceID);
+
+	ITControlPoint* getControlPoint(const unsigned int surfaceID, const unsigned int i, const unsigned int j);
 
 	void createNewTrajectoryCurve(const int k);
 

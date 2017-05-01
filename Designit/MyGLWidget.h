@@ -10,6 +10,8 @@ public:
 	explicit MyGLWidget(QWidget *parent = 0);
 	~MyGLWidget(void) {};
 
+	void setDrawParameters(float glPanCenterX, float glPanCenterY, float glViewHalfExtent);
+
 protected:
 
 	void initializeGL();
@@ -33,6 +35,20 @@ private:
 
 	QPoint lastPos;
 
+	float glViewHalfExtent;
+	float glPanCentreX;
+	float glPanCentreY;
+
+	float centerX;
+	float centerY;
+	float centerZ;
+	float azimuth;
+	float polar;
+	float radius;
+	float eyeX;
+	float eyeY;
+	float eyeZoom;
+
 	// Drawing methods.
 	void drawMyAxes();
 	void draw();
@@ -42,4 +58,9 @@ private:
 	void drawMyPanelNormals();
 	void drawMyAnnotations();
 	void drawMyTracks( int frame );
+
+	void drawSphere(double r, int lats, int longs, float R, float GG, float B);
+
+	void modPolar(float p);
+	void modAzimuth(float a);
 };

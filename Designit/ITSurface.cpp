@@ -137,6 +137,13 @@ ITPoint * ITSurface::getControlPoint(const int i, const int j)
 	return _MyControlPoints->at(i).at(j);
 }
 
+ITControlPoint * ITSurface::getPoint(const int i, const int j)
+{
+	if ((i >= sizeX()) || (j >= sizeY())) throw std::exception("NO_POINT");
+
+	return _MyControlPoints->at(i).at(j);
+}
+
 ITSurface * ITSurface::getCopyTranslated(const int k, const float x, const float y, const float z)
 {
 	ITSurface *s = new ITSurface();

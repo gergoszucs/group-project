@@ -41,25 +41,13 @@ extern bool UnsavedChanges;
 extern bool IsDataLoaded;
 
 // OpenGL view parameters.
-extern float glXYViewHalfExtent;
-extern float glXYPanCentreX;
-extern float glXYPanCentreY;
-
-extern float glXZViewHalfExtent;
-extern float glXZPanCentreX;
-extern float glXZPanCentreY;
-
-extern float glYZViewHalfExtent;
-extern float glYZPanCentreX;
-extern float glYZPanCentreY;
-
 extern float glGaussianViewHalfExtent;
 extern float glGaussianPanCentreX;
 extern float glGaussianPanCentreY;
 
-extern float gl3DViewHalfExtent;
-extern float gl3DPanCentreX;
-extern float gl3DPanCentreY;
+//extern float gl3DViewHalfExtent;
+//extern float gl3DPanCentreX;
+//extern float gl3DPanCentreY;
 
 extern float glXViewHalfExtent;
 extern float glXPanCentreX;
@@ -90,6 +78,8 @@ extern bool IsHorizontalDragOnly;
 
 extern bool trajectoryMode;
 
+
+
 // Editing mode flags.
 enum EDIT_MODES_ENUM {NONE, 
 					  DRAG, 
@@ -97,10 +87,10 @@ enum EDIT_MODES_ENUM {NONE,
 					  DRAG_COL, 
 					  DRAG_ALL, 
 					  RESIZE_ALL, 
-					  ROTATE_ALL, 
+					  ROTATE, 
 					  SHEAR_ALL, 
 					  PERSPECTIVE_ALL, 
-					  FLIP_HORIZONTAL_ALL,
+					  FLIP,
 					  COPY_SURFACE,
 					  DELETE_SURFACE,
 					  INSERT_ROW,
@@ -122,5 +112,16 @@ extern EDIT_MODES_ENUM MY_EDIT_MODE; // GUI, BATCH.
 // Window cintrol flag.
 enum WIDGET_CONTROL_ENUM { X, Y, Z, R, P, S, NO };
 extern WIDGET_CONTROL_ENUM MY_WIDGET_CONTROL;
+
+// Selection mode.
+enum SELECT_MODE
+{
+	POINT_M,
+	ROW_M,
+	COLUMN_M,
+	SURFACE_M
+};
+
+extern SELECT_MODE _selectMode;
 
 #endif /*  GLOBAL_H */
