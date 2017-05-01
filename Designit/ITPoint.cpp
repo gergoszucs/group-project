@@ -72,6 +72,11 @@ float ITPoint::distanceFrom(ITPoint* secondPoint)
 	);
 }
 
+QString ITPoint::getAnnotationText()
+{
+	return QString("k: %1, i: %2, j: %3, \r \n x: %4, y: %5, z: %6").arg(_k).arg(_i).arg(_j).arg(_X).arg(_Y).arg(_Z);
+}
+
 void ITPoint::propagateMe(ITPoint* cp, ITPoint* rotationPoint, ITPoint* translationPoint)
 {
 	// Moves a temporary point from the base position during FlowitCudaUnsteady play out.

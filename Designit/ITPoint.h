@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <qstring.h>
 #include "Enums.h"
 
 class ITPoint
@@ -37,6 +38,8 @@ public:
 	ITPoint* cross(ITPoint* secondPoint);
 	float dot(ITPoint* secondPoint);
 	float distanceFrom(ITPoint* secondPoint);
+
+	QString getAnnotationText();
 
 	// Worker methods.
 	void propagateMe(ITPoint* cp, ITPoint* rotationPoint, ITPoint* translationPoint);

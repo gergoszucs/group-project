@@ -4,22 +4,25 @@
 
 #include "ITControlPoint.h"
 
-class MyXYView : public QGLWidget
+enum SELECT_MODE
+{
+	POINT_SINGLE,
+	POINT_STACKING,
+	ROW_SINGLE,
+	ROW_STACKING,
+	COLUMN_SINGLE,
+	COLUMN_STACKING,
+	SURFACE_SINGLE,
+	SURFACE_STACKING
+};
+
+class View2d : public QGLWidget
 {
 	Q_OBJECT
 
 public:
-	explicit MyXYView(QWidget *parent = 0);
-	~MyXYView(void);
-
-	void dragFocusPoints(float posX, float posY, float old_posX, float old_posY);
-	void rotateFocusPoints(float dTheta);
-	void resizeFocusPoints(float y, float yold);
-	void shearFocusPoints(float dx);
-	void perspectiveFocusPoints(float x, float y, float xold, float yold);
-	void perspectiveFocusPointsOld(float posX, float posY, float old_posX, float old_posY);
-	void synchronizeBaseSurfaceCoordinates();
-	void centredRotateFocusPoints(float dTheta);
+	explicit View2d(QWidget *parent = 0);
+	~View2d(void);
 
 	// Accessors.
 	float get_EditValue();
@@ -45,6 +48,8 @@ public:
 
 	ITControlPoint *get_ScratchControlPoint();
 	void set_ScratchControlPoint(ITControlPoint *p);
+
+	void set_plane(PLANE p);
 
 protected:
 
@@ -82,11 +87,24 @@ private:
 	bool _PrimedForSecondClick;
 	bool _SecondClicksFinished;
 
-	bool drawDial = false;
-	float dialCentreX, dialCentreY, dialAngle;
-	float dialSize = 2;
+	// bool drawDial = false;
+	// float dialCentreX, dialCentreY, dialAngle;
+	// float dialSize = 2;
 
 	ITControlPoint *_ScratchControlPoint; // Used for MATCH_POINT mode.
+
+	PLANE _plane;
+
+	SELECT_MODE _selectMode;
+
+	std::vector< ITControlPoint* > focusedPoints;
+
+	float glPanCenterX;
+	float glPanCenterY;
+	float glViewHalfExtent;
+
+	// Utility methods.
+	void finishEdit();
 
 	// Drawing methods.
 	void drawMyAxes();
@@ -98,13 +116,8 @@ private:
 	void drawMyGrids();
 	void drawMyScratchControlPoint();
 	void drawSphere(double r, int lats, int longs, float R, float GG, float B);
-	void drawAngleDial();
+	// void drawAngleDial();
 
-	void findControlPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI, int *targetJ);
+	void findControlPointIndicesNearMouse(double posX, double posY, int *targetK, int *targetI, int *targetJ);
 	void AssignFocusPoint(QMouseEvent *event);
-	void flipAllHorizontally();
-	void copyNewSurface(int k);
-	void copyNewSurfaceMirror(int k);
-	void mergeSurfacesByRow(int k1, int k2);
-	void mergeSurfacesByRowReverse(int k1, int k2);
 };

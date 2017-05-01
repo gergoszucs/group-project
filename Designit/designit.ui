@@ -246,7 +246,7 @@
             <enum>QTabWidget::Triangular</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>3</number>
            </property>
            <widget class="QWidget" name="tab_XYView">
             <attribute name="title">
@@ -254,7 +254,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="MyXYView" name="myXYView"/>
+              <widget class="View2d" name="myXYView"/>
              </item>
             </layout>
            </widget>
@@ -264,7 +264,7 @@
             </attribute>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="MyXZView" name="myXZView"/>
+              <widget class="View2d" name="myXZView"/>
              </item>
             </layout>
            </widget>
@@ -274,7 +274,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="MyYZView" name="myYZView"/>
+              <widget class="View2d" name="myYZView"/>
              </item>
             </layout>
            </widget>
@@ -307,8 +307,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>304</width>
-          <height>659</height>
+          <width>218</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -940,21 +940,6 @@
    <header>myglwidget.h</header>
   </customwidget>
   <customwidget>
-   <class>MyXYView</class>
-   <extends>QOpenGLWidget</extends>
-   <header>myxyview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyXZView</class>
-   <extends>QOpenGLWidget</extends>
-   <header location="global">myxzview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyYZView</class>
-   <extends>QOpenGLWidget</extends>
-   <header>myyzview.h</header>
-  </customwidget>
-  <customwidget>
    <class>MyGaussianView</class>
    <extends>QOpenGLWidget</extends>
    <header>mygaussianview.h</header>
@@ -963,6 +948,11 @@
    <class>MyGLGeneralTrajectoryCurveView</class>
    <extends>QOpenGLWidget</extends>
    <header>myglgeneraltrajectorycurveview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>View2d</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">view2d.h</header>
   </customwidget>
  </customwidgets>
  <resources>

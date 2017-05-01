@@ -33,12 +33,10 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include <myxzview.h>
+#include <view2d.h>
 #include "mygaussianview.h"
 #include "myglgeneraltrajectorycurveview.h"
 #include "myglwidget.h"
-#include "myxyview.h"
-#include "myyzview.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -121,13 +119,13 @@ public:
     QTabWidget *tabsWorkSurface;
     QWidget *tab_XYView;
     QVBoxLayout *verticalLayout_4;
-    MyXYView *myXYView;
+    View2d *myXYView;
     QWidget *tab_XZView;
     QHBoxLayout *horizontalLayout_3;
-    MyXZView *myXZView;
+    View2d *myXZView;
     QWidget *tab_YZView;
     QVBoxLayout *verticalLayout_3;
-    MyYZView *myYZView;
+    View2d *myYZView;
     QWidget *tab_gaussianView;
     QVBoxLayout *verticalLayout_8;
     MyGaussianView *myGaussianView;
@@ -511,7 +509,7 @@ public:
         verticalLayout_4->setSpacing(6);
         verticalLayout_4->setContentsMargins(11, 11, 11, 11);
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        myXYView = new MyXYView(tab_XYView);
+        myXYView = new View2d(tab_XYView);
         myXYView->setObjectName(QStringLiteral("myXYView"));
 
         verticalLayout_4->addWidget(myXYView);
@@ -523,7 +521,7 @@ public:
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        myXZView = new MyXZView(tab_XZView);
+        myXZView = new View2d(tab_XZView);
         myXZView->setObjectName(QStringLiteral("myXZView"));
 
         horizontalLayout_3->addWidget(myXZView);
@@ -535,7 +533,7 @@ public:
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        myYZView = new MyYZView(tab_YZView);
+        myYZView = new View2d(tab_YZView);
         myYZView->setObjectName(QStringLiteral("myYZView"));
 
         verticalLayout_3->addWidget(myYZView);
@@ -571,7 +569,7 @@ public:
         editingTools->addItem(SurfaceTools, QStringLiteral("Surface Tools"));
         TrajectoryTools = new QWidget();
         TrajectoryTools->setObjectName(QStringLiteral("TrajectoryTools"));
-        TrajectoryTools->setGeometry(QRect(0, 0, 304, 659));
+        TrajectoryTools->setGeometry(QRect(0, 0, 218, 418));
         horizontalLayout_7 = new QHBoxLayout(TrajectoryTools);
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
@@ -776,7 +774,7 @@ public:
 
         tabsAdditionalData->setCurrentIndex(0);
         editingTools->setCurrentIndex(0);
-        tabsWorkSurface->setCurrentIndex(0);
+        tabsWorkSurface->setCurrentIndex(3);
         tabsWorkTrajectory->setCurrentIndex(0);
 
 
