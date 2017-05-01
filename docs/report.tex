@@ -16,33 +16,33 @@
 	\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 	\center
 	
-    \textsc{\LARGE Cranfield University}\\[0.5cm]
-    \includegraphics[width=2cm]{images/cranfield}\\[0.5cm]
-    \textsc{\Large MSc in Computational and Software Techniques in Engineering 2016/2017}\\[0.5cm]
-    \textsc{\large Software Engineering in Technical Computing}\\[0.5cm]
-    \textsc{\large School of Aerospace, Transport and Manufacturing}\\[0.5cm]
+    \textsc{\LARGE Cranfield University}\\[0.8cm]
+    \includegraphics[width=2cm]{images/cranfield}\\[0.8cm]
+    \textsc{\Large MSc in Computational and Software Techniques in Engineering 2016/2017}\\[0.8cm]
+    \textsc{\large Software Engineering in Technical Computing}\\
+    \textsc{\large School of Aerospace, Transport and Manufacturing}\\[1.1cm]
        
     \HRule \\[0.4cm]
     {\huge \bfseries Applications in Practical  \\[0.5cm]
-    	High End Computing}\\[0.4cm]
-    \HRule \\[1.5cm]
+    	High-End Computing}\\[0.3cm]
+    \LARGE\HRule \\[1.5cm]
        
     \begin{minipage}{1.1\textwidth}
     	\begin{flushleft} \large
-        	\emph{Authors:}\\
-            Andreas \textsc{Schmidhofer} \\
-            Gergő \textsc{Szűcs} \\
-            Paweł \textsc{Żybura} \\ 
-            Piotr \textsc{Kaźmierczak} \\
-            Xin \textsc{Lu} 
+        	{Authors}\\
+            Andreas \textbf{Schmidhofer} \\
+            Gergő \textbf{Szűcs} \\
+            Paweł \textbf{Żybura} \\ 
+            Piotr \textbf{Kaźmierczak} \\
+            Xin \textbf{Lu}
         \end{flushleft}
     \end{minipage}
 	\\[0.9cm] 
     \begin{minipage}{0.9\textwidth}
     	\begin{flushright} \large
-        	\emph{Supervisors:}
-            \\ Dr Dominique \textsc{Fleischmann}
-            \\ Dr  Irene \textsc{Moulitsas}
+        	{Supervisors}
+            \\ Dr Dominique \textbf{Fleischmann}
+            \\ Dr  Irene \textbf{Moulitsas}
         \end{flushright}
     \end{minipage}\\[1cm]
        
@@ -58,21 +58,181 @@
 
 \chapter{Introduction}
 
+In this paper we will discuss the project we had to complete for the Applications in Practical High-End Computing, as well as giving \textbf{insight to the team}, the way we worked throughout the weeks, the \textbf{approaches we took} and the \textbf{results we have achieved}.
+
+The kick-off of the project was five days of introduction of the software, where we had the chance to familiarise ourselves with the concept of the application, its purpose and the source code itself. We were also given many hints and ideas about the possible features and improvements. However, it was emphasised that we were expected to \textbf{think out of the box}, try to \textbf{create something extraordinary}, while still focusing on the feasibility of software for our future customers.
+
 \section{Our vision of the project}
 
+The major idea we had was to \textbf{explore as many aspects of improvement as possible}. First of all we wanted to apply our already existing software engineering knowledge and everything we had learnt during the Requirements Analysis and System Design course and make sure the source code employs the \textbf{best practices for both efficiency and readability}.
+
+During the first days of the project we realised that it is a bit cumbersome to set-up the environment and have the code running. Due to that we wanted to make sure the whole package is as user friendly as possible, by \textbf{removing} most of the \textbf{third party dependencies}, by including them into the deployment and providing a \textbf{standalone installer} for the customers.
+
+Our market analysis had shown that the potential users have troubles using the software. Most of their concerns were about the layout and handling of the graphical interface and the necessity of having three different applications. This put our focus on \textbf{merging two} of the existing \textbf{applications} together and providing convenient access between the remaining two, while also adding  quality of life features to the user interface.
+
+Another drawback of the software is the strict requirement of a CUDA enabled graphical card, which may not be available for many of our customers. Since this is a must because of the complexity of the computations in FlexIT, our idea was to provide \textbf{cloud access to the software} for these customers. In this case, the application would run on a Windows server with a feasible GPU, removing the dependency from the user side.
+
+Creating the meshes in SurfIT was also more complicated than most of the customers would like, and there are many existing software out there for this task, one of the most famous is CAD. We explored the possibilities of \textbf{importing} the different type of \textbf{models from CAD} into our application, allowing the user to create meshes faster or even use existing ones.
+
+Apart from these ambitious ideas, we also aimed to work on the existing source code, \textbf{implement missing features}, \textbf{fix existing bugs} and in general, \textbf{make the program faster and the user-experience smoother}.
+
+
 \section{The team}
+
+Our team was based on diversity in both nationalities and expertise. We knew that the project is not only about making the best software, but to understand the big picture, \textbf{create an achievable common goal and work towards that as a team}. 
+
+Mixing \textbf{multiple disciplines} in the group helped us a lot to come up with a wide variety of ideas, while the \textbf{cultural diversity} allowed us to learn about the mindset and behaviour of people from different nationalities. As we are in a software engineering course, the majority of the expertise came from this field, while also having decent amount of mechatronical and  mechanical engineering, as well as mathematics knowledge. Due to the recent Management for Technology course, we were familiar with many aspects of managements, including marketing, which was a big part of the project. \\[0.3cm]
+
+\begin{minipage}{0.3\textwidth}\raggedleft
+\includegraphics[width=2.5cm]{images/andy}
+\end{minipage}
+\hfill
+\begin{minipage}{0.7\textwidth}\center
+Andreas \textbf{Schmidhofer} \\   
+Austria \\
+Computer scientist
+\end{minipage} \\[0.3cm]
+
+\begin{minipage}{0.4\textwidth}\center
+Gergő \textbf{Szűcs} \\   
+Hungary \\
+Software engineer
+\end{minipage}%
+\hfill%
+\begin{minipage}{0.4\textwidth}\raggedright
+\includegraphics[width=2.5cm]{images/gergo}
+\end{minipage} \\[0.3cm]
+
+\begin{minipage}{0.3\textwidth}\raggedleft
+\includegraphics[width=2.5cm]{images/pawel}
+\end{minipage}
+\hfill
+\begin{minipage}{0.7\textwidth}\center
+Paweł \textbf{Żybura} \\   
+Poland \\
+Mechatronical engineer
+\end{minipage} \\[0.3cm]
+
+\begin{minipage}{0.4\textwidth}\center
+Piotr \textbf{Kaźmierczak} \\  
+Poland \\
+Mechanical engineer
+\end{minipage}%
+\hfill%
+\begin{minipage}{0.4\textwidth}\raggedright
+\includegraphics[width=2.5cm]{images/piotr}
+\end{minipage} \\[0.3cm]
+
+\begin{minipage}{0.3\textwidth}\raggedleft
+\includegraphics[width=2.5cm]{images/xin}
+\end{minipage}
+\hfill
+\begin{minipage}{0.7\textwidth}\center
+Xin \textbf{Lu} \\   
+China \\
+Mathematician
+\end{minipage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Work organization}
+
+In general, we felt that our groups was working quite effectively, keeping in mind that we had assignments and thesis work as well during the group project's period. Every team member was proactive and perceptive during our meetings, while we were also be able to work on our own when it was required.
    
 \section{Meetings}
+
+During the project all group members had stayed on campus, allowing us to \textbf{meet in person regularly} and sometimes on exceptional occasions. We have held our regular meetings twice a week, usually on Monday and Thursday. On these occasions, we have told each other about the progress we had made, since the previous meeting and discussed the tasks for the next period of time, while also helping each other with the problems and questions, which we could not solve alone.
+
+We always \textbf{rotated the role of the meeting leader} in our group, to make sure everyone can get familiar with the aspect of it, while also making sure there is always a person to control the flow of these gatherings. The meetings usually took around 30-40 minutes, including the time while we added our notes and tasks to Trello, to make sure we have some footprint of the meeting.
+
+Every now and then one of the group members faced critical problems, which would have caused delay in our progression, hence they needed to call an \textbf{emergency meetings}. These meetings were not always for the whole group, but for the people who could help the person in need. Thankfully, we did not have too many of these critical situations, and every group member was glad to help each other.
    
 \section{External tools}
 
+As we mentioned before, we had used quite a few tools to manage our project. 
+
+\textbf{Trello} was our project management tools, which made handling the tasks and deadlines effortless. We set up different type of lists, where we initially added all our ideas. During our work, we always added the new ideas and bugs to the list, to make sure everyone know about their existence. These tasks then were assigned to people and given a deadline during our meetings. This allowed us to easily follow what each person was working on at the given time.
+
+To make sure we are able to follow the dynamic nature of the project and synchronize our work efficiently, we put our source code into a private \textbf{GitHub repository}. This let us to share our changes in the source code with each other easily, and keep track of the changes we made. We could also try out \textbf{experimental features} on branches and merging the promising ones back to the trunk later. Apart from these, it provided us with some interesting feedback on our work, for example the usual days and hours of commits, the distribution of the programming languages in the code base, etc.
+
 \section{Project timeline}
 
+While our original plan did not exactly come through (due to unexpected issues, new ideas and delays), we have managed to do most of the initial ideas.
+
+\begin{figure}[H]
+\includegraphics[width=12.8cm]{images/weeklyplan}
+\caption{High level initial weekly plan}
+\centering
+\end{figure}
+
+We will discuss all of the work we carried out in different sections later in this paper.
+
 \section{Individual contribution}
+
+As this was a group project, most of our achievements would not had been possible individually. \textbf{What we have done is the great effort of the whole team}, however here are the parts that each individual mostly worked on. Keep in mind, that we have helped each other in most of the tasks, to allow greater efficiency and faster problem solving. \\
+
+\noindent Andreas \textbf{Schmidhofer} 
+\begin{itemize}
+	\item Requirement analysis
+	\item Design
+	\item Preparing the presentation
+	\item Researching cloud computing possibilities
+	\item Testing on the Amazon cloud
+	\item Creating and editing video for the presentation
+	\item Testing 
+	\item Performance measurements
+	\item Preparing the portfolio
+\end{itemize} 
+
+\noindent \\ Gergő \textbf{Szűcs}
+\begin{itemize}
+	\item Requirement analysis
+	\item Design
+	\item Code review
+	\item Code refactoring
+	\item CUDA research
+	\item DesignIT and FlexIT interfacing
+	\item Preparing the presentation
+	\item Testing 
+	\item Bugfixing
+	\item Installer creation
+	\item Performance measurements
+	\item Preparing the portfolio
+\end{itemize}
+
+\noindent \\ Paweł \textbf{Żybura} 
+\begin{itemize}
+	\item Requirement analysis
+	\item Design
+	\item Code review
+	\item Merging SurfIT and MoveIT into DesignIT
+	\item Preparing the presentation
+	\item Testing 
+	\item Preparing the portfolio
+\end{itemize}
+
+\noindent \\ Piotr \textbf{Kaźmierczak} 
+\begin{itemize}
+	\item Market analysis
+	\item Test plan
+	\item CAD research
+	\item Preparing the presentation
+	\item Testing 
+	\item Performance measurements
+	\item Preparing the portfolio
+\end{itemize}
+
+\noindent \\ Xin \textbf{Lu}
+\begin{itemize}
+	\item Market analysis
+	\item Test plan
+	\item Mathematics research
+	\item Preparing the presentation
+	\item Implementing new liner equation solver
+	\item Testing 
+	\item Performance measurements
+	\item Preparing the portfolio
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
