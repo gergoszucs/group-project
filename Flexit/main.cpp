@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 		w->statusBar()->showMessage(QObject::tr("Ready"));
 
 		// Set the main window icon.
-		QIcon icon("myappicon.ico");
+		QIcon icon(":/Resources/flexit.png");
 		w->setWindowIcon(icon);
 		w->show();
 
