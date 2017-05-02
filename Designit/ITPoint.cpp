@@ -1,6 +1,7 @@
 #include "ITPoint.h"
 #include "ITSurface.h"
 #include "global.h"
+#include "UtililityFunctions.h"
 
 ITPoint::ITPoint(float x, float y, float z)
 {
@@ -161,6 +162,11 @@ void ITPoint::rotateAround(ITPoint& center, const float angle, PLANE p)
 	set_X(pxNew);
 	set_Y(pyNew);
 	set_Z(pzNew);
+}
+
+Point3 ITPoint::getCoordinates()
+{
+	return Point3(_X, _Y, _Z);
 }
 
 // Accessors.

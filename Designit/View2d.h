@@ -3,6 +3,7 @@
 #include <QGLWidget>
 
 #include "ITControlPoint.h"
+#include "Point3.h"
 
 class View2d : public QGLWidget
 {
@@ -52,12 +53,20 @@ private:
 
 	bool primedForClick = false;
 
-	ITControlPoint *_ScratchControlPoint; // Used for MATCH_POINT mode.
+	ITControlPoint *_ScratchControlPoint;
+	int memoryK, memoryI, memoryJ;
 	bool scrachPointReady = false;
+	bool readyToShear = false;
 
 	bool singleSelect = false;
 
 	PLANE _plane = XY;
+
+	float beginAngle;
+	bool dialInitialized = false;
+	bool drawDial = false;
+
+	bool drawVector = false;
 
 	float angleRotated = 0.0;
 	float draggedX = 0.0;
@@ -72,6 +81,7 @@ private:
 	void getAxesPos(float& pX, float& pY, const int x, const int y);
 	void addFocusPoint(ITControlPoint* p);
 	void setPointHighlight(QMouseEvent *event);
+	void getCenterOfFocused(float& posX, float& posY, float& posZ);
 
 	// Drawing methods.
 	void drawMyAxes();
@@ -83,4 +93,6 @@ private:
 	void drawMyGrids();
 	void drawMyScratchControlPoint();
 	void drawSphere(double r, int lats, int longs, float R, float GG, float B);
+	void drawAngleDial(const float radius);
+	void drawDragVector();
 };

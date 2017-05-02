@@ -268,6 +268,8 @@ void MyGLGeneralTrajectoryCurveView::AssignFocusPoint(QMouseEvent *event)
 {
 	float posX, posY, posZ, old_posX, old_posY;
 
+	posZ = 0.0;
+
 	getInAxesPosition(posX, posY, event->x(), event->y(), this->width(), this->height(), get_PanCentreX(), get_PanCentreY(), get_ViewHalfExtent());
 
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "3D point with POS: %f, %f, %f", posX, posY, posZ);

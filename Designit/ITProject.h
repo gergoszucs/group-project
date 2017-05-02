@@ -12,6 +12,7 @@
 #include "rapidjson/prettywriter.h"
 
 #include "Enums.h"
+#include "Point3.h"
 
 class ITControlPoint;
 
@@ -19,16 +20,6 @@ using namespace rapidjson;
 
 // Forward declarations.
 class ITSurface;
-
-struct Point3
-{
-public:
-	float x, y, z;
-
-	Point3() : x(0), y(0), z(0) {}
-
-	Point3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
-};
 
 class ITProject
 {

@@ -106,6 +106,10 @@ void UndoRedoSystem::redoSurfaceDelete(ITProject* p)
 {
 	if (deletedSurfaces.size() == 0) throw std::exception("NOTHING_TO_REDO");
 
+	int test = deletedSurfaces.size();
+
+	w->setMyTextDataField(QString::number(test));
+
 	int originalSurfaceID = std::get<0>(deletedSurfaces.back());
 
 	if ((originalSurfaceID < 0) || (originalSurfaceID > p->get_MySurfaces()->size())) throw std::exception("RECREATION_OF_SURFACE_IMPOSSIBLE");
@@ -222,18 +226,16 @@ void UndoRedoSystem::undoGroupPointsMove(ITProject * p, const unsigned int id)
 
 void UndoRedoSystem::undoGroupPointsRotate(ITProject * p, const unsigned int id)
 {
-	auto data = pointGroupsRotate[id];
-
-	for (auto it : std::get<0>(data))
+	for (auto it : std::get<0>(pointGroupsRotate[id]))
 	{
 		int surfaceID = it->get_K();
 		int i = it->get_I();
 		int j = it->get_J();
-		float posX = std::get<1>(data);
-		float posY = std::get<2>(data);
-		float posZ = std::get<3>(data);
-		float angle = -std::get<4>(data);
-		PLANE plane = std::get<5>(data);
+		float posX = std::get<1>(pointGroupsRotate[id]);
+		float posY = std::get<2>(pointGroupsRotate[id]);
+		float posZ = std::get<3>(pointGroupsRotate[id]);
+		float angle = -std::get<4>(pointGroupsRotate[id]);
+		PLANE plane = std::get<5>(pointGroupsRotate[id]);
 
 		p->rotatePoint(surfaceID, i, j, posX, posY, posZ, angle, plane, false);
 	}
@@ -258,18 +260,16 @@ void UndoRedoSystem::redoGroupPointsMove(ITProject * p, const unsigned int id)
 
 void UndoRedoSystem::redoGroupPointsRotate(ITProject * p, const unsigned int id)
 {
-	auto data = pointGroupsRotate[id];
-
-	for (auto it : std::get<0>(data))
+	for (auto it : std::get<0>(pointGroupsRotate[id]))
 	{
 		int surfaceID = it->get_K();
 		int i = it->get_I();
 		int j = it->get_J();
-		float posX = std::get<1>(data);
-		float posY = std::get<2>(data);
-		float posZ = std::get<3>(data);
-		float angle = std::get<4>(data);
-		PLANE plane = std::get<5>(data);
+		float posX = std::get<1>(pointGroupsRotate[id]);
+		float posY = std::get<2>(pointGroupsRotate[id]);
+		float posZ = std::get<3>(pointGroupsRotate[id]);
+		float angle = std::get<4>(pointGroupsRotate[id]);
+		PLANE plane = std::get<5>(pointGroupsRotate[id]);
 
 		p->rotatePoint(surfaceID, i, j, posX, posY, posZ, angle, plane, false);
 	}

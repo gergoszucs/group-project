@@ -545,7 +545,7 @@ public:
         editingTools->addItem(SurfaceTools, QStringLiteral("Surface Tools"));
         TrajectoryTools = new QWidget();
         TrajectoryTools->setObjectName(QStringLiteral("TrajectoryTools"));
-        TrajectoryTools->setGeometry(QRect(0, 0, 304, 659));
+        TrajectoryTools->setGeometry(QRect(0, 0, 218, 418));
         horizontalLayout_7 = new QHBoxLayout(TrajectoryTools);
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
@@ -742,7 +742,7 @@ public:
 
         tabsAdditionalData->setCurrentIndex(0);
         editingTools->setCurrentIndex(0);
-        tabsWorkSurface->setCurrentIndex(3);
+        tabsWorkSurface->setCurrentIndex(0);
         tabsWorkTrajectory->setCurrentIndex(0);
 
 

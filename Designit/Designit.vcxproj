@@ -143,6 +143,7 @@
     <ClCompile Include="MyGaussianView.cpp" />
     <ClCompile Include="MyGLGeneralTrajectoryCurveView.cpp" />
     <ClCompile Include="MyGLWidget.cpp" />
+    <ClCompile Include="Point3.cpp" />
     <ClCompile Include="qjsonitem.cpp" />
     <ClCompile Include="qjsonmodel.cpp" />
     <ClCompile Include="ITPointTrajectory.cpp" />
@@ -152,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enums.h" />
+    <ClInclude Include="Point3.h" />
     <ClInclude Include="undoRedoSystem.h" />
     <ClInclude Include="UtililityFunctions.h" />
     <CustomBuild Include="View2d.h">

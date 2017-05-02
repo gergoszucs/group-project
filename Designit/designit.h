@@ -72,8 +72,7 @@ public slots:
 	void on_actionMerge_surfaces_by_row_reverse_triggered();
 	void on_actionMeasure_distance_triggered();
 	
-
-void on_actionPlayout_Test_triggered();
+	void on_actionPlayout_Test_triggered();
 
 	void on_actionControl_points_triggered();
 	void on_actionInterpolated_points_triggered();
@@ -91,8 +90,6 @@ void on_actionPlayout_Test_triggered();
 
 	void on_actionUndo_triggered();
 	void on_actionRedo_triggered();
-
-	void userHasEnteredTextData();
 
 	void toolBoxTabChanged(int index);
 

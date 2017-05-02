@@ -3,6 +3,7 @@
 #include <string>
 #include <qstring.h>
 #include "Enums.h"
+#include "Point3.h"
 
 class ITPoint
 {
@@ -47,6 +48,8 @@ public:
 	void rotateAround(ITPoint& center, const float angle, PLANE p);
 
 	// Accessors.	
+	Point3 getCoordinates();
+
 	float get_X();
 	void set_X(float x);
 

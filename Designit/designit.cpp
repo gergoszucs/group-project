@@ -29,7 +29,6 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.action_Flexit->setEnabled(false);
 
 	// Default display OpenGL axes enabled.
-	//ui.actionAxes->setIcon( icon );
 	ui.actionControl_points->setIcon(icon);
 	ui.actionInterpolated_points->setIcon(icon);
 	ui.actionNormals->setIcon(icon);
@@ -41,7 +40,7 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	my_statusTable->setColumnCount(2);
 
 	my_statusTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Key")));
-	my_statusTable->setColumnWidth(0, 40);
+	my_statusTable->setColumnWidth(0, 110);
 
 	my_statusTable->setHorizontalHeaderItem(1, new QTableWidgetItem(QString("Value")));
 	my_statusTable->setColumnWidth(1, 130);
@@ -50,9 +49,6 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 
 	// Send HTTP log message.
 	sendHTTPRequest(QString("Program"), QString("Launched"), 0.0, 0, DataFileNameWithPath);
-
-	// Connect user text edit to enter method.
-	connect(ui.myEditTextDataField, &QLineEdit::returnPressed, this, &Designit::userHasEnteredTextData);
 
 	// Connect "finished item editing" signal of spreadsheet to "save data" slot
 	connect(ui.mySpreadsheet->itemDelegate(), &QAbstractItemDelegate::commitData, this, &Designit::updateDataFromSpreadsheet);
@@ -88,7 +84,7 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.myXZView->set_plane(XZ);
 	ui.myYZView->set_plane(YZ);
 
-	//populate command list
+	// Populate command list.
 	functions.emplace("help", &Designit::help);
 	functions.emplace("testFunction", &Designit::testFunction);
 
@@ -1806,30 +1802,6 @@ void Designit::setMyTextDataField(QString str)
 {
 	ui.myEditTextDataField->setText(str);
 
-}
-
-void Designit::userHasEnteredTextData()
-{
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Return");
-
-	//if (MY_EDIT_MODE == ROTATE_ALL)
-	//{
-	//	float netAngleReds = ui.myEditTextDataField->text().toFloat() * PI / 180.0 - ui.myXYView->get_EditValue();
-	//	ui.myXYView->set_EditValue(netAngleReds);
-	//	ui.myXYView->rotateFocusPoints(netAngleReds);
-
-	//	// Redraw other views.
-	//	updateAllTabs();
-	//}
-	//else if (MY_EDIT_MODE == SHEAR_ALL)
-	//{
-	//	float netShearDistance = ui.myEditTextDataField->text().toFloat();
-	//	ui.myXYView->set_EditValue(netShearDistance);
-	//	ui.myXYView->shearFocusPoints(netShearDistance);
-
-	//	// Redraw other views.
-	//	updateAllTabs();
-	//}
 }
 
 void Designit::handleCommand()
