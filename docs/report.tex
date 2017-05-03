@@ -248,6 +248,28 @@ As this was a group project, most of our achievements would not had been possibl
 
 \section{Cloud computing}
 
+In order to support the program on any device it could be hosted in the cloud. 
+We investigated the possibility of running the program on AWS (Amazon Web Services). 
+
+The selected instance is called g2.2xlarge which is an instance with a Graphics Card.
+Additional Storrage of 60GB had to be added in order to support the whole development kit.
+The instance runs Windows Server 2016 Base. 
+
+The following software had to be installed: Visual Studio, QT extensions and CUDA drivers.
+After that the program could be compiled on the cloud instance.
+
+When running the program it did not produce correct results. All results were NaN (not a number).
+Furthermore it crashed after a few frames. This behaviour was also observed on other (non-cloud based) hardware.
+
+Initially the graphics could not be displayed either but after removing the OpenGL \texttt{renderText} calls 
+they seemed to work. 
+
+No speedup could be seen when running on the cloud instance. Therefore we dropped the idea of supporting the program on AWS.
+However, it is a theoretically possible way of distributing the software by giving access to a coud instance 
+which would not require any installation or special hardware at the client computer. 
+
+One possible future option to try would be using p2 AWS instance which are tuned for GPU computations. Due to financial restrictions we could not do this in the course of this project.
+
 \section{Importing CAD models}
    
 There are many CAD programs but the most popular program in the world is Autodesk. 
