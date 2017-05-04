@@ -624,7 +624,7 @@
   <action name="actionReset">
    <property name="icon">
     <iconset resource="flexit.qrc">
-     <normaloff>:/Resources/icon_reset.jpg</normaloff>:/Resources/icon_reset.jpg</iconset>
+     <normaloff>:/Resources/icon_reset.png</normaloff>:/Resources/icon_reset.png</iconset>
    </property>
    <property name="text">
     <string>Reset</string>

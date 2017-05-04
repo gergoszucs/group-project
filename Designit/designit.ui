@@ -311,8 +311,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>304</width>
-          <height>659</height>
+          <width>218</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -896,7 +896,7 @@
    </property>
    <property name="icon">
     <iconset resource="designit.qrc">
-     <normaloff>:/Resources/flexit.ico</normaloff>:/Resources/flexit.ico</iconset>
+     <normaloff>:/Resources/flexit.png</normaloff>:/Resources/flexit.png</iconset>
    </property>
    <property name="text">
     <string>action_Flexit</string>

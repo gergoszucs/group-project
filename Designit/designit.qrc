@@ -66,5 +66,6 @@
         <file>Resources/redo_icon.png</file>
         <file>Resources/undo_icon.png</file>
         <file>Resources/designit.png</file>
+        <file>Resources/flexit.png</file>
     </qresource>
 </RCC>
