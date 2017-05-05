@@ -130,6 +130,13 @@ int ITSurface::sizeY()
 	}
 }
 
+int ITSurface::sizeTrajectory()
+{
+	if (_MyTrajectoryCurves->size() == 0) throw std::exception("NO_TRAJECTORY");
+
+	return _MyTrajectoryCurves->at(0)->get_MyTrajectoryCurveSegments()->size();
+}	
+
 ITPoint * ITSurface::getControlPoint(const int i, const int j)
 {
 	if ((i >= sizeX()) || (j >= sizeY())) throw std::exception("NO_POINT");
@@ -148,8 +155,8 @@ ITSurface * ITSurface::getCopyTranslated(const int k, const float x, const float
 {
 	ITSurface *s = new ITSurface();
 
-	s->set_NoOfInterpolatedPointsU(20);
-	s->set_NoOfInterpolatedPointsV(20);
+	s->set_NoOfInterpolatedPointsU(_NoOfInterpolatedPointsU);
+	s->set_NoOfInterpolatedPointsV(_NoOfInterpolatedPointsV);
 
 	float centerX, centerY, centerZ;
 
@@ -237,7 +244,7 @@ void ITSurface::addRow(const int i, std::vector<ITControlPoint*>& row)
 
 void ITSurface::duplicateRow(const int i)
 {
-	if ((i >= sizeX() - 1) || (i < 0)) { throw std::exception("NO_ROW"); }
+	if ((i >= sizeX()) || (i < 0)) { throw std::exception("NO_ROW"); }
 
 	int k = getControlPoint(0, 0)->get_K();
 
@@ -260,8 +267,15 @@ void ITSurface::duplicateRow(const int i)
 	}
 
 	// Insert the row.
-	std::vector < std::vector <ITControlPoint*> >::iterator it = _MyControlPoints->begin();
-	_MyControlPoints->insert(it + i + 1, dummy_v);
+	if (i == sizeX() - 1)
+	{
+		_MyControlPoints->push_back(dummy_v);
+	}
+	else
+	{
+		std::vector < std::vector <ITControlPoint*> >::iterator it = _MyControlPoints->begin();
+		_MyControlPoints->insert(it + i + 1, dummy_v);
+	}
 
 	// Re-assign the _K, _I and _J variables.
 	reassignIdentifiers(k);
@@ -369,9 +383,10 @@ void ITSurface::addColumn(const int j, std::vector<ITControlPoint*>& column)
 
 void ITSurface::duplicateColumn(const int j)
 {
-	if ((j >= sizeY() - 1) || (j < 0)) { throw std::exception("NO_COLUMN"); }
+	if ((j >= sizeY()) || (j < 0)) { throw std::exception("NO_COLUMN"); }
 
 	int k = getControlPoint(0, 0)->get_K();
+	int size = sizeY();
 
 	// Create a new vector.
 	std::vector <ITControlPoint *> dummy_v;
@@ -390,7 +405,14 @@ void ITSurface::duplicateColumn(const int j)
 		p->set_U(0.0);
 		p->set_V(0.0);
 
-		_MyControlPoints->at(i).insert(it + j + 1, p);
+		if (j == size)
+		{
+			_MyControlPoints->at(i).push_back(p);
+		}
+		else
+		{
+			_MyControlPoints->at(i).insert(it + j + 1, p);
+		}
 	}
 
 	// Re-assign the _K, _I and _J variables.
@@ -1079,7 +1101,6 @@ std::vector < std::vector <ITPoint*> > *ITSurface::get_MyInterpolatedNormals() {
 void ITSurface::set_MyInterpolatedNormals(std::vector < std::vector <ITPoint*> > *myInterpolatedNormals) { _MyInterpolatedNormals = myInterpolatedNormals; }
 
 std::vector <ITTrajectoryCurve*> *ITSurface::get_MyTrajectoryCurves() { return _MyTrajectoryCurves; }
-void set_MyTrajectoryCurves(std::vector <ITTrajectoryCurve*> *myTrajectoryCurves);
 
 ITPoint *ITSurface::get_MyCentreOfRotationPoint() { return _MyCentreOfRotationPoint; }
 void ITSurface::set_MyCentreOfRotationPoint(ITPoint* p) { _MyCentreOfRotationPoint = p; }

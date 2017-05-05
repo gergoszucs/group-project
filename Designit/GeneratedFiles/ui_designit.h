@@ -83,6 +83,8 @@ public:
     QAction *action_Flexit;
     QAction *actionUndo;
     QAction *actionRedo;
+    QAction *actionDrag_vector;
+    QAction *actionAngle_dial;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout_2;
     QSplitter *splitter;
@@ -109,6 +111,14 @@ public:
     QSpacerItem *horizontalSpacer_2;
     QLineEdit *myEditTextDataField;
     MyGLWidget *myGLWidget;
+    QFrame *TrajectoryButtons;
+    QHBoxLayout *horizontalLayout_6;
+    QPushButton *previousFrame;
+    QPushButton *toBegin;
+    QPushButton *stop;
+    QPushButton *start;
+    QPushButton *nextFrame;
+    QPushButton *syncCurves;
     QToolBox *editingTools;
     QWidget *SurfaceTools;
     QHBoxLayout *horizontalLayout;
@@ -335,6 +345,14 @@ public:
         QIcon icon30;
         icon30.addFile(QStringLiteral(":/Resources/redo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionRedo->setIcon(icon30);
+        actionDrag_vector = new QAction(DesignitClass);
+        actionDrag_vector->setObjectName(QStringLiteral("actionDrag_vector"));
+        actionDrag_vector->setCheckable(true);
+        actionDrag_vector->setChecked(true);
+        actionAngle_dial = new QAction(DesignitClass);
+        actionAngle_dial->setObjectName(QStringLiteral("actionAngle_dial"));
+        actionAngle_dial->setCheckable(true);
+        actionAngle_dial->setChecked(true);
         centralWidget = new QWidget(DesignitClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout_2 = new QHBoxLayout(centralWidget);
@@ -421,7 +439,7 @@ public:
         splitter->addWidget(tabsAdditionalData);
         frame_2 = new QFrame(splitter);
         frame_2->setObjectName(QStringLiteral("frame_2"));
-        frame_2->setMinimumSize(QSize(400, 400));
+        frame_2->setMinimumSize(QSize(400, 713));
         frame_2->setMaximumSize(QSize(100000, 16777215));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
@@ -461,6 +479,66 @@ public:
         myGLWidget->setObjectName(QStringLiteral("myGLWidget"));
 
         verticalLayout_2->addWidget(myGLWidget);
+
+        TrajectoryButtons = new QFrame(frame_2);
+        TrajectoryButtons->setObjectName(QStringLiteral("TrajectoryButtons"));
+        TrajectoryButtons->setMinimumSize(QSize(0, 50));
+        TrajectoryButtons->setMaximumSize(QSize(16777215, 50));
+        TrajectoryButtons->setFrameShape(QFrame::StyledPanel);
+        TrajectoryButtons->setFrameShadow(QFrame::Raised);
+        horizontalLayout_6 = new QHBoxLayout(TrajectoryButtons);
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        previousFrame = new QPushButton(TrajectoryButtons);
+        previousFrame->setObjectName(QStringLiteral("previousFrame"));
+        QIcon icon31;
+        icon31.addFile(QStringLiteral(":/Resources/button_black_first.png"), QSize(), QIcon::Normal, QIcon::Off);
+        previousFrame->setIcon(icon31);
+
+        horizontalLayout_6->addWidget(previousFrame);
+
+        toBegin = new QPushButton(TrajectoryButtons);
+        toBegin->setObjectName(QStringLiteral("toBegin"));
+        QIcon icon32;
+        icon32.addFile(QStringLiteral(":/Resources/button_black_repeat.png"), QSize(), QIcon::Normal, QIcon::Off);
+        toBegin->setIcon(icon32);
+
+        horizontalLayout_6->addWidget(toBegin);
+
+        stop = new QPushButton(TrajectoryButtons);
+        stop->setObjectName(QStringLiteral("stop"));
+        QIcon icon33;
+        icon33.addFile(QStringLiteral(":/Resources/button_black_pause.png"), QSize(), QIcon::Normal, QIcon::Off);
+        stop->setIcon(icon33);
+
+        horizontalLayout_6->addWidget(stop);
+
+        start = new QPushButton(TrajectoryButtons);
+        start->setObjectName(QStringLiteral("start"));
+        QIcon icon34;
+        icon34.addFile(QStringLiteral(":/Resources/button_black_play.png"), QSize(), QIcon::Normal, QIcon::Off);
+        start->setIcon(icon34);
+
+        horizontalLayout_6->addWidget(start);
+
+        nextFrame = new QPushButton(TrajectoryButtons);
+        nextFrame->setObjectName(QStringLiteral("nextFrame"));
+        QIcon icon35;
+        icon35.addFile(QStringLiteral(":/Resources/button_black_last.png"), QSize(), QIcon::Normal, QIcon::Off);
+        nextFrame->setIcon(icon35);
+
+        horizontalLayout_6->addWidget(nextFrame);
+
+        syncCurves = new QPushButton(TrajectoryButtons);
+        syncCurves->setObjectName(QStringLiteral("syncCurves"));
+        syncCurves->setCheckable(true);
+        syncCurves->setChecked(false);
+
+        horizontalLayout_6->addWidget(syncCurves);
+
+
+        verticalLayout_2->addWidget(TrajectoryButtons);
 
         splitter->addWidget(frame_2);
         editingTools = new QToolBox(splitter);
@@ -545,7 +623,7 @@ public:
         editingTools->addItem(SurfaceTools, QStringLiteral("Surface Tools"));
         TrajectoryTools = new QWidget();
         TrajectoryTools->setObjectName(QStringLiteral("TrajectoryTools"));
-        TrajectoryTools->setGeometry(QRect(0, 0, 218, 418));
+        TrajectoryTools->setGeometry(QRect(0, 0, 304, 659));
         horizontalLayout_7 = new QHBoxLayout(TrajectoryTools);
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
@@ -668,6 +746,9 @@ public:
         menuView->addAction(actionAnnotations);
         menuView->addAction(actionGrids);
         menuView->addAction(actionReset_all_views);
+        menuView->addSeparator();
+        menuView->addAction(actionDrag_vector);
+        menuView->addAction(actionAngle_dial);
         menuEdit->addAction(actionDrag);
         menuEdit->addAction(actionCentred_rotate);
         menuEdit->addSeparator();
@@ -739,6 +820,12 @@ public:
         mainToolBar->addAction(actionWeb_help);
 
         retranslateUi(DesignitClass);
+        QObject::connect(start, SIGNAL(released()), DesignitClass, SLOT(startTest()));
+        QObject::connect(toBegin, SIGNAL(released()), DesignitClass, SLOT(restart()));
+        QObject::connect(previousFrame, SIGNAL(released()), DesignitClass, SLOT(previousFrame()));
+        QObject::connect(nextFrame, SIGNAL(released()), DesignitClass, SLOT(nextFrame()));
+        QObject::connect(stop, SIGNAL(released()), DesignitClass, SLOT(stopTest()));
+        QObject::connect(syncCurves, SIGNAL(toggled(bool)), DesignitClass, SLOT(syncCurves(bool)));
 
         tabsAdditionalData->setCurrentIndex(0);
         editingTools->setCurrentIndex(0);
@@ -818,12 +905,20 @@ public:
         actionRedo->setToolTip(QApplication::translate("DesignitClass", "Redo action.", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
         actionRedo->setShortcut(QApplication::translate("DesignitClass", "Ctrl+Y", Q_NULLPTR));
+        actionDrag_vector->setText(QApplication::translate("DesignitClass", "Drag vector", Q_NULLPTR));
+        actionAngle_dial->setText(QApplication::translate("DesignitClass", "Angle dial", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_statusWindow), QApplication::translate("DesignitClass", "Status window", Q_NULLPTR));
         collapseAllButton->setText(QApplication::translate("DesignitClass", "Collapse All", Q_NULLPTR));
         expandAllButton->setText(QApplication::translate("DesignitClass", "Expand All", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_viewJSON), QApplication::translate("DesignitClass", "JSON view", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_dataFile), QApplication::translate("DesignitClass", "Data file", Q_NULLPTR));
         label_2->setText(QApplication::translate("DesignitClass", "3D view", Q_NULLPTR));
+        previousFrame->setText(QApplication::translate("DesignitClass", "Previous", Q_NULLPTR));
+        toBegin->setText(QApplication::translate("DesignitClass", "Restart", Q_NULLPTR));
+        stop->setText(QApplication::translate("DesignitClass", "Stop", Q_NULLPTR));
+        start->setText(QApplication::translate("DesignitClass", "Start", Q_NULLPTR));
+        nextFrame->setText(QApplication::translate("DesignitClass", "Next", Q_NULLPTR));
+        syncCurves->setText(QApplication::translate("DesignitClass", "Sync Curves", Q_NULLPTR));
         tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XYView), QApplication::translate("DesignitClass", "XY view", Q_NULLPTR));
         tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XZView), QApplication::translate("DesignitClass", "XZ view", Q_NULLPTR));
         tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_YZView), QApplication::translate("DesignitClass", "YZ view", Q_NULLPTR));

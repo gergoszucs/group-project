@@ -106,9 +106,7 @@ void UndoRedoSystem::redoSurfaceDelete(ITProject* p)
 {
 	if (deletedSurfaces.size() == 0) throw std::exception("NOTHING_TO_REDO");
 
-	int test = deletedSurfaces.size();
-
-	w->setMyTextDataField(QString::number(test));
+	w->setMyTextDataField(QString::number(deletedSurfaces.size()));
 
 	int originalSurfaceID = std::get<0>(deletedSurfaces.back());
 

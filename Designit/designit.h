@@ -32,6 +32,10 @@ public:
 
 	void sendHTTPRequest(QString actionKey, QString actionValue, float elapsedTimeSecs, int totalProblemSize, QString fileNameWithPath);
 
+	bool getSync();
+	bool getDial();
+	bool getVector();
+
 	UndoRedoSystem undoRedo;
 
 public slots:
@@ -144,6 +148,13 @@ public slots:
 
 	QString getCommandList();
 
+	void nextFrame();
+	void previousFrame();
+	void startTest();
+	void stopTest();
+	void restart();
+	void syncCurves(bool b);
+
 private:
 	Ui::DesignitClass ui;
 
@@ -194,6 +205,15 @@ private:
 
 	static int matePoints(const QStringList & arguments, const bool reg);
 
+	static int mergeSurface(const QStringList & arguments, const bool reg);
+	static int mergeSurfaceReversed(const QStringList & arguments, const bool reg);
+
+	static int setTrajectoryPoint(const QStringList & arguments, const bool reg);
+	static int moveTrajectoryPoint(const QStringList & arguments, const bool reg);
+
+	static int setU(const QStringList & arguments, const bool reg);
+	static int setV(const QStringList & arguments, const bool reg);
+
 	static int help(const QStringList & arguments, const bool reg);
 
 	static int redoSurfaceDelete(const QStringList & arguments, const bool reg);
@@ -204,6 +224,8 @@ private:
 	static int undoPointGroupRotate(const QStringList & arguments, const bool reg);
 	static int redoPointGroupMove(const QStringList & arguments, const bool reg);
 	static int redoPointGroupRotate(const QStringList & arguments, const bool reg);
+
+	static int undoMerge(const QStringList & arguments, const bool reg);
 
 public:
 	std::unordered_map<std::string, std::function<int(const QStringList & arguments, const bool reg)>> functions;

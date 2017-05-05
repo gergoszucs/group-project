@@ -45,22 +45,6 @@ extern float glGaussianViewHalfExtent;
 extern float glGaussianPanCentreX;
 extern float glGaussianPanCentreY;
 
-//extern float gl3DViewHalfExtent;
-//extern float gl3DPanCentreX;
-//extern float gl3DPanCentreY;
-
-extern float glXViewHalfExtent;
-extern float glXPanCentreX;
-extern float glXPanCentreY;
-
-extern float glYViewHalfExtent;
-extern float glYPanCentreX;
-extern float glYPanCentreY;
-
-extern float glZViewHalfExtent;
-extern float glZPanCentreX;
-extern float glZPanCentreY;
-
 // Drawing semaphores.
 extern bool drawRotateXHorizontal;
 extern bool drawRotateYHorizontal;

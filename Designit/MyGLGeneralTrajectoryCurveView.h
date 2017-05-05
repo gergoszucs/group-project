@@ -2,6 +2,8 @@
 
 #include <QGLWidget>
 
+class ITControlPoint;
+
 class MyGLGeneralTrajectoryCurveView : public QGLWidget
 {
 	Q_OBJECT
@@ -11,6 +13,7 @@ public:
 	~MyGLGeneralTrajectoryCurveView(void) {};
 
 	void resetMyView();
+	void setSceneParameters(float eyeX, float eyeY, float eyeZoom);
 
 	// Accessors.
 	float get_EditValue();
@@ -42,7 +45,6 @@ protected:
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
-	void setViewOrtho(int width, int height);
 	void keyPressEvent(QKeyEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
@@ -55,6 +57,10 @@ private:
 	int xRot;
 	int yRot;
 	int zRot;
+
+	float eyeX = 40.0;
+	float eyeY = 0.0;
+	float eyeZoom = 1.0;
 
 	int myWidth;
 	int myHeight;
@@ -77,6 +83,10 @@ private:
 	int orginX;
 	int orginY;
 
+	int surfaceID = -1;
+	int pointID = -1;
+	int surfaceID_light = -1;
+	int pointID_light = -1;
 
 	// Drawing methods.
 	void draw();
@@ -85,10 +95,10 @@ private:
 	void drawMyCurve();
 	void drawSphere(double r, int lats, int longs, float R, float GG, float B);
 	void drawMyFocusSegments();
-	void AssignFocusPoint(QMouseEvent *event);
 	void findTrajectoryPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI);
 	void findOrdinateRange(float *minOrdinate, float *maxOrdinate);
-	void dragFocusPoints(float posX, float posY, float old_posX, float old_posY);
 	void drawMyCurveHandles(int curveIndex);
 	void drawMyInterpolatedCurve(int curveIndex);
+
+	void getAxesPos(float& pX, float& pY, const int x, const int y);
 };

@@ -68,12 +68,14 @@ void ITPhysics::playOutDryRun()
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside playOutDryRun");
 
 	// At the start of the dry run, we move points back to base.
-	if (FrameNumber == 0)
+	if (FrameNumber == project->get_MaxKeyFrame())
 	{
 		for (int k = 0; k<project->get_MySurfaces()->size(); k++)
 		{
 			project->get_MySurfaces()->at(k)->moveMeBackToBase(k);
-		} // k
+		}
+
+		FrameNumber = 0;
 	}
 
 	while ((FrameNumber < project->get_MaxKeyFrame()) && (IsDryRun)) // Note that we do NOT require !IsStep here. This allows us to dry run after stepping.

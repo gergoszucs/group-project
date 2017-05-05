@@ -478,7 +478,7 @@ void View2d::drawSphere(double r, int lats, int longs, float R, float GG, float 
 
 void View2d::drawAngleDial(const float radius)
 {
-	if ((focusedPoints.size() != 0) && (scrachPointReady))
+	if ((focusedPoints.size() != 0) && (scrachPointReady) && (w->getDial()))
 	{
 		Point3 center = _ScratchControlPoint->getCoordinates();
 
@@ -583,13 +583,12 @@ void View2d::drawAngleDial(const float radius)
 
 void View2d::drawDragVector()
 {
-	if (focusedPoints.size() != 0) 
+	if ((focusedPoints.size() != 0) && (w->getVector()))
 	{
 		Point3 pointNow = focusedPoints[0]->getCoordinates();
 
 		Point3 pointBegin(pointNow.x - draggedX, pointNow.y - draggedY, pointNow.z - draggedZ);
 
-		
 		glColor3f(0.0f, 0.0f, 0.0f);
 		glLineWidth(2.5);
 		glBegin(GL_LINE_STRIP);
@@ -847,53 +846,36 @@ void View2d::mousePressEvent(QMouseEvent *event)
 				switch (ret)
 				{
 				case 0:
-					project->flipSurfaceCentral(k, XY);
 					command.push_back("XY");
 					break;
 				case 1:
-					project->flipSurfaceCentral(k, YZ);
 					command.push_back("YZ");
 					break;
 				case 2:
-					project->flipSurfaceCentral(k, XZ);
 					command.push_back("XZ");
 					break;
 				}
 
-				w->undoRedo.registerCommand(command, command);
+				w->executeCommand("FLIP", command, true);
 
 				finishEdit();
 				break;
 			case COPY_SURFACE:
-				project->copySurface(k, 0, 0, 0);
-
 				command.push_back("copySurface");
 				command.push_back(QString::number(k));
 				command.push_back("0");
 				command.push_back("0");
 				command.push_back("0");
 
-				revCommand.push_back("deleteSurface");
-				revCommand.push_back(QString::number(k));
-
-				w->undoRedo.registerCommand(command, revCommand);
+				w->executeCommand("COPY SURFACE", command, true);
 
 				finishEdit();
 				break;
 			case DELETE_SURFACE:
-				tmp = project->getSurface(k);
-				tmpBase = project->getBaseSurface(k);
-
-				project->deleteSurface(k);
-
-				w->undoRedo.registerSurface(tmp, tmpBase);
-
 				command.push_back("deleteSurface");
 				command.push_back(QString::number(k));
 
-				revCommand.push_back("redoSurfaceDelete");
-
-				w->undoRedo.registerCommand(command, revCommand);
+				w->executeCommand("DELETE SURFACE", command, true);
 
 				finishEdit();
 				break;
@@ -911,11 +893,7 @@ void View2d::mousePressEvent(QMouseEvent *event)
 					command.push_back(QString::number(k));
 					command.push_back(QString::number(i));
 
-					revCommand.push_back("deleteRow");
-					revCommand.push_back(QString::number(k));
-					revCommand.push_back(QString::number(i + 1));
-
-					w->undoRedo.registerCommand(command, revCommand);
+					w->executeCommand("INSERT ROW", command, true);
 				}
 
 				finishEdit();
@@ -923,52 +901,26 @@ void View2d::mousePressEvent(QMouseEvent *event)
 			case DELETE_ROW:
 				if (project->getSurface(k)->sizeX() == 1)
 				{
-					tmp = project->getSurface(k);
-					tmpBase = project->getBaseSurface(k);
-
-					project->deleteSurface(k);
-
-					w->undoRedo.registerSurface(tmp, tmpBase);
-
 					command.push_back("deleteSurface");
 					command.push_back(QString::number(k));
-
-					revCommand.push_back("redoSurfaceDelete");
-
-					w->undoRedo.registerCommand(command, revCommand);
 				}
 				else
 				{
-					project->getSurface(k)->getRowCopy(i, tmpVec);
-
-					project->deleteRow(k, i);
-
-					w->undoRedo.registerRow(k, i, tmpVec);
-
 					command.push_back("deleteRow");
 					command.push_back(QString::number(k));
 					command.push_back(QString::number(i));
-
-					revCommand.push_back("redoRowDelete");
-
-					w->undoRedo.registerCommand(command, revCommand);
 				}
+
+				w->executeCommand("DELETE ROW", command, true);
 
 				finishEdit();
 				break;
 			case DUPLICATE_ROW:
-
-				project->duplicateRow(k, i);
-
 				command.push_back("duplicateRow");
 				command.push_back(QString::number(k));
 				command.push_back(QString::number(i));
 
-				revCommand.push_back("deleteRow");
-				revCommand.push_back(QString::number(k));
-				revCommand.push_back(QString::number(i + 1));
-
-				w->undoRedo.registerCommand(command, revCommand);
+				w->executeCommand("DUPLICATE ROW", command, true);
 
 				finishEdit();
 				break;
@@ -981,17 +933,11 @@ void View2d::mousePressEvent(QMouseEvent *event)
 				}
 				else
 				{
-					project->insertColumn(k, j);
-
 					command.push_back("insertColumn");
 					command.push_back(QString::number(k));
 					command.push_back(QString::number(j));
 
-					revCommand.push_back("deleteColumn");
-					revCommand.push_back(QString::number(k));
-					revCommand.push_back(QString::number(j + 1));
-
-					w->undoRedo.registerCommand(command, revCommand);
+					w->executeCommand("INSERT COLUMN", command, true);
 				}
 
 				finishEdit();
@@ -999,51 +945,26 @@ void View2d::mousePressEvent(QMouseEvent *event)
 			case DELETE_COL:
 				if (project->getSurface(k)->sizeY() == 1)
 				{
-					tmp = project->getSurface(k);
-					tmpBase = project->getBaseSurface(k);
-
-					project->deleteSurface(k);
-
-					w->undoRedo.registerSurface(tmp, tmpBase);
-
 					command.push_back("deleteSurface");
 					command.push_back(QString::number(k));
-
-					revCommand.push_back("redoSurfaceDelete");
-
-					w->undoRedo.registerCommand(command, revCommand);
 				}
 				else
 				{
-					project->getSurface(k)->getColumnCopy(j, tmpVec);
-
-					project->deleteColumn(k, j);
-
-					w->undoRedo.registerColumn(k , j, tmpVec);
-
 					command.push_back("deleteColumn");
 					command.push_back(QString::number(k));
 					command.push_back(QString::number(j));
-
-					revCommand.push_back("redoColumnDelete");
-
-					w->undoRedo.registerCommand(command, revCommand);
 				}
+
+				w->executeCommand("DELETE COLUMN", command, true);
 
 				finishEdit();
 				break;
 			case DUPLICATE_COL:
-				project->duplicateColumn(k, j);
-
 				command.push_back("duplicateColumn");
 				command.push_back(QString::number(k));
 				command.push_back(QString::number(j));
 
-				revCommand.push_back("deleteColumn");
-				revCommand.push_back(QString::number(k));
-				revCommand.push_back(QString::number(j + 1));
-
-				w->undoRedo.registerCommand(command, revCommand);
+				w->executeCommand("DUPLICATE COLUMN", command, true);
 
 				finishEdit();
 				break;
@@ -1065,10 +986,6 @@ void View2d::mousePressEvent(QMouseEvent *event)
 				}
 				else
 				{
-					tmpPoint = project->getPointData(k, i, j);
-
-					project->matePoints(_ScratchControlPoint->get_K(), _ScratchControlPoint->get_I(), _ScratchControlPoint->get_J(), k, i, j);
-
 					command.push_back("matePoints");
 					command.push_back(QString::number(_ScratchControlPoint->get_K()));
 					command.push_back(QString::number(_ScratchControlPoint->get_I()));
@@ -1077,13 +994,7 @@ void View2d::mousePressEvent(QMouseEvent *event)
 					command.push_back(QString::number(i));
 					command.push_back(QString::number(j));
 
-					revCommand.push_back("setPoint");
-					revCommand.push_back(QString::number(k));
-					revCommand.push_back(QString::number(i));
-					revCommand.push_back(QString::number(j));
-					revCommand.push_back(QString::number(tmpPoint.x));
-					revCommand.push_back(QString::number(tmpPoint.y));
-					revCommand.push_back(QString::number(tmpPoint.z));
+					w->executeCommand("MATE POINTS", command, true);
 
 					finishEdit();
 				}
@@ -1097,10 +1008,6 @@ void View2d::mousePressEvent(QMouseEvent *event)
 
 				ret = msgBox.exec();
 
-				project->copySurface(k, 0, 0, 0);
-
-				surfaceID = project->get_MySurfaces()->size() - 1;
-
 				command.push_back("copySurfaceMirror");
 				command.push_back(QString::number(k));
 				command.push_back("0");
@@ -1110,40 +1017,192 @@ void View2d::mousePressEvent(QMouseEvent *event)
 				switch (ret)
 				{
 				case 0:
-					project->flipSurfaceCentral(surfaceID, XY);
 					command.push_back("XY");
 					break;
 				case 1:
-					project->flipSurfaceCentral(surfaceID, YZ);
 					command.push_back("YZ");
 					break;
 				case 2:
-					project->flipSurfaceCentral(surfaceID, XZ);
 					command.push_back("XZ");
 					break;
 				}
 
-				revCommand.push_back("deleteSurface");
-				revCommand.push_back(QString::number(k));
-
-				w->undoRedo.registerCommand(command, revCommand);
+				w->executeCommand("COPY SURFACE MIRROR", command, true);
 
 				finishEdit();
 				break;
 			case MERGE_SURFACES_BY_ROW:
-				finishEdit();
+				if (!primedForClick)
+				{
+					_ScratchControlPoint->set_K(k);
+
+					for (int itX = 0; itX < project->getSurface(k)->sizeX(); itX++)
+					{
+						for (int itY = 0; itY < project->getSurface(k)->sizeY(); itY++)
+						{
+							addFocusPoint(project->getControlPoint(k, itX, itY));
+						}
+					}
+
+					primedForClick = true;
+				}
+				else
+				{
+					if (_ScratchControlPoint->get_K() == k)
+					{
+						QMessageBox::warning(this, "Merge surface", "You cannot merge surface with itself");
+
+						finishEdit();
+					}
+					else if (project->getSurface(_ScratchControlPoint->get_K())->sizeY() != project->getSurface(k)->sizeY())
+					{
+						QMessageBox::warning(this, "Merge surface", "You cannot merge surfaces with diffrent number of columns");
+
+						finishEdit();
+					}
+					else
+					{
+						auto tmp = project->getSurface(k);
+						auto tmpBase = project->getBaseSurface(k);
+
+						QStringList items;
+						items << tr("First to first") << tr("First to last") << tr("Last to first") << tr("Last to last");
+
+						bool ok;
+						QString item = QInputDialog::getItem(this, tr("Merge surface"),
+							tr("Choose how to merge surfaces rowwise:"), items, 0, false, &ok);
+
+						if (ok && !item.isEmpty())
+						{
+							command.push_back("mergeSurface");
+							command.push_back(QString::number(_ScratchControlPoint->get_K()));
+
+							if (QString::compare(item, items[0], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("first");
+								command.push_back(QString::number(k));
+								command.push_back("first");
+							}
+							else if (QString::compare(item, items[1], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("first");
+								command.push_back(QString::number(k));
+								command.push_back("last");
+							}
+							else if (QString::compare(item, items[2], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("last");
+								command.push_back(QString::number(k));
+								command.push_back("first");
+							}
+							else if (QString::compare(item, items[3], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("last");
+								command.push_back(QString::number(k));
+								command.push_back("last");
+							}
+							
+							w->executeCommand("MERGE SURFACE", command, true);
+
+							finishEdit();
+						}
+						else
+						{
+							finishEdit();
+						}
+					}
+				}
 				break;
 			case MERGE_SURFACES_BY_ROW_REVERSE:
-				finishEdit();
+				if (!primedForClick)
+				{
+					_ScratchControlPoint->set_K(k);
+
+					for (int itX = 0; itX < project->getSurface(k)->sizeX(); itX++)
+					{
+						for (int itY = 0; itY < project->getSurface(k)->sizeY(); itY++)
+						{
+							addFocusPoint(project->getControlPoint(k, itX, itY));
+						}
+					}
+
+					primedForClick = true;
+				}
+				else
+				{
+					if (_ScratchControlPoint->get_K() == k)
+					{
+						QMessageBox::warning(this, "Merge surface reversed", "You cannot merge surface with itself");
+
+						finishEdit();
+					}
+					else if (project->getSurface(_ScratchControlPoint->get_K())->sizeY() != project->getSurface(k)->sizeY())
+					{
+						QMessageBox::warning(this, "Merge surface reversed", "You cannot merge surfaces with diffrent number of columns");
+
+						finishEdit();
+					}
+					else
+					{
+						auto tmp = project->getSurface(k);
+						auto tmpBase = project->getBaseSurface(k);
+
+						QStringList items;
+						items << tr("First to first") << tr("First to last") << tr("Last to first") << tr("Last to last");
+
+						bool ok;
+						QString item = QInputDialog::getItem(this, tr("Merge surface reversed"),
+							tr("Choose how to merge surfaces rowwise:"), items, 0, false, &ok);
+
+						if (ok && !item.isEmpty())
+						{
+							command.push_back("mergeSurfaceReversed");
+							command.push_back(QString::number(_ScratchControlPoint->get_K()));
+
+							if (QString::compare(item, items[0], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("first");
+								command.push_back(QString::number(k));
+								command.push_back("first");
+							}
+							else if (QString::compare(item, items[1], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("first");
+								command.push_back(QString::number(k));
+								command.push_back("last");
+							}
+							else if (QString::compare(item, items[2], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("last");
+								command.push_back(QString::number(k));
+								command.push_back("first");
+							}
+							else if (QString::compare(item, items[3], Qt::CaseInsensitive) == 0)
+							{
+								command.push_back("last");
+								command.push_back(QString::number(k));
+								command.push_back("last");
+							}
+
+							w->executeCommand("MERGE SURFACE REVERSED", command, true);
+
+							finishEdit();
+						}
+						else
+						{
+							finishEdit();
+						}
+					}
+				}
 				break;
 			case MEASURE_DISTANCE:
-				if (!primedForClick)
+				if (!scrachPointReady)
 				{
 					_ScratchControlPoint->set_X(project->getControlPoint(k, i, j)->get_X());
 					_ScratchControlPoint->set_Y(project->getControlPoint(k, i, j)->get_Y());
 					_ScratchControlPoint->set_Z(project->getControlPoint(k, i, j)->get_Z());
 
-					primedForClick = true;
+					scrachPointReady = true;
 				}
 				else
 				{
@@ -1161,17 +1220,11 @@ void View2d::mousePressEvent(QMouseEvent *event)
 				data = QInputDialog::getDouble(this, tr("Scaling"), tr("Enter scaling factor:"), 1.0, 0.001, 2147483647, 3, &status);
 				if ((status) && (data > 0))
 				{
-					project->resizeSurface(k, data);
-
 					command.push_back("resizeSurface");
 					command.push_back(QString::number(k));
 					command.push_back(QString::number(data));
 
-					revCommand.push_back("resizeSurface");
-					revCommand.push_back(QString::number(k));
-					revCommand.push_back(QString::number(1/data));
-
-					w->undoRedo.registerCommand(command, revCommand);
+					w->executeCommand("RESIZE SURFACE", command, true);
 				}
 				break;
 			default:
@@ -1227,168 +1280,8 @@ void View2d::mousePressEvent(QMouseEvent *event)
 			}
 		}
 
-		//{
-		//	if (MY_EDIT_MODE == MERGE_SURFACES_BY_ROW)
-		//	{
-		//		if (get_PrimedForFirstClick())
-		//		{
-		//			// Empty the focus vectors.
-		//			w->emptyFocusVectors();
-		//
-		//			// Save the first point indices.
-		//			get_ScratchControlPoint()->set_X(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_X());
-		//			get_ScratchControlPoint()->set_Y(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Y());
-		//			get_ScratchControlPoint()->set_Z(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Z());
-		//
-		//			get_ScratchControlPoint()->set_K(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_K());
-		//			get_ScratchControlPoint()->set_I(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_I());
-		//			get_ScratchControlPoint()->set_J(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_J());
-		//
-		//			// Cancel primed for first click and prime for second click.
-		//			set_PrimedForFirstClick(false);
-		//			set_PrimedForSecondClick(true);
-		//
-		//			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "First surface has been captured.");
-		//		}
-		//		else if (get_PrimedForSecondClick())
-		//		{
-		//			// Get second point and move it to the first one.
-		//			ITControlPoint *firstPoint = get_ScratchControlPoint();
-		//			ITControlPoint *secondPoint = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
-		//			ITControlPoint *secondBasePoint = project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
-		//
-		//			// Check that the number of columns for the two surfaces is the same.
-		//			int k1 = firstPoint->get_K();
-		//			int k2 = secondPoint->get_K();
-		//			int noOfCols1 = project->get_MySurfaces()->at(k1)->get_MyControlPoints()->at(0).size();
-		//			int noOfCols2 = project->get_MySurfaces()->at(k2)->get_MyControlPoints()->at(0).size();
-		//			if (noOfCols1 == noOfCols2)
-		//			{
-		//				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Second surface has been captured.");
-		//
-		//				mergeSurfacesByRow(firstPoint->get_K(), secondPoint->get_K());
-		//
-		//				// Cancel primed for first click and cancel primed for second click.
-		//				set_PrimedForFirstClick(false);
-		//				set_PrimedForSecondClick(false);
-		//
-		//				// Reset the buttons.
-		//				w->resetModeButtons();
-		//
-		//				// Reset the scratch point.
-		//				get_ScratchControlPoint()->set_X(0.0);
-		//				get_ScratchControlPoint()->set_Y(0.0);
-		//				get_ScratchControlPoint()->set_Z(0.0);
-		//
-		//				get_ScratchControlPoint()->set_K(-1);
-		//				get_ScratchControlPoint()->set_I(-1);
-		//				get_ScratchControlPoint()->set_J(-1);
-		//
-		//				// Empty the focus vectors.
-		//				w->emptyFocusVectors();
-		//
-		//				// Finally recompute all the Bezier surface.
-		//				for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++)
-		//				{
-		//					project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Calling manageComputationOfInterpolatedPoints on surface: %i", kk);
-		//					project->get_MySurfaces()->at(kk)->manageComputationOfInterpolatedPoints();
-		//				}
-		//
-		//				// Mark the project as changed.
-		//				UnsavedChanges = true;
-		//			}
-		//			else
-		//			{
-		//				QMessageBox::StandardButton reply;
-		//				reply = QMessageBox::warning(this, "Merge Surfaces", "You cannot merge surfaces with different numbers of control point columns.");
-		//
-		//				// Reset the buttons.
-		//				w->resetModeButtons();
-		//
-		//				// Reset the edit mode.
-		//				MY_EDIT_MODE = NONE;
-		//			}
-		//		}
-		//	}
-		//	else if (MY_EDIT_MODE == MERGE_SURFACES_BY_ROW_REVERSE)
-		//	{
-		//		if (get_PrimedForFirstClick())
-		//		{
-		//			// Empty the focus vectors.
-		//			w->emptyFocusVectors();
-		//
-		//			// Save the first point indices.
-		//			get_ScratchControlPoint()->set_X(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_X());
-		//			get_ScratchControlPoint()->set_Y(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Y());
-		//			get_ScratchControlPoint()->set_Z(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_Z());
-		//
-		//			get_ScratchControlPoint()->set_K(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_K());
-		//			get_ScratchControlPoint()->set_I(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_I());
-		//			get_ScratchControlPoint()->set_J(project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->get_J());
-		//
-		//			// Cancel primed for first click and prime for second click.
-		//			set_PrimedForFirstClick(false);
-		//			set_PrimedForSecondClick(true);
-		//
-		//			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "First point has been captured. k: %i", k);
-		//		}
-		//		else if (get_PrimedForSecondClick())
-		//		{
-		//			// Get second point and move it to the first one.
-		//			ITControlPoint *firstPoint = get_ScratchControlPoint();
-		//			ITControlPoint *secondPoint = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
-		//
-		//			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Second point has been captured. k: %i", k);
-		//
-		//			mergeSurfacesByRowReverse(firstPoint->get_K(), secondPoint->get_K());
-		//
-		//			// Cancel primed for first click and cancel primed for second click.
-		//			set_PrimedForFirstClick(false);
-		//			set_PrimedForSecondClick(false);
-		//
-		//			// Reset the scratch point.
-		//			get_ScratchControlPoint()->set_X(0.0);
-		//			get_ScratchControlPoint()->set_Y(0.0);
-		//			get_ScratchControlPoint()->set_Z(0.0);
-		//
-		//			get_ScratchControlPoint()->set_K(-1);
-		//			get_ScratchControlPoint()->set_I(-1);
-		//			get_ScratchControlPoint()->set_J(-1);
-		//
-		//			// Reset the buttons.
-		//			w->resetModeButtons();
-		//
-		//			// Empty the focus vectors.
-		//			w->emptyFocusVectors();
-		//
-		//			// Finally recompute all the Bezier surface.
-		//			for (int kk = 0; kk < project->get_MySurfaces()->size(); kk++)
-		//			{
-		//				project->get_MySurfaces()->at(kk)->manageComputationOfInterpolatedPoints();
-		//			}
-		//
-		//			// Mark the project as changed.
-		//			UnsavedChanges = true;
-		//
-		//			// Reset the buttons.
-		//			w->resetModeButtons();
-		//
-		//			// Reset the edit mode.
-		//			MY_EDIT_MODE = NONE;
-		//		}
-		//	}
-
 		// Redraw everything.
 		update();
-
-		//if (MY_EDIT_MODE == ROTATE_ALL)
-		//{
-		//	dialAngle = 0;
-		//
-		//	getInAxesPosition(dialCentreX, dialCentreY, event->x(), event->y(), this->width(), this->height(), glXYPanCentreX, glXYPanCentreY, glXYViewHalfExtent);
-		//
-		//	drawDial = true;
-		//}
 	}
 }
 
@@ -1580,9 +1473,6 @@ void View2d::mouseMoveEvent(QMouseEvent *event)
 
 	lastPos = event->pos();
 
-	// Adjust viewport view.
-	//this->setViewOrtho(myWidth, myHeight);
-
 	// Redraw everything.
 	update();
 
@@ -1756,9 +1646,6 @@ void View2d::wheelEvent(QWheelEvent *event)
 	eyeX += tmpAx - tmpBx;
 	eyeY += tmpAy - tmpBy;
 
-	// Adjust viewport view.
-	//this->setViewOrtho(myWidth, myHeight);
-
 	// Redraw everything.
 	update();
 }
@@ -1818,7 +1705,7 @@ void View2d::setPointHighlight(QMouseEvent *event)
 
 	if ((k > -1) && (i > -1) && (j > -1))
 	{
-		if ((MY_EDIT_MODE == COPY_SURFACE) || (MY_EDIT_MODE == DELETE_SURFACE) || (MY_EDIT_MODE == COPY_SURFACE_MIRROR) || (MY_EDIT_MODE == FLIP) || (MY_EDIT_MODE == RESIZE))
+		if ((MY_EDIT_MODE == COPY_SURFACE) || (MY_EDIT_MODE == DELETE_SURFACE) || (MY_EDIT_MODE == COPY_SURFACE_MIRROR) || (MY_EDIT_MODE == FLIP) || (MY_EDIT_MODE == RESIZE) || (MY_EDIT_MODE == MERGE_SURFACES_BY_ROW) || (MY_EDIT_MODE == MERGE_SURFACES_BY_ROW_REVERSE))
 		{
 			for (int itX = 0; itX < project->getSurface(k)->sizeX(); itX++)
 			{
@@ -1976,6 +1863,7 @@ void View2d::finishEdit()
 	project->synchronizeSurfaceVectorsFromControl();
 
 	focusedPoints.erase(focusedPoints.begin(), focusedPoints.end());
+	focusedPoints_light.erase(focusedPoints_light.begin(), focusedPoints_light.end());
 
 	primedForClick = false;
 
@@ -2006,70 +1894,9 @@ void View2d::finishEdit()
 	readyToShear = false;
 
 	MY_EDIT_MODE = NONE;
-}
 
-//void View2d::mergeSurfacesByRow(int k1, int k2)
-//{
-//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mergeSurfacesByRow");
-//
-//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mergeSurfacesByRow. About to appended to k1. k1 i: %i", project->get_MySurfaces()->at(k1)->get_MyControlPoints()->size());
-//
-//	// The k1 surface forms the start of the new surface.
-//	// Go through the second surface and add its points to the end of the first.
-//	for (int i = 0; i < project->get_MySurfaces()->at(k2)->get_MyControlPoints()->size(); i++)
-//	{
-//		// Create new vectors that will contain the data for a row to be appended to k1.
-//		std::vector <ITControlPoint *> dummy_v;
-//		std::vector <ITControlPoint *> dummy_base_v;
-//
-//		// Loop over columns of the current row of k2.
-//		for (int j = 0; j < project->get_MySurfaces()->at(k2)->get_MyControlPoints()->at(i).size(); j++)
-//		{
-//			float x = project->get_MySurfaces()->at(k2)->get_MyControlPoints()->at(i).at(j)->get_X();
-//			float y = project->get_MySurfaces()->at(k2)->get_MyControlPoints()->at(i).at(j)->get_Y();
-//			float z = project->get_MySurfaces()->at(k2)->get_MyControlPoints()->at(i).at(j)->get_Z();
-//
-//			ITControlPoint *p = new ITControlPoint(x, y, z);
-//
-//			ITControlPoint *pb = new ITControlPoint(x, y, z);
-//
-//			dummy_v.push_back(p);
-//			dummy_base_v.push_back(pb);
-//		}
-//
-//		project->get_MySurfaces()->at(k1)->get_MyControlPoints()->push_back(dummy_v);
-//		project->get_MyBaseSurfaces()->at(k1)->get_MyControlPoints()->push_back(dummy_base_v);
-//	}
-//
-//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mergeSurfacesByRow. Data for k2 has been appended to k1. k1 i: %i", project->get_MySurfaces()->at(k1)->get_MyControlPoints()->size());
-//
-//	// Erase the second surface.
-//	project->get_MySurfaces()->erase(project->get_MySurfaces()->begin() + k2);
-//	project->get_MyBaseSurfaces()->erase(project->get_MyBaseSurfaces()->begin() + k2);
-//
-//	// Re-assign control point _K, _I and _J indices.
-//	// Re-assign the _K, _I and _J variables.
-//	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-//	{
-//		for (int i = 0; i < project->get_MySurfaces()->at(k)->get_MyControlPoints()->size(); i++)
-//		{
-//			for (int j = 0; j < project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).size(); j++)
-//			{
-//				ITControlPoint* p = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
-//				p->set_K(k);
-//				p->set_I(i);
-//				p->set_J(j);
-//
-//				ITControlPoint* pb = project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j);
-//				pb->set_K(k);
-//				pb->set_I(i);
-//				pb->set_J(j);
-//			}
-//		}
-//	}
-//
-//	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside mergeSurfacesByRow. All data has been merged, and indices have been reassigned.");
-//}
+	w->updateAllTabs();
+}
 
 // Accessors.
 ITControlPoint *View2d::get_ScratchControlPoint() { return _ScratchControlPoint; }

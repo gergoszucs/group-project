@@ -157,15 +157,6 @@
     <CustomBuild Include="MyGLGeneralTrajectoryCurveView.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="MyGLXTrajectoryView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MyGLYTrajectoryView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MyGLZTrajectoryView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="designit.h">
       <Filter>Header Files</Filter>
     </CustomBuild>

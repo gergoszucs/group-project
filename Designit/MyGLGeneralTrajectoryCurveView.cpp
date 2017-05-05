@@ -27,9 +27,7 @@ MyGLGeneralTrajectoryCurveView::MyGLGeneralTrajectoryCurveView(QWidget *parent)
 
 	set_EditValue(0.0);
 
-	set_ViewHalfExtent(50.0);
-	set_PanCentreX(40.0);
-	set_PanCentreY(0.0);
+	setMouseTracking(true);
 }
 
 void MyGLGeneralTrajectoryCurveView::keyPressEvent(QKeyEvent * event)
@@ -50,23 +48,20 @@ void MyGLGeneralTrajectoryCurveView::keyPressEvent(QKeyEvent * event)
 
 	if (event->key() == Qt::Key_Up)
 	{
-		set_PanCentreY(get_PanCentreY() + factor);
+		eyeY += factor;
 	}
 	else if (event->key() == Qt::Key_Down)
 	{
-		set_PanCentreY(get_PanCentreY() - factor);
+		eyeY -= factor;
 	}
 	else if (event->key() == Qt::Key_Left)
 	{
-		set_PanCentreX(get_PanCentreX() + factor);
+		eyeX += factor;
 	}
 	else if (event->key() == Qt::Key_Right)
 	{
-		set_PanCentreX(get_PanCentreX() - factor);
+		eyeX -= factor;
 	}
-
-	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
 
 	// Force redraw.
 	update();
@@ -94,25 +89,19 @@ void MyGLGeneralTrajectoryCurveView::mouseMoveEvent(QMouseEvent *event)
 
 	if (event->buttons() & Qt::LeftButton)
 	{
-		// Check for shift key press for zoom.
-		if (event->modifiers() & Qt::ShiftModifier)
+		if (!(event->modifiers())) // Just clicking without modifiers.
 		{
-			// Update zoom.
-			float tmp = get_ViewHalfExtent() + factor * dy;
-
-			if (tmp >= 0.0) set_ViewHalfExtent(tmp);
-		}
-		else if (!(event->modifiers())) // Just clicking without modifiers.
-		{
-			if (MY_EDIT_MODE == DRAG_TRAJECTORY_POINT)
+			if ((MY_EDIT_MODE == DRAG_TRAJECTORY_POINT) && ((surfaceID > -1) && (pointID > -1)))
 			{
 				float posX, posY, old_posX, old_posY;
 
-				getInAxesPosition(posX, posY, event->x(), event->y(), this->width(), this->height(), get_PanCentreX(), get_PanCentreY(), get_ViewHalfExtent());
-				getInAxesPosition(old_posX, old_posY, lastPos.x(), lastPos.y(), this->width(), this->height(), get_PanCentreX(), get_PanCentreY(), get_ViewHalfExtent());
+				getAxesPos(posX, posY, event->x(), event->y());
+				getAxesPos(old_posX, old_posY, lastPos.x(), lastPos.y());
 
 				// Drag the Focus points
-				dragFocusPoints(posX, posY, old_posX, old_posY);
+				project->moveTrajectoryPoint(surfaceID, get_MyCurveIndex(), pointID + 1, posY - old_posY, w->getSync());
+
+				_EditValue += posY - old_posY;
 
 				UnsavedChanges = true;
 			}
@@ -121,14 +110,29 @@ void MyGLGeneralTrajectoryCurveView::mouseMoveEvent(QMouseEvent *event)
 	else if (event->buttons() & Qt::RightButton)
 	{
 		if (factor == 1.0) factor = 0.5;
-		set_PanCentreX(get_PanCentreX() - factor * dx);
-		set_PanCentreY(get_PanCentreY() + factor * dy);
+		eyeX -= factor * dx;
+		eyeY += factor * dy;
+	}
+	else
+	{
+		int k, i;
+		float posX, posY;
+		getAxesPos(posX, posY, event->x(), event->y());
+		findTrajectoryPointIndicesNearMouse(posX, posY, 0.0, &k, &i);
+
+		if ((k > -1) && (i > -1))
+		{
+			surfaceID_light = k;
+			pointID_light = i;
+		}
+		else
+		{
+			surfaceID_light = -1;
+			pointID_light = -1;
+		}
 	}
 
 	lastPos = event->pos();
-
-	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
 
 	// Redraw everything.
 	this->update();
@@ -153,87 +157,60 @@ void MyGLGeneralTrajectoryCurveView::wheelEvent(QWheelEvent *event)
 
 	float tmpAx, tmpAy, tmpBx, tmpBy;
 
-	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), get_PanCentreX(), get_PanCentreY(), get_ViewHalfExtent());
+	getAxesPos(tmpAx, tmpAy, event->x(), event->y());
 
-	float tmp = get_ViewHalfExtent() - factor * dy;
+	float tmp = eyeZoom + 0.01 * factor * dy;
 
-	if (tmp >= 0.0) set_ViewHalfExtent(tmp);
+	if (tmp >= 0.0) eyeZoom = tmp;
 
-	getInAxesPosition(tmpBx, tmpBy, event->x(), event->y(), this->width(), this->height(), get_PanCentreX(), get_PanCentreY(), get_ViewHalfExtent());
+	getAxesPos(tmpBx, tmpBy, event->x(), event->y());
 
-	set_PanCentreX(get_PanCentreX() + tmpAx - tmpBx);
-	set_PanCentreY(get_PanCentreY() + tmpAy - tmpBy);
-
-	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
+	eyeX += tmpAx - tmpBx;
+	eyeY += tmpAy - tmpBy;
 
 	// Redraw everything.
-	updateGL();
-}
-
-void MyGLGeneralTrajectoryCurveView::dragFocusPoints(float posX, float posY, float old_posX, float old_posY)
-{
-	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-	{
-		int n = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyFocusTrajectoryCurveSegmentIndices()->size();
-
-		if (n == 0)
-		{
-			continue;
-		}
-
-		int noOfSegments = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyTrajectoryCurveSegments()->size();
-
-		// Loop over focus end points.
-		for (int t = 0; t < n; t++)
-		{
-			ITPointTrajectory *p;
-			int index = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyFocusTrajectoryCurveSegmentIndices()->at(t);
-			if (get_MyEndOfSegment() == 1)
-			{
-				p = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyTrajectoryCurveSegments()->at(index)->get_P1_p();
-			}
-			else
-			{
-				p = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyTrajectoryCurveSegments()->at(index)->get_P0_p();
-			}
-
-			p->set_X(p->get_X() + posY - old_posY);
-
-			// Check if we need to update the initial point of the next segment too.
-			if ((index < noOfSegments - 1) && (get_MyEndOfSegment() == 1))
-			{
-				ITPointTrajectory *p0 = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyTrajectoryCurveSegments()->at(index + 1)->get_P0_p();
-				p0->set_X(p0->get_X() + posY - old_posY);
-			}
-
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "New point: %f", p->get_X());
-		}
-
-		// Update curve.
-		project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->computeMySegmentEndTangentVectors();
-	}
+	update();
 }
 
 void MyGLGeneralTrajectoryCurveView::mouseReleaseEvent(QMouseEvent *releaseEvent)
 {
-	// Empty all focus index vectors.
-	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
+	if (_EditValue != 0)
 	{
-		int n = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyFocusTrajectoryCurveSegmentIndices()->size();
-		for (int t = 0; t < n; t++)
+		QStringList command, revCommand;
+
+		command.push_back("moveTrajectoryPoint");
+		command.push_back(QString::number(surfaceID));
+		command.push_back(QString::number(get_MyCurveIndex()));
+		command.push_back(QString::number(pointID + 1));
+		command.push_back(QString::number(_EditValue));
+
+		revCommand.push_back("moveTrajectoryPoint");
+		revCommand.push_back(QString::number(surfaceID));
+		revCommand.push_back(QString::number(get_MyCurveIndex()));
+		revCommand.push_back(QString::number(pointID + 1));
+		revCommand.push_back(QString::number(-_EditValue));
+
+		if (w->getSync())
 		{
-			project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyFocusTrajectoryCurveSegmentIndices()->pop_back();
+			command.push_back(QString::number(1));
+			revCommand.push_back(QString::number(1));
 		}
+		else
+		{
+			command.push_back(QString::number(0));
+			revCommand.push_back(QString::number(0));
+		}
+
+		w->undoRedo.registerCommand(command, revCommand);
 	}
+
+	surfaceID = -1;
+	pointID = -1;
 
 	MY_EDIT_MODE = NONE;
 
-	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
-
 	// Redraw everything.
-	updateGL();
+	update();
 
 	// Redraw other views.
 	w->updateAllTabs();
@@ -253,42 +230,35 @@ void MyGLGeneralTrajectoryCurveView::mousePressEvent(QMouseEvent *event)
 	{
 		set_EditValue(0.0);
 
-		AssignFocusPoint(event); // Get the indices of the focus point, and get ready for a mouse move.
+		float posX, posY, posZ, old_posX, old_posY;
+
+		posZ = 0.0;
+
+		getAxesPos(posX, posY, event->x(), event->y());
+
+		// Find the vertex that is closest.
+		int k, i;
+		findTrajectoryPointIndicesNearMouse(posX, posY, posZ, &k, &i);
+
+		if ((k > -1) && (i > -1))
+		{
+			surfaceID = k;
+			pointID = i;
+		}
+		else
+		{
+			surfaceID = -1;
+			pointID = -1;
+		}
+
+		// Redraw everything.
+		updateGL();
 
 		MY_EDIT_MODE = DRAG_TRAJECTORY_POINT;
 	}
-	else
-	{
-		// Some modifier was pressed, so we need to take the "conn".
-	}
-
 }
 
-void MyGLGeneralTrajectoryCurveView::AssignFocusPoint(QMouseEvent *event)
-{
-	float posX, posY, posZ, old_posX, old_posY;
-
-	posZ = 0.0;
-
-	getInAxesPosition(posX, posY, event->x(), event->y(), this->width(), this->height(), get_PanCentreX(), get_PanCentreY(), get_ViewHalfExtent());
-
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "3D point with POS: %f, %f, %f", posX, posY, posZ);
-
-	// Find the vertex that is closest.
-	int i, k;
-	findTrajectoryPointIndicesNearMouse(posX, posY, posZ, &k, &i);
-
-	if ((k > -1) && (i > -1))
-	{
-			// We have found a control point, so add it to the focus vector.
-			project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(get_MyCurveIndex())->get_MyFocusTrajectoryCurveSegmentIndices()->push_back(i);
-	}
-
-	// Redraw everything.
-	updateGL();
-}
-
-void  MyGLGeneralTrajectoryCurveView::findTrajectoryPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI)
+void MyGLGeneralTrajectoryCurveView::findTrajectoryPointIndicesNearMouse(double posX, double posY, double posZ, int *targetK, int *targetI)
 {
 	float threshold = 1.0;
 	float minDistance = 10000.0;
@@ -350,24 +320,6 @@ void  MyGLGeneralTrajectoryCurveView::findTrajectoryPointIndicesNearMouse(double
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Indices of nearest trajectory point. k: %i, i: %i", *targetK, *targetI);
 }
 
-void MyGLGeneralTrajectoryCurveView::setViewOrtho(int width, int height)
-{
-	float aspect = (float)width / (float)height; // Landscape is greater than 1.
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glOrtho(get_PanCentreX() - get_ViewHalfExtent(),
-		get_PanCentreX() + get_ViewHalfExtent(),
-		get_PanCentreY() - get_ViewHalfExtent() / aspect,
-		get_PanCentreY() + get_ViewHalfExtent() / aspect,
-		-50000.0,
-		50000.0);
-
-
-	glMatrixMode(GL_MODELVIEW);
-}
-
 void MyGLGeneralTrajectoryCurveView::resizeGL(int width, int height)
 {
 	myWidth = width;
@@ -375,7 +327,12 @@ void MyGLGeneralTrajectoryCurveView::resizeGL(int width, int height)
 
 	glViewport(0, 0, width, height);
 
-	setViewOrtho(width, height);
+	float aspect = (float)width / (float)height;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-50.0, +50.0, -50.0 / aspect, +50.0 / aspect, -50000, 50000.0);
+	glMatrixMode(GL_MODELVIEW);
 
 	draw();
 }
@@ -384,7 +341,8 @@ void MyGLGeneralTrajectoryCurveView::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	glTranslatef(0.0, 0.0, -10.0);
+	glTranslatef(-eyeX*eyeZoom, -eyeY*eyeZoom, 0.0);
+	glScalef(eyeZoom, eyeZoom, eyeZoom);
 
 	// 20160510: Ordering of these rotation has been changed to give more intuitive rotation in response to mouse movement.
 
@@ -409,12 +367,11 @@ void MyGLGeneralTrajectoryCurveView::initializeGL()
 
 	glDisable(GL_CULL_FACE); // Make sure both sides of QUADS are filled.
 
-	// 20161215 New Stuff.
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_LINE_SMOOTH);
+	//glEnable(GL_POLYGON_SMOOTH);
+	//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	//glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	//glEnable(GL_MULTISAMPLE);
 }
 
 void MyGLGeneralTrajectoryCurveView::draw()
@@ -427,9 +384,21 @@ void MyGLGeneralTrajectoryCurveView::draw()
 		drawMyCurveHandles(get_MyCurveIndex());
 		drawMyInterpolatedCurve(get_MyCurveIndex());
 
-		//drawMyControlPointsNet();
-		//drawMyInterpolatedPointsNet();
-		//drawMyFocusControlPoints();
+		// Draw focused point
+		if ((surfaceID > -1) && (pointID > -1))
+		{
+			glTranslatef(project->getTrajectorySegment(surfaceID, get_MyCurveIndex(), pointID)->get_EndKeyFrame(), project->getTrajectoryPoint(surfaceID, get_MyCurveIndex(), pointID + 1)->get_X(), 0.0);
+			drawSphere(1.5, 15, 15, 1.0, 0.0, 0.0);
+			glTranslatef(-project->getTrajectorySegment(surfaceID, get_MyCurveIndex(), pointID)->get_EndKeyFrame(), -project->getTrajectoryPoint(surfaceID, get_MyCurveIndex(), pointID + 1)->get_X(), 0.0);
+		}
+
+		if ((surfaceID_light > -1) && (pointID_light > -1))
+		{
+			glTranslatef(project->getTrajectorySegment(surfaceID_light, get_MyCurveIndex(), pointID_light)->get_EndKeyFrame(), project->getTrajectoryPoint(surfaceID_light, get_MyCurveIndex(), pointID_light + 1)->get_X(), 0.0);
+			drawSphere(1.5, 15, 15, 0.7, 0.0, 0.0);
+			glTranslatef(-project->getTrajectorySegment(surfaceID_light, get_MyCurveIndex(), pointID_light)->get_EndKeyFrame(), -project->getTrajectoryPoint(surfaceID_light, get_MyCurveIndex(), pointID_light + 1)->get_X(), 0.0);
+		}
+
 		drawMyAnnotations();
 	}
 }
@@ -556,7 +525,6 @@ void MyGLGeneralTrajectoryCurveView::drawMyCurve()
 
 	// Now plot the dots.
 	// Loop though all the surfaces.
-	float radius = glXViewHalfExtent / 100.0;
 
 	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
 	{
@@ -568,7 +536,7 @@ void MyGLGeneralTrajectoryCurveView::drawMyCurve()
 			float plotY = currentSegment->get_P1_p()->get_X();
 
 			glTranslatef(plotX, plotY, 0.0);
-			drawSphere(radius, 15, 15, 0.0, 0.0, 0.0);
+			drawSphere(1.0, 15, 15, 0.0, 0.0, 0.0);
 			glTranslatef(-plotX, -plotY, 0.0);
 		}
 	}
@@ -586,19 +554,13 @@ void MyGLGeneralTrajectoryCurveView::drawMyFocusSegments()
 			if (get_MyEndOfSegment() == 1)
 			{
 				glTranslatef(s->get_EndKeyFrame(), s->get_P1_p()->get_X(), 0.0);
-
-				float radius = glXViewHalfExtent / 50.0;
-				drawSphere(radius, 15, 15, 1.0, 0.0, 0.0);
-
+				drawSphere(1.0, 15, 15, 1.0, 0.0, 0.0);
 				glTranslatef(-s->get_EndKeyFrame(), -s->get_P1_p()->get_X(), 0.0);
 			}
 			else
 			{
 				glTranslatef(s->get_StartKeyFrame(), s->get_P0_p()->get_X(), 0.0);
-
-				float radius = glXViewHalfExtent / 50.0;
-				drawSphere(radius, 15, 15, 1.0, 0.0, 0.0);
-
+				drawSphere(1.0, 15, 15, 1.0, 0.0, 0.0);
 				glTranslatef(-s->get_StartKeyFrame(), -s->get_P0_p()->get_X(), 0.0);
 			}
 		}
@@ -769,9 +731,11 @@ void MyGLGeneralTrajectoryCurveView::drawMyInterpolatedCurve(int curveIndex)
 
 void MyGLGeneralTrajectoryCurveView::resetMyView()
 {
-	set_ViewHalfExtent(50.0);
-	set_PanCentreX(40.0);
-	set_PanCentreY(0.0);
+	eyeX = 40.0;
+	eyeY = 0.0;
+	eyeZoom = 1.0;
+
+	update();
 }
 
 void MyGLGeneralTrajectoryCurveView::drawSphere(double r, int lats, int longs, float R, float GG, float B)
@@ -803,6 +767,35 @@ void MyGLGeneralTrajectoryCurveView::drawSphere(double r, int lats, int longs, f
 		}
 		glEnd();
 	}
+}
+
+void MyGLGeneralTrajectoryCurveView::getAxesPos(float & pX, float & pY, const int x, const int y)
+{
+	GLint viewport[4];
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLfloat winX, winY, winZ;
+	GLdouble posX, posY, posZ;
+
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	winX = (float)x;
+	winY = (float)viewport[3] - (float)y;
+	winZ = 0.0;
+
+	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+	pX = posX;
+	pY = posY;
+}
+
+void MyGLGeneralTrajectoryCurveView::setSceneParameters(float eyeX, float eyeY, float eyeZoom)
+{
+	this->eyeX = eyeX;
+	this->eyeY = eyeY;
+	if (eyeZoom > 0) this->eyeZoom = eyeZoom;
 }
 
 // Accessors.

@@ -64,22 +64,6 @@ float glGaussianViewHalfExtent = 50.0;
 float glGaussianPanCentreX = 0.0;
 float glGaussianPanCentreY = 0.0;
 
-//float gl3DViewHalfExtent = 50.0;
-//float gl3DPanCentreX = 0.0;
-//float gl3DPanCentreY = 0.0;
-
-float glXViewHalfExtent = 50.0;
-float glXPanCentreX = 50.0;
-float glXPanCentreY = 0.0;
-
-float glYViewHalfExtent = 50.0;
-float glYPanCentreX = 40.0;
-float glYPanCentreY = 0.0;
-
-float glZViewHalfExtent = 50.0;
-float glZPanCentreX = 40.0;
-float glZPanCentreY = 0.0;
-
 WIDGET_CONTROL_ENUM MY_WIDGET_CONTROL;
 
 // Drawing semaphores.

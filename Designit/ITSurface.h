@@ -71,6 +71,8 @@ public:
 
 	int sizeX();
 	int sizeY();
+	int sizeTrajectory();
+
 	ITPoint * getControlPoint(const int i, const int j);
 	ITControlPoint * getPoint(const int i, const int j);
 	void getCenter(float& x, float& y, float& z);

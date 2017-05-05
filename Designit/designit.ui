@@ -127,7 +127,7 @@
        <property name="minimumSize">
         <size>
          <width>400</width>
-         <height>400</height>
+         <height>713</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -199,6 +199,98 @@
         </item>
         <item>
          <widget class="MyGLWidget" name="myGLWidget"/>
+        </item>
+        <item>
+         <widget class="QFrame" name="TrajectoryButtons">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QPushButton" name="previousFrame">
+             <property name="text">
+              <string>Previous</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_first.png</normaloff>:/Resources/button_black_first.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="toBegin">
+             <property name="text">
+              <string>Restart</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_repeat.png</normaloff>:/Resources/button_black_repeat.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stop">
+             <property name="text">
+              <string>Stop</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_pause.png</normaloff>:/Resources/button_black_pause.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="start">
+             <property name="text">
+              <string>Start</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_play.png</normaloff>:/Resources/button_black_play.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="nextFrame">
+             <property name="text">
+              <string>Next</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_last.png</normaloff>:/Resources/button_black_last.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="syncCurves">
+             <property name="text">
+              <string>Sync Curves</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -307,8 +399,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>218</width>
-          <height>418</height>
+          <width>304</width>
+          <height>659</height>
          </rect>
         </property>
         <attribute name="label">
@@ -424,6 +516,9 @@
     <addaction name="actionAnnotations"/>
     <addaction name="actionGrids"/>
     <addaction name="actionReset_all_views"/>
+    <addaction name="separator"/>
+    <addaction name="actionDrag_vector"/>
+    <addaction name="actionAngle_dial"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -899,6 +994,28 @@
     <string>Ctrl+Y</string>
    </property>
   </action>
+  <action name="actionDrag_vector">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Drag vector</string>
+   </property>
+  </action>
+  <action name="actionAngle_dial">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Angle dial</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -926,5 +1043,110 @@
  <resources>
   <include location="designit.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>start</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>startTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>595</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toBegin</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>restart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>437</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>previousFrame</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>previousFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nextFrame</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>nextFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stop</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>stopTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>516</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>syncCurves</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>syncCurves(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>754</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>startTest()</slot>
+  <slot>stopTest()</slot>
+  <slot>restart()</slot>
+  <slot>previousFrame()</slot>
+  <slot>nextFrame()</slot>
+  <slot>syncCurves(bool)</slot>
+ </slots>
 </ui>
