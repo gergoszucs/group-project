@@ -1,8 +1,12 @@
 #include "ITProject.h"
 #include "ITSurface.h"
+#include "ITControlPoint.h"
 #include "global.h"
+#include "ITPointTrajectory.h"
 #include "ITTrajectoryCurve.h"
 #include "ITTrajectoryCurveSegment.h"
+
+#include <vector>
 
 using namespace rapidjson;
 
@@ -695,7 +699,7 @@ void ITProject::duplicateRow(const int surfaceID, const int i)
 {
 	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if ((i >= getSurface(surfaceID)->sizeX() - 1) || (i < 0)) throw std::exception("NO_ROW");
+	if ((i >= getSurface(surfaceID)->sizeX()) || (i < 0)) throw std::exception("NO_ROW");
 
 	getSurface(surfaceID)->duplicateRow(i);
 	getBaseSurface(surfaceID)->duplicateRow(i);
@@ -743,7 +747,7 @@ void ITProject::duplicateColumn(const int surfaceID, const int j)
 {
 	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
 
-	if ((j >= getSurface(surfaceID)->sizeY() - 1) || (j < 0)) throw std::exception("NO_COLUMN");
+	if ((j >= getSurface(surfaceID)->sizeY()) || (j < 0)) throw std::exception("NO_COLUMN");
 
 	getSurface(surfaceID)->duplicateColumn(j);
 	getBaseSurface(surfaceID)->duplicateColumn(j);
@@ -768,6 +772,83 @@ void ITProject::deleteColumn(const int surfaceID, const int j)
 
 	getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
+	w->updateAllTabs();
+}
+
+void ITProject::mergeSurface(const unsigned int firstSurfaceID, const MERGE_ROW firstMergeRow, const unsigned int secondSurfaceID, const MERGE_ROW secondMergeRow, const bool reversed)
+{
+	if (firstSurfaceID >= _MySurfaces->size()) throw std::exception("NO_SURFACE");
+	if (secondSurfaceID >= _MySurfaces->size()) throw std::exception("NO_SURFACE");
+	if (firstSurfaceID == secondSurfaceID) throw std::exception("MERGE_IMPOSSIBLE");
+
+	ITSurface* first = getSurface(firstSurfaceID);
+	ITSurface* second = getSurface(secondSurfaceID);
+	ITSurface* firstBase = getBaseSurface(firstSurfaceID);
+	ITSurface* secondBase = getBaseSurface(secondSurfaceID);
+
+	if (first->sizeY() != second->sizeY()) throw std::exception("NO_MATCH_COLUMNS");
+
+	std::vector< ITControlPoint* > row;
+	std::vector< ITControlPoint* > rowBase;
+	int end = first->sizeX();
+
+	if (secondMergeRow == FIRST)
+	{
+		for (int i = 0; i < second->sizeX(); i++)
+		{
+			second->getRowCopy(i, row);
+			secondBase->getRowCopy(i, rowBase);
+
+			if (reversed)
+			{
+				std::reverse(row.begin(), row.end());
+				std::reverse(rowBase.begin(), rowBase.end());
+			}
+
+			if (firstMergeRow == LAST)
+			{
+				first->addRow(end, row);
+				firstBase->addRow(end, rowBase);
+				end++;
+			}
+			else
+			{
+				first->addRow(0, row);
+				firstBase->addRow(0, rowBase);
+			}
+		}
+	}
+	else
+	{
+		for (int i = second->sizeX() - 1; i >= 0 ; i--)
+		{
+			second->getRowCopy(i, row);
+			secondBase->getRowCopy(i, rowBase);
+
+			if (reversed)
+			{
+				std::reverse(row.begin(), row.end());
+				std::reverse(rowBase.begin(), rowBase.end());
+			}
+
+			if (firstMergeRow == LAST)
+			{
+				first->addRow(end, row);
+				firstBase->addRow(end, rowBase);
+				end++;
+			}
+			else
+			{
+				first->addRow(0, row);
+				firstBase->addRow(0, rowBase);
+			}
+		}
+	}
+	
+
+	deleteSurface(secondSurfaceID);
+
+	manageComputationOfInterpolatedPoints();
 	w->updateAllTabs();
 }
 
@@ -801,6 +882,64 @@ void ITProject::matePoints(const int baseSurfaceID, const int baseI, const int b
 	w->updateAllTabs();
 }
 
+void ITProject::setTrajectoryPoint(const unsigned int surfaceID, const int curveID, const int pointID, const float data, const bool sync)
+{
+	if (sync)
+	{
+		for (int i = 0; i < _MySurfaces->size(); i++)
+		{
+			if (pointID == getSurface(i)->sizeTrajectory())
+			{
+				getTrajectorySegment(i, curveID, pointID - 1)->get_P1_p()->set_X(data);
+			}
+			else if (pointID > 0)
+			{
+				getTrajectorySegment(i, curveID, pointID)->get_P0_p()->set_X(data);
+				getTrajectorySegment(i, curveID, pointID - 1)->get_P1_p()->set_X(data);
+			}
+
+			getSurface(i)->get_MyTrajectoryCurves()->at(i)->computeMySegmentEndTangentVectors();
+		}
+	}
+	else
+	{
+		if (pointID == getSurface(surfaceID)->sizeTrajectory())
+		{
+			getTrajectorySegment(surfaceID, curveID, pointID - 1)->get_P1_p()->set_X(data);
+		}
+		else if (pointID > 0)
+		{
+			getTrajectorySegment(surfaceID, curveID, pointID)->get_P0_p()->set_X(data);
+			getTrajectorySegment(surfaceID, curveID, pointID - 1)->get_P1_p()->set_X(data);
+		}
+
+		getSurface(surfaceID)->get_MyTrajectoryCurves()->at(curveID)->computeMySegmentEndTangentVectors();
+	}
+
+	UnsavedChanges = true;
+}
+
+void ITProject::moveTrajectoryPoint(const unsigned int surfaceID, const int curveID, const int pointID, const float diff, const bool sync)
+{
+	float org = getTrajectoryPoint(surfaceID, curveID, pointID)->get_X();
+
+	setTrajectoryPoint(surfaceID, curveID, pointID, org + diff, sync);
+}
+
+void ITProject::setU(const unsigned int surfaceID, const int data)
+{
+	getSurface(surfaceID)->set_NoOfInterpolatedPointsU(data);
+
+	UnsavedChanges = true;
+}
+
+void ITProject::setV(const unsigned int surfaceID, const int data)
+{
+	getSurface(surfaceID)->set_NoOfInterpolatedPointsV(data);
+
+	UnsavedChanges = true;
+}
+
 Point3 ITProject::getPointData(const int surfaceID, const int i, const int j)
 {
 	if ((surfaceID >= _MySurfaces->size()) || (surfaceID < 0)) throw std::exception("NO_SURFACE");
@@ -829,6 +968,17 @@ Point3 ITProject::getSurfaceCenter(const int surfaceID)
 	return tmp;
 }
 
+ITControlPoint * ITProject::getControlPoint(const unsigned int surfaceID, const unsigned int i, const unsigned int j)
+{
+	if (surfaceID >= _MySurfaces->size()) throw std::exception("NO_SURFACE");
+
+	if (i >= getSurface(surfaceID)->sizeX()) throw std::exception("NO_POINT");
+
+	if (j >= getSurface(surfaceID)->sizeY()) throw std::exception("NO_POINT");
+
+	return getSurface(surfaceID)->getPoint(i,j);
+}
+
 void ITProject::synchronizeSurfaceVectorsFromControl()
 {
 	for (int k = 0; k < _MySurfaces->size(); k++)
@@ -845,6 +995,19 @@ void ITProject::synchronizeSurfaceVectorsFromControl()
 				pBase->set_Z(p->get_Z());
 			}
 		}
+	}
+}
+
+void ITProject::manageComputationOfInterpolatedPoints()
+{
+	for (int i = 0; i < _MySurfaces->size(); i++)
+	{
+		_MySurfaces->at(i)->manageComputationOfInterpolatedPoints();
+	}
+
+	for (int i = 0; i < _MyBaseSurfaces->size(); i++)
+	{
+		_MyBaseSurfaces->at(i)->manageComputationOfInterpolatedPoints();
 	}
 }
 
@@ -1129,4 +1292,29 @@ ITSurface* ITProject::getBaseSurface(const int k)
 	if ((k >= _MyBaseSurfaces->size()) || (k < 0)) throw std::exception("NO_SURFACE");
 
 	return _MyBaseSurfaces->at(k);
-};
+}
+
+ITTrajectoryCurveSegment* ITProject::getTrajectorySegment(const unsigned int surfaceID, const unsigned int curveID, const unsigned int segmentID)
+{
+	if (surfaceID >= _MySurfaces->size()) throw std::exception("NO_SURFACE");
+	if (curveID >= getSurface(surfaceID)->get_MyTrajectoryCurves()->size()) throw std::exception("NO_CURVE");
+	if (segmentID >= getSurface(surfaceID)->get_MyTrajectoryCurves()->at(curveID)->get_MyTrajectoryCurveSegments()->size()) throw std::exception("NO_POINT");
+
+	return get_MySurfaces()->at(surfaceID)->get_MyTrajectoryCurves()->at(curveID)->get_MyTrajectoryCurveSegments()->at(segmentID);
+}
+
+ITPointTrajectory * ITProject::getTrajectoryPoint(const unsigned int surfaceID, const unsigned int curveID, const unsigned int pointID)
+{
+	if (surfaceID >= _MySurfaces->size()) { throw std::exception("NO_SURFACE"); }
+	if (curveID >= getSurface(surfaceID)->get_MyTrajectoryCurves()->size()) { throw std::exception("NO_CURVE"); }
+	if (pointID > getSurface(surfaceID)->get_MyTrajectoryCurves()->at(curveID)->get_MyTrajectoryCurveSegments()->size()) { throw std::exception("NO_POINT"); }
+
+	if (pointID == 0)
+	{
+		return get_MySurfaces()->at(surfaceID)->get_MyTrajectoryCurves()->at(curveID)->get_MyTrajectoryCurveSegments()->at(pointID)->get_P0_p();
+	}
+	else
+	{
+		return get_MySurfaces()->at(surfaceID)->get_MyTrajectoryCurves()->at(curveID)->get_MyTrajectoryCurveSegments()->at(pointID - 1)->get_P1_p();
+	}
+}

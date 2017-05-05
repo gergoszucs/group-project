@@ -27,10 +27,14 @@ public:
 	void updateAllTabs();
 	void setMyTextDataField(QString str);
 	void resetModeButtons();
-	void emptyFocusVectors();
+	void finishEditAllViews();
 	void keyPressEvent(QKeyEvent *event);
 
 	void sendHTTPRequest(QString actionKey, QString actionValue, float elapsedTimeSecs, int totalProblemSize, QString fileNameWithPath);
+
+	bool getSync();
+	bool getDial();
+	bool getVector();
 
 	UndoRedoSystem undoRedo;
 
@@ -49,28 +53,30 @@ public slots:
 	void on_actionDelete_surface_triggered();
 
 	void on_actionDrag_triggered();
-	void on_actionDrag_row_triggered();
-	void on_actionDrag_col_triggered();
-	void on_actionDrag_all_triggered();
-	void on_actionRotate_all_triggered();
-	void on_actionResize_all_triggered();
+	void on_actionRotate_triggered();
+	void on_actionCentred_rotate_triggered();
+
 	void on_actionShear_triggered();
-	void on_actionPerspective_triggered();
-	void on_actionFlip_horizontal_triggered();
-	void on_actionPlayout_Test_triggered();
+	void on_actionResize_triggered();
+	void on_actionFlip_triggered();
 	void on_actionCopy_surface_triggered();
+	void on_actionCopy_surface_mirror_triggered();
+
 	void on_actionInsert_row_triggered();
 	void on_actionDelete_row_triggered();
 	void on_actionDuplicate_row_triggered();
+
 	void on_actionInsert_col_triggered();
 	void on_actionDelete_col_triggered();
 	void on_actionDuplicate_col_triggered();
+
 	void on_actionMate_points_triggered();
-	void on_actionCopy_surface_mirror_triggered();
+
 	void on_actionMerge_surfaces_by_row_triggered();
 	void on_actionMerge_surfaces_by_row_reverse_triggered();
 	void on_actionMeasure_distance_triggered();
-	void on_actionCentred_rotate_triggered();
+	
+	void on_actionPlayout_Test_triggered();
 
 	void on_actionControl_points_triggered();
 	void on_actionInterpolated_points_triggered();
@@ -88,8 +94,6 @@ public slots:
 
 	void on_actionUndo_triggered();
 	void on_actionRedo_triggered();
-
-	void userHasEnteredTextData();
 
 	void toolBoxTabChanged(int index);
 
@@ -144,6 +148,13 @@ public slots:
 
 	QString getCommandList();
 
+	void nextFrame();
+	void previousFrame();
+	void startTest();
+	void stopTest();
+	void restart();
+	void syncCurves(bool b);
+
 private:
 	Ui::DesignitClass ui;
 
@@ -194,11 +205,27 @@ private:
 
 	static int matePoints(const QStringList & arguments, const bool reg);
 
+	static int mergeSurface(const QStringList & arguments, const bool reg);
+	static int mergeSurfaceReversed(const QStringList & arguments, const bool reg);
+
+	static int setTrajectoryPoint(const QStringList & arguments, const bool reg);
+	static int moveTrajectoryPoint(const QStringList & arguments, const bool reg);
+
+	static int setU(const QStringList & arguments, const bool reg);
+	static int setV(const QStringList & arguments, const bool reg);
+
 	static int help(const QStringList & arguments, const bool reg);
 
 	static int redoSurfaceDelete(const QStringList & arguments, const bool reg);
 	static int redoRowDelete(const QStringList & arguments, const bool reg);
 	static int redoColumnDelete(const QStringList & arguments, const bool reg);
+
+	static int undoPointGroupMove(const QStringList & arguments, const bool reg);
+	static int undoPointGroupRotate(const QStringList & arguments, const bool reg);
+	static int redoPointGroupMove(const QStringList & arguments, const bool reg);
+	static int redoPointGroupRotate(const QStringList & arguments, const bool reg);
+
+	static int undoMerge(const QStringList & arguments, const bool reg);
 
 public:
 	std::unordered_map<std::string, std::function<int(const QStringList & arguments, const bool reg)>> functions;

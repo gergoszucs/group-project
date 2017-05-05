@@ -65,6 +65,11 @@
         <file>Resources/icon_test.png</file>
         <file>Resources/redo_icon.png</file>
         <file>Resources/undo_icon.png</file>
+        <file>Resources/button_black_first.png</file>
+        <file>Resources/button_black_last.png</file>
+        <file>Resources/button_black_pause.png</file>
+        <file>Resources/button_black_play.png</file>
+        <file>Resources/button_black_repeat.png</file>
         <file>Resources/designit.png</file>
         <file>Resources/flexit.png</file>
     </qresource>

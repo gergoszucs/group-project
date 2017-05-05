@@ -10,6 +10,7 @@
 #include "ITTrajectoryCurveSegment.h"
 #include "ITPointTrajectory.h"
 #include "UtililityFunctions.h"
+#include <gl\GLU.h>
 
 MyGLWidget::MyGLWidget(QWidget *parent)
 	: QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -19,7 +20,29 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 	yRot = 0;
 	zRot = 0;
 
+	glViewHalfExtent = 50.0;
+	glPanCentreX = 0.0;
+	glPanCentreY = 0.0;
+
 	setFocusPolicy(Qt::StrongFocus);
+
+	centerX = 0.0;
+	centerY = 0.0;
+	centerZ = 0.0;
+	azimuth = M_PI + M_PI_2;
+	polar = M_PI_2;
+	radius = 20;
+
+	eyeX = 0.0;
+	eyeY = 0.0;
+	eyeZoom = 1.0;
+}
+
+void MyGLWidget::setDrawParameters(float glPanCenterX, float glPanCenterY, float glViewHalfExtent)
+{
+	this->glPanCentreX = glPanCenterX;
+	this->glPanCentreY = glPanCenterY;
+	this->glViewHalfExtent = glViewHalfExtent;
 }
 
 void MyGLWidget::initializeGL()
@@ -36,11 +59,11 @@ void MyGLWidget::initializeGL()
 	glDisable(GL_CULL_FACE); // Make sure both sides of QUADS are filled.
 
 	//<from moveit>
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_LINE_SMOOTH);
+	//glEnable(GL_POLYGON_SMOOTH);
+	//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	//glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	//glEnable(GL_MULTISAMPLE);
 	//</from moveit>
 }
 
@@ -48,9 +71,13 @@ void MyGLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	glTranslatef(0.0, 0.0, -10.0);
+	glTranslatef(-eyeX*eyeZoom, -eyeY*eyeZoom, 0.0); //
+	glScalef(eyeZoom, eyeZoom, eyeZoom);
+	//gluLookAt(centerX + cameraX, centerY + cameraY, centerZ + cameraZ, centerX, centerY, centerZ, 0, 0, 1);
 
-	// 20160510: Ordering of these rotation has been changed to give more intuitive rotation in response to mouse movement.
+	//glTranslatef(0.0, 0.0, -10.0);
+
+	//// 20160510: Ordering of these rotation has been changed to give more intuitive rotation in response to mouse movement.
 	if (drawRotateZVertical)
 	{
 		// Z vertical.  (Checked)
@@ -88,29 +115,45 @@ void MyGLWidget::resizeGL(int width, int height)
 	myWidth = width;
 	myHeight = height;
 
+	//glViewport(0, 0, width, height);
+
+	//this->setViewOrtho(width, height);
+
 	glViewport(0, 0, width, height);
 
-	setViewOrtho(width, height);
+	float aspect = (float)width / (float)height;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-50.0, +50.0, -50.0 /aspect, +50.0 /aspect, -50000, 50000.0);
+	/*glOrtho(glPanCentreX - glViewHalfExtent,
+		glPanCentreX + glViewHalfExtent,
+		glPanCentreY - glViewHalfExtent / aspect,
+		glPanCentreY + glViewHalfExtent / aspect,
+		-50000.0,
+		50000.0);*/
+
+	glMatrixMode(GL_MODELVIEW);
 
 	draw();
 }
 
 void MyGLWidget::setViewOrtho(int width, int height)
 {
-	float aspect = (float)width / (float)height; // Landscape is greater than 1.
+	//float aspect = (float)width / (float)height; // Landscape is greater than 1.
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
 
-	// Landscape.
-	glOrtho(gl3DPanCentreX - gl3DViewHalfExtent,
-		gl3DPanCentreX + gl3DViewHalfExtent,
-		gl3DPanCentreY - gl3DViewHalfExtent / aspect,
-		gl3DPanCentreY + gl3DViewHalfExtent / aspect,
-		-50000.0,
-		50000.0);
+	//// Landscape.
 
-	glMatrixMode(GL_MODELVIEW);
+	//glOrtho(glPanCentreX - glViewHalfExtent,
+	//	glPanCentreX + glViewHalfExtent,
+	//	glPanCentreY - glViewHalfExtent / aspect,
+	//	glPanCentreY + glViewHalfExtent / aspect,
+	//	-50000.0,
+	//	50000.0);
+	//glMatrixMode(GL_MODELVIEW);
 }
 
 //drawing functions
@@ -397,6 +440,50 @@ void MyGLWidget::drawMyTracks( int frame )
 	}
 }
 
+void MyGLWidget::drawSphere(double r, int lats, int longs, float R, float GG, float B)
+{
+	// Ref: http://stackoverflow.com/questions/22058111/opengl-draw-sphere-using-glvertex3f
+	glColor3f(R, GG, B);
+
+	int i, j;
+	for (i = 0; i <= lats; i++)
+	{
+		double lat0 = M_PI * (-0.5 + (double)(i - 1) / lats);
+		double z0 = sin(lat0);
+		double zr0 = cos(lat0);
+
+		double lat1 = M_PI * (-0.5 + (double)i / lats);
+		double z1 = sin(lat1);
+		double zr1 = cos(lat1);
+
+		glBegin(GL_QUAD_STRIP);
+		for (j = 0; j <= longs; j++)
+		{
+			double lng = 2 * M_PI * (double)(j - 1) / longs;
+			double x = cos(lng);
+			double y = sin(lng);
+
+			glNormal3f(x * zr0, y * zr0, z0);
+			glVertex3f(x * zr0 * r, y * zr0 * r, z0 * r);
+			glNormal3f(x * zr1, y * zr1, z1);
+			glVertex3f(x * zr1 * r, y * zr1 * r, z1 * r);
+		}
+		glEnd();
+	}
+}
+
+void MyGLWidget::modPolar(float p)
+{
+	float tmp = polar + DEG_TO_RAD(p);
+
+	if ((tmp < M_PI) && (tmp > 0)) polar = tmp;
+}
+
+void MyGLWidget::modAzimuth(float a)
+{
+	azimuth += DEG_TO_RAD(a);
+}
+
 //Control slots
 
 void MyGLWidget::keyPressEvent(QKeyEvent * event)
@@ -417,23 +504,23 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
 
 	if (event->key() == Qt::Key_Up)
 	{
-		gl3DPanCentreY = gl3DPanCentreY + factor;
+		glPanCentreY += factor;
 	}
 	else if (event->key() == Qt::Key_Down)
 	{
-		gl3DPanCentreY = gl3DPanCentreY - factor;
+		glPanCentreY -= factor;
 	}
 	else if (event->key() == Qt::Key_Left)
 	{
-		gl3DPanCentreX = gl3DPanCentreX - factor;
+		glPanCentreX -= factor;
 	}
 	else if (event->key() == Qt::Key_Right)
 	{
-		gl3DPanCentreX = gl3DPanCentreX + factor;
+		glPanCentreX += factor;
 	}
 
 	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
+	//this->setViewOrtho(myWidth, myHeight);
 
 	// Force redraw.
 	update();
@@ -471,27 +558,37 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
 		if (event->modifiers() & Qt::ShiftModifier)
 		{
 			// Update zoom.
-			float tmp = gl3DViewHalfExtent + factor * dy;
+			//float tmp = glViewHalfExtent + factor * dy;
 
-			if (tmp >= 0.0) gl3DViewHalfExtent = tmp;
+			//if (tmp >= 0.0) glViewHalfExtent = tmp;
 		}
 		else // No other keys pressed so rotate.
 		{
 			xRot = xRot + dy;
 			yRot = yRot + dx;
+			//modAzimuth(-dx);
+			//modPolar(dy);
 		}
 	}
 	else if (event->buttons() & Qt::RightButton)
 	{
 		if (factor == 1.0) factor = 0.5;
-		gl3DPanCentreX = gl3DPanCentreX - factor * dx;
-		gl3DPanCentreY = gl3DPanCentreY + factor * dy;
+		//glPanCentreX -= factor * dx;
+		//glPanCentreY += factor * dy;
+		//centerX += dx * cos(azimuth);
+		//centerY += dy * sin(azimuth);
+		//centerZ += dy * sin(azimuth) * sin(polar);
+		//float cameraX = radius * sin(polar) * cos(azimuth);
+		//float cameraY = radius * sin(polar) * sin(azimuth);
+		//float cameraZ = radius * cos(polar);
+		eyeX -= factor * dx;
+		eyeY += factor * dy;
 	}
 
 	lastPos = event->pos();
 
 	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
+	//this->setViewOrtho(myWidth, myHeight);
 
 	// Redraw everything.
 	updateGL();
@@ -514,22 +611,22 @@ void MyGLWidget::wheelEvent(QWheelEvent *event)
 		factor = 1.0;
 	}
 
-	float tmpAx, tmpAy, tmpBx, tmpBy;
+	/*float tmpAx, tmpAy, tmpBx, tmpBy;
 
-	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), gl3DPanCentreX, gl3DPanCentreY, gl3DViewHalfExtent);
-
-	float tmp = gl3DViewHalfExtent - factor * dy;
+	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), glPanCentreX, glPanCentreY, glViewHalfExtent);
+	*/
+	float tmp = eyeZoom + 0.01 * factor * dy;
 	
-	if (tmp >= 0.0) gl3DViewHalfExtent = tmp;
-
-	getInAxesPosition(tmpBx, tmpBy, event->x(), event->y(), this->width(), this->height(), gl3DPanCentreX, gl3DPanCentreY, gl3DViewHalfExtent);
-
-	gl3DPanCentreX += tmpAx - tmpBx;
-	gl3DPanCentreY += tmpAy - tmpBy;
+	if (tmp >= 0.0) eyeZoom = tmp;
+	/*
+	getinaxesposition(tmpbx, tmpby, event->x(), event->y(), this->width(), this->height(), glpancentrex, glpancentrey, glviewhalfextent);
+	
+	glPanCentreX += tmpAx - tmpBx;
+	glPanCentreY += tmpAy - tmpBy;*/
 
 	// Adjust viewport view.
-	setViewOrtho(myWidth, myHeight);
+	//this->setViewOrtho(myWidth, myHeight);
 
 	// Redraw everything.
-	updateGL();
+	update();
 }

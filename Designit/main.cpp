@@ -60,37 +60,9 @@ bool UnsavedChanges = false;
 bool IsDataLoaded = false;
 
 // OpenGL view parameters.
-float glXYViewHalfExtent = 50.0;
-float glXYPanCentreX = 0.0;
-float glXYPanCentreY = 0.0;
-
-float glXZViewHalfExtent = 50.0;
-float glXZPanCentreX = 0.0;
-float glXZPanCentreY = 0.0;
-
-float glYZViewHalfExtent = 50.0;
-float glYZPanCentreX = 0.0;
-float glYZPanCentreY = 0.0;
-
 float glGaussianViewHalfExtent = 50.0;
 float glGaussianPanCentreX = 0.0;
 float glGaussianPanCentreY = 0.0;
-
-float gl3DViewHalfExtent = 50.0;
-float gl3DPanCentreX = 0.0;
-float gl3DPanCentreY = 0.0;
-
-float glXViewHalfExtent = 50.0;
-float glXPanCentreX = 50.0;
-float glXPanCentreY = 0.0;
-
-float glYViewHalfExtent = 50.0;
-float glYPanCentreX = 40.0;
-float glYPanCentreY = 0.0;
-
-float glZViewHalfExtent = 50.0;
-float glZPanCentreX = 40.0;
-float glZPanCentreY = 0.0;
 
 WIDGET_CONTROL_ENUM MY_WIDGET_CONTROL;
 
@@ -109,6 +81,8 @@ bool drawGrids = true;
 
 bool IsVerticalDragOnly = false;
 bool IsHorizontalDragOnly = false;
+
+SELECT_MODE _selectMode = POINT_M;
 
 int main(int argc, char *argv[])
 {

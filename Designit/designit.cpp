@@ -29,7 +29,6 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.action_Flexit->setEnabled(false);
 
 	// Default display OpenGL axes enabled.
-	//ui.actionAxes->setIcon( icon );
 	ui.actionControl_points->setIcon(icon);
 	ui.actionInterpolated_points->setIcon(icon);
 	ui.actionNormals->setIcon(icon);
@@ -41,7 +40,7 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	my_statusTable->setColumnCount(2);
 
 	my_statusTable->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Key")));
-	my_statusTable->setColumnWidth(0, 40);
+	my_statusTable->setColumnWidth(0, 110);
 
 	my_statusTable->setHorizontalHeaderItem(1, new QTableWidgetItem(QString("Value")));
 	my_statusTable->setColumnWidth(1, 130);
@@ -50,9 +49,6 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 
 	// Send HTTP log message.
 	sendHTTPRequest(QString("Program"), QString("Launched"), 0.0, 0, DataFileNameWithPath);
-
-	// Connect user text edit to enter method.
-	connect(ui.myEditTextDataField, &QLineEdit::returnPressed, this, &Designit::userHasEnteredTextData);
 
 	// Connect "finished item editing" signal of spreadsheet to "save data" slot
 	connect(ui.mySpreadsheet->itemDelegate(), &QAbstractItemDelegate::commitData, this, &Designit::updateDataFromSpreadsheet);
@@ -84,7 +80,11 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	ui.trajectoryCurveB->set_MyCurveIndex(5);
 	ui.trajectoryCurveB->set_MyChar('B');
 
-	//populate command list
+	ui.myXYView->set_plane(XY);
+	ui.myXZView->set_plane(XZ);
+	ui.myYZView->set_plane(YZ);
+
+	// Populate command list.
 	functions.emplace("help", &Designit::help);
 	functions.emplace("testFunction", &Designit::testFunction);
 
@@ -129,12 +129,30 @@ Designit::Designit(QWidget *parent) : QMainWindow(parent)
 	functions.emplace("deleteColumn", &Designit::deleteColumn);
 
 	functions.emplace("matePoints", &Designit::matePoints);
+	
+	functions.emplace("setTrajectoryPoint", &Designit::setTrajectoryPoint);
+	functions.emplace("moveTrajectoryPoint", &Designit::moveTrajectoryPoint);
+
+	functions.emplace("mergeSurface", &Designit::mergeSurface); 
+	functions.emplace("mergeSurfaceReversed", &Designit::mergeSurfaceReversed);
+
+	functions.emplace("setU", &Designit::setU);
+	functions.emplace("setV", &Designit::setV);
 
 	systemFunctions.emplace("redoSurfaceDelete", &Designit::redoSurfaceDelete);
 	systemFunctions.emplace("redoRowDelete", &Designit::redoRowDelete);
 	systemFunctions.emplace("redoColumnDelete", &Designit::redoColumnDelete);
 
+	systemFunctions.emplace("undoPointGroupMove", &Designit::undoPointGroupMove);
+	systemFunctions.emplace("undoPointGroupRotate", &Designit::undoPointGroupRotate);
+	systemFunctions.emplace("redoPointGroupMove", &Designit::redoPointGroupMove);
+	systemFunctions.emplace("redoPointGroupRotate", &Designit::redoPointGroupRotate);
+
+	systemFunctions.emplace("undoMerge", &Designit::undoMerge);
+
 	ui.commandLine->installEventFilter(this);
+
+	ui.TrajectoryButtons->setVisible(false);
 }
 
 void Designit::on_action_Flexit_triggered() {
@@ -297,13 +315,10 @@ void Designit::keyPressEvent(QKeyEvent *event)
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "keyPressEvent");
 
 	// Get the focus widget.
-	QWidget *w = QApplication::focusWidget();
+	QWidget *wg = QApplication::focusWidget();
 
-	if (w == ui.mySpreadsheet)
+	if (wg == ui.mySpreadsheet)
 	{
-		// We are on the spreadsheet widget.
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "We are focused on the spreadsheet");
-
 		if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
 		{
 			// CTRL-C was pressed, so copy data to clipboard.
@@ -389,13 +404,116 @@ void Designit::keyPressEvent(QKeyEvent *event)
 						ui.mySpreadsheet->setItem(row + i, col + j, new_item);
 					}
 				}
+
+				updateDataFromSpreadsheet();
 			}
 		}
 	}
-	else
+	else if (wg == ui.trajectorySpreadsheet)
 	{
-		// We are on another widget.
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "We are focused on another widget");
+		if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
+		{
+			// CTRL-C was pressed, so copy data to clipboard.
+			// Model of my first QTableWidget
+			QItemSelectionModel *myModel = ui.trajectorySpreadsheet->selectionModel();
+			QModelIndexList list = myModel->selectedIndexes();
+
+			if (list.size() > 0)
+			{
+				QString selectionString;
+
+				// Something was selected, so perform copy.
+				int currentRow = 0; // To determine when to insert newlines
+
+				for (int t = 0; t < list.size(); t++)
+				{
+					QModelIndex item = list.at(t);
+
+					QString contentsOfCurrentItem = item.data().toString();
+
+					if (selectionString.length() == 0)
+					{
+						// First item
+					}
+					else if (item.row() != currentRow)
+					{
+						// New row
+						selectionString += '\n';
+					}
+					else
+					{
+						// Next cell
+						selectionString += '\t';
+					}
+
+					currentRow = item.row();
+					selectionString += item.data().toString();
+
+					QByteArray ba1;
+					ba1 = contentsOfCurrentItem.toLatin1();
+					const char *str1 = ba1.data();
+				}
+
+				QClipboard *clipboard = QApplication::clipboard();
+				clipboard->setText(selectionString);
+			}
+		}
+		else if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier))
+		{
+			// CTRL-V was pressed, so paste data from clipboard.
+			QClipboard *clipboard = QApplication::clipboard();
+
+			// Model of my first QTableWidget
+			QItemSelectionModel *myModel = ui.trajectorySpreadsheet->selectionModel();
+
+			QModelIndexList list = myModel->selectedIndexes();
+
+			if (list.size() == 1)
+			{
+				QModelIndex item = list.at(0);
+
+				int col = item.column();
+				int row = item.row();
+
+				QString contents = clipboard->text();
+				QStringList contentsRowList = contents.split("\n");
+
+				for (int i = 0; i < contentsRowList.size(); i++)
+				{
+					QStringList contentsRowColList = contentsRowList.at(i).split(QRegExp("\\s"));
+
+					for (int j = 0; j < contentsRowColList.size(); j++)
+					{
+						QTableWidgetItem* new_item = new QTableWidgetItem();
+						new_item->setText(QString(contentsRowColList.at(j).toStdString().c_str()));  // 
+						ui.trajectorySpreadsheet->setItem(row + i, col + j, new_item);
+					}
+				}
+			}
+
+			updateTrajectoryFromSpreadsheet();
+		}
+	}
+
+	if (event->key() == Qt::Key_Alt)
+	{
+		switch (_selectMode)
+		{
+		case POINT_M:
+			_selectMode = ROW_M;
+			break;
+		case ROW_M:
+			_selectMode = COLUMN_M;
+			break;
+		case COLUMN_M:
+			_selectMode = SURFACE_M;
+			break;
+		case SURFACE_M:
+			_selectMode = POINT_M;
+			break;
+		}
+
+		w->updateAllTabs();
 	}
 
 	// Call the base class method.
@@ -417,8 +535,12 @@ void Designit::on_actionInterpolated_points_density_U_triggered()
 	int kk = item.toInt();
 	int nU = QInputDialog::getInt(this, "Interpolated points U direction resolution", "Number of U points:", project->get_MySurfaces()->at(kk)->get_NoOfInterpolatedPointsU(), 0, 100, 1, &ok);
 
-	project->get_MySurfaces()->at(kk)->set_NoOfInterpolatedPointsU(nU);
-	project->get_MySurfaces()->at(kk)->manageComputationOfInterpolatedPoints();
+	QStringList command;
+	command.push_back("setU");
+	command.push_back(QString::number(kk));
+	command.push_back(QString::number(nU));
+
+	executeCommand("CHANGE U", command, true);
 
 	on_actionGaussian_curvature_triggered();
 
@@ -440,8 +562,12 @@ void Designit::on_actionInterpolated_points_density_V_triggered()
 	int kk = item.toInt();
 	int nV = QInputDialog::getInt(this, "Interpolated points V direction resolution", "Number of V points:", project->get_MySurfaces()->at(kk)->get_NoOfInterpolatedPointsV(), 0, 100, 1, &ok);
 
-	project->get_MySurfaces()->at(kk)->set_NoOfInterpolatedPointsV(nV);
-	project->get_MySurfaces()->at(kk)->manageComputationOfInterpolatedPoints();
+	QStringList command;
+	command.push_back("setV");
+	command.push_back(QString::number(kk));
+	command.push_back(QString::number(nV));
+
+	executeCommand("CHANGE V", command, true);
 
 	on_actionGaussian_curvature_triggered();
 
@@ -454,6 +580,8 @@ void Designit::updateAllTabs()
 
 	// Update the main geometry OpenGL view.
 	ui.myGLWidget->repaint(); // update seems to only take effect when the used pans the opengl widget.
+	//ui.myGLWidget->updateGL();
+	//ui.myGLWidget->updateCustom();
 
 	// Update the output graphs.
 	ui.myXYView->update();
@@ -463,6 +591,15 @@ void Designit::updateAllTabs()
 	// Update Gaussian view.
 	ui.myGaussianView->updateGL();
 
+	// Upgate trajectory graphs.
+	ui.trajectoryCurveX->update();
+	ui.trajectoryCurveY->update();
+	ui.trajectoryCurveZ->update();
+	ui.trajectoryCurveB->update();
+	ui.trajectoryCurveP->update();
+	ui.trajectoryCurveR->update();
+
+	// Update spreadsheets.
 	w->updateSpreadsheet();
 	w->updateTrajectorySpreadsheet();
 }
@@ -538,6 +675,9 @@ void Designit::closeProject()
 	// Send the HTTP request.
 	sendHTTPRequest(QString("File"), QString("Closed"), 0.0, 0, DataFileNameWithPath);
 
+	undoRedo.reset();
+	finishEditAllViews();
+
 	ui.action_Flexit->setEnabled(false);
 }
 
@@ -567,22 +707,11 @@ void Designit::on_actionAbout_triggered()
 void Designit::on_actionReset_all_views_triggered()
 {
 	// OpenGL view parameters.
-	glXYViewHalfExtent = 50.0;
-	glXYPanCentreX = 0.0;
-	glXYPanCentreY = 0.0;
-
-	glXZViewHalfExtent = 50.0;
-	glXZPanCentreX = 0.0;
-	glXZPanCentreY = 0.0;
-
-	glYZViewHalfExtent = 50.0;
-	glYZPanCentreX = 0.0;
-	glYZPanCentreY = 0.0;
-
-	gl3DViewHalfExtent = 50.0;
-	gl3DPanCentreX = 0.0;
-	gl3DPanCentreY = 0.0;
-
+	ui.myGLWidget->setDrawParameters(0.0, 0.0, 50.0);
+	
+	ui.myXYView->setSceneParameters(0.0, 0.0, 1.0);
+	ui.myYZView->setSceneParameters(0.0, 0.0, 1.0);
+	ui.myXZView->setSceneParameters(0.0, 0.0, 1.0);
 
 	// Drawing semaphores.
 	drawRotateXHorizontal = false;
@@ -747,7 +876,7 @@ void Designit::on_actionDelete_surface_triggered()
 		this->ui.actionDelete_surface->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -867,7 +996,7 @@ void Designit::on_actionCopy_surface_triggered()
 		this->ui.actionCopy_surface->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -904,7 +1033,7 @@ void Designit::on_actionDrag_triggered()
 		this->ui.actionDrag->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -912,120 +1041,6 @@ void Designit::on_actionDrag_triggered()
 
 	// Finally force process events.
 	QApplication::processEvents();
-}
-
-void Designit::on_actionDrag_row_triggered()
-{
-	// Set all the buttons to "normal" icons.
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != DRAG_ROW)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = DRAG_ROW;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_drag_row_highlight.png");
-		this->ui.actionDrag_row->setIcon(icon);
-
-		IsHorizontalDragOnly = false;
-		IsVerticalDragOnly = false;
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_drag_row.png");
-		this->ui.actionDrag_row->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres.
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-
-}
-
-void Designit::on_actionDrag_col_triggered()
-{
-	// Set all the buttons to "normal" icons.
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != DRAG_COL)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = DRAG_COL;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_drag_col_highlight.png");
-		this->ui.actionDrag_col->setIcon(icon);
-
-		IsHorizontalDragOnly = false;
-		IsVerticalDragOnly = false;
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_drag_col.png");
-		this->ui.actionDrag_col->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres.
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-
-}
-
-void Designit::on_actionDrag_all_triggered()
-{
-	// Set all the buttons to "normal" icons.
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != DRAG_ALL)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = DRAG_ALL;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_drag_all_highlight.png");
-		this->ui.actionDrag_all->setIcon(icon);
-
-		IsHorizontalDragOnly = false;
-		IsVerticalDragOnly = false;
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_drag_all.png");
-		this->ui.actionDrag_all->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres.
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-
 }
 
 void Designit::resetModeButtons()
@@ -1034,29 +1049,17 @@ void Designit::resetModeButtons()
 	QIcon icon1 = QIcon("Resources/icon_drag.png");
 	this->ui.actionDrag->setIcon(icon1);
 
-	QIcon icon2 = QIcon("Resources/icon_drag_row.png");
-	this->ui.actionDrag_row->setIcon(icon2);
-
-	QIcon icon3 = QIcon("Resources/icon_drag_col.png");
-	this->ui.actionDrag_col->setIcon(icon3);
-
-	QIcon icon4 = QIcon("Resources/icon_drag_all.png");
-	this->ui.actionDrag_all->setIcon(icon4);
-
 	QIcon icon5 = QIcon("Resources/icon_rotate_all.png");
-	this->ui.actionRotate_all->setIcon(icon5);
+	this->ui.actionRotate->setIcon(icon5);
 
 	QIcon icon6 = QIcon("Resources/icon_resize_all.png");
-	this->ui.actionResize_all->setIcon(icon6);
+	this->ui.actionResize->setIcon(icon6);
 
 	QIcon icon7 = QIcon("Resources/icon_shear.png");
 	this->ui.actionShear->setIcon(icon7);
 
-	QIcon icon8 = QIcon("Resources/icon_perspective_all.png");
-	this->ui.actionPerspective->setIcon(icon8);
-
 	QIcon icon9 = QIcon("Resources/icon_flip_horizontal.png");
-	this->ui.actionFlip_horizontal->setIcon(icon9);
+	this->ui.actionFlip->setIcon(icon9);
 
 	QIcon icon10 = QIcon("Resources/icon_copy.png");
 	this->ui.actionCopy_surface->setIcon(icon10);
@@ -1124,7 +1127,7 @@ void Designit::on_actionCopy_surface_mirror_triggered()
 		this->ui.actionCopy_surface_mirror->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Delete scratch point.
 		delete ui.myXYView->get_ScratchControlPoint();
@@ -1137,18 +1140,18 @@ void Designit::on_actionCopy_surface_mirror_triggered()
 	QApplication::processEvents();
 }
 
-void Designit::on_actionRotate_all_triggered()
+void Designit::on_actionRotate_triggered()
 {
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != ROTATE_ALL)
+	if (MY_EDIT_MODE != ROTATE)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = ROTATE_ALL;
+		MY_EDIT_MODE = ROTATE;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_rotate_all_highlight.png");
-		this->ui.actionRotate_all->setIcon(icon);
+		this->ui.actionRotate->setIcon(icon);
 	}
 	else
 	{
@@ -1157,10 +1160,10 @@ void Designit::on_actionRotate_all_triggered()
 
 		// Reset the icon.
 		QIcon icon = QIcon("Resources/icon_rotate_all.png");
-		this->ui.actionRotate_all->setIcon(icon);
+		this->ui.actionRotate->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1193,7 +1196,7 @@ void Designit::on_actionInsert_row_triggered()
 		this->ui.actionInsert_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1215,9 +1218,6 @@ void Designit::on_actionMerge_surfaces_by_row_reverse_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_merge_surfaces_reverse_highlight.png");
 		this->ui.actionMerge_surfaces_by_row_reverse->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1229,7 +1229,7 @@ void Designit::on_actionMerge_surfaces_by_row_reverse_triggered()
 		this->ui.actionMerge_surfaces_by_row_reverse->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1252,9 +1252,6 @@ void Designit::on_actionMerge_surfaces_by_row_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_merge_surfaces_highlight.png");
 		this->ui.actionMerge_surfaces_by_row->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1266,7 +1263,7 @@ void Designit::on_actionMerge_surfaces_by_row_triggered()
 		this->ui.actionMerge_surfaces_by_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1290,9 +1287,6 @@ void Designit::on_actionMeasure_distance_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_measure_distance_highlight.png");
 		this->ui.actionMeasure_distance->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1304,7 +1298,7 @@ void Designit::on_actionMeasure_distance_triggered()
 		this->ui.actionMeasure_distance->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1491,9 +1485,6 @@ void Designit::on_actionMate_points_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_mate_points_highlight.png");
 		this->ui.actionMate_points->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
 	}
 	else
 	{
@@ -1505,7 +1496,7 @@ void Designit::on_actionMate_points_triggered()
 		this->ui.actionMate_points->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1539,7 +1530,7 @@ void Designit::on_actionInsert_col_triggered()
 		this->ui.actionInsert_col->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1572,7 +1563,7 @@ void Designit::on_actionDelete_row_triggered()
 		this->ui.actionDelete_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1606,7 +1597,7 @@ void Designit::on_actionDelete_col_triggered()
 		this->ui.actionDelete_col->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1639,7 +1630,7 @@ void Designit::on_actionDuplicate_row_triggered()
 		this->ui.actionDuplicate_row->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1673,7 +1664,7 @@ void Designit::on_actionDuplicate_col_triggered()
 		this->ui.actionDuplicate_col->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres.
 		w->updateAllTabs();
@@ -1683,30 +1674,25 @@ void Designit::on_actionDuplicate_col_triggered()
 	QApplication::processEvents();
 }
 
-void Designit::emptyFocusVectors()
+void Designit::finishEditAllViews()
 {
-	for (int k = 0; k < project->get_MySurfaces()->size(); k++)
-	{
-		int N = project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->size();
-		for (int n = 0; n < N; n++)
-		{
-			project->get_MySurfaces()->at(k)->get_MyFocusControlPoints()->pop_back();
-		}
-	}
+	ui.myXYView->finishEdit();
+	ui.myXZView->finishEdit();
+	ui.myYZView->finishEdit();
 }
 
-void Designit::on_actionResize_all_triggered()
+void Designit::on_actionResize_triggered()
 {
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != RESIZE_ALL)
+	if (MY_EDIT_MODE != RESIZE)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = RESIZE_ALL;
+		MY_EDIT_MODE = RESIZE;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_resize_all_highlight.png");
-		this->ui.actionResize_all->setIcon(icon);
+		this->ui.actionResize->setIcon(icon);
 	}
 	else
 	{
@@ -1715,10 +1701,10 @@ void Designit::on_actionResize_all_triggered()
 
 		// Reset the icon.
 		QIcon icon = QIcon("Resources/icon_Resize_all.png");
-		this->ui.actionResize_all->setIcon(icon);
+		this->ui.actionResize->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -1733,10 +1719,10 @@ void Designit::on_actionShear_triggered()
 {
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != SHEAR_ALL)
+	if (MY_EDIT_MODE != SHEAR)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = SHEAR_ALL;
+		MY_EDIT_MODE = SHEAR;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_shear_highlight.png");
@@ -1752,7 +1738,7 @@ void Designit::on_actionShear_triggered()
 		this->ui.actionShear->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -1762,53 +1748,20 @@ void Designit::on_actionShear_triggered()
 	QApplication::processEvents();
 }
 
-void Designit::on_actionPerspective_triggered()
-{
-	resetModeButtons();
-
-	if (MY_EDIT_MODE != PERSPECTIVE_ALL)
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = PERSPECTIVE_ALL;
-
-		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_perspective_all_highlight.png");
-		this->ui.actionPerspective->setIcon(icon);
-	}
-	else
-	{
-		// Update the ENUM
-		MY_EDIT_MODE = NONE;
-
-		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_perspective_all.png");
-		this->ui.actionPerspective->setIcon(icon);
-
-		// Empty the focus vectors.
-		emptyFocusVectors();
-
-		// Redraw everything (to get rid of any spheres).
-		w->updateAllTabs();
-	}
-
-	// Finally force process events.
-	QApplication::processEvents();
-}
-
-void Designit::on_actionFlip_horizontal_triggered()
+void Designit::on_actionFlip_triggered()
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_actionFlip_horizontal_triggered");
 
 	resetModeButtons();
 
-	if (MY_EDIT_MODE != FLIP_HORIZONTAL_ALL)
+	if (MY_EDIT_MODE != FLIP)
 	{
 		// Update the ENUM
-		MY_EDIT_MODE = FLIP_HORIZONTAL_ALL;
+		MY_EDIT_MODE = FLIP;
 
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_flip_horizontal_highlight.png");
-		this->ui.actionFlip_horizontal->setIcon(icon);
+		this->ui.actionFlip->setIcon(icon);
 	}
 	else
 	{
@@ -1817,10 +1770,10 @@ void Designit::on_actionFlip_horizontal_triggered()
 
 		// Reset the icon.
 		QIcon icon = QIcon("Resources/icon_flip_horizontal.png");
-		this->ui.actionFlip_horizontal->setIcon(icon);
+		this->ui.actionFlip->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -1844,14 +1797,6 @@ void Designit::on_actionCentred_rotate_triggered()
 		// Highlight the icon.
 		QIcon icon = QIcon("Resources/icon_centred_rotate_highlight.png");
 		this->ui.actionCentred_rotate->setIcon(icon);
-
-		ui.myXYView->set_PrimedForFirstClick(true);
-		ui.myXYView->set_PrimedForSecondClick(false);
-		ui.myXYView->set_SecondClicksFinished(false);
-
-		ui.myXZView->set_PrimedForFirstClick(true);
-		ui.myXZView->set_PrimedForSecondClick(false);
-		ui.myXZView->set_SecondClicksFinished(false);
 	}
 	else
 	{
@@ -1863,7 +1808,7 @@ void Designit::on_actionCentred_rotate_triggered()
 		this->ui.actionCentred_rotate->setIcon(icon);
 
 		// Empty the focus vectors.
-		emptyFocusVectors();
+		finishEditAllViews();
 
 		// Redraw everything (to get rid of any spheres).
 		w->updateAllTabs();
@@ -1973,30 +1918,6 @@ void Designit::setMyTextDataField(QString str)
 
 }
 
-void Designit::userHasEnteredTextData()
-{
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Return");
-
-	if (MY_EDIT_MODE == ROTATE_ALL)
-	{
-		float netAngleReds = ui.myEditTextDataField->text().toFloat() * PI / 180.0 - ui.myXYView->get_EditValue();
-		ui.myXYView->set_EditValue(netAngleReds);
-		ui.myXYView->rotateFocusPoints(netAngleReds);
-
-		// Redraw other views.
-		updateAllTabs();
-	}
-	else if (MY_EDIT_MODE == SHEAR_ALL)
-	{
-		float netShearDistance = ui.myEditTextDataField->text().toFloat();
-		ui.myXYView->set_EditValue(netShearDistance);
-		ui.myXYView->shearFocusPoints(netShearDistance);
-
-		// Redraw other views.
-		updateAllTabs();
-	}
-}
-
 void Designit::handleCommand()
 {
 	QString input = ui.commandLine->text();
@@ -2035,6 +1956,18 @@ void Designit::handleCommand()
 			break;
 		case 6:
 			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("No row in surface"));
+			break;
+		case 7:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Can't merge same surface"));
+			break;
+		case 8:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Diffrent number of columns"));
+			break;
+		case 9:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("No trajectory curve"));
+			break;
+		case 10:
+			appendStatusTableWidget(QString(arguments[0].toUtf8().constData()), QString("Wrong point id"));
 			break;
 		case 98:
 			break;
@@ -2112,19 +2045,90 @@ QString Designit::getCommandList()
 	return QStr;
 }
 
+void Designit::nextFrame()
+{
+	int tmp = FrameNumber + 1;
+	if ((tmp >= 0) && (tmp <= project->get_MaxKeyFrame()))
+	{
+		FrameNumber = tmp;
+
+		ITPhysics::PropagateSurfaceGeometry(FrameNumber);
+
+		w->updateAllTabs();
+	}
+}
+
+void Designit::previousFrame()
+{
+	int tmp = FrameNumber - 1;
+	if ((tmp >= 0) && (tmp <= project->get_MaxKeyFrame()))
+	{
+		FrameNumber = tmp;
+
+		ITPhysics::PropagateSurfaceGeometry(FrameNumber);
+
+		w->updateAllTabs();
+	}
+}
+
+void Designit::startTest()
+{
+	if ((trajectoryMode) && (!IsDryRun))
+	{
+		IsDryRun = true;
+
+		ITPhysics::playOutDryRun();
+
+		IsDryRun = false;
+	}
+}
+
+void Designit::stopTest()
+{
+	if ((trajectoryMode) && (IsDryRun))
+	{
+		IsDryRun = false;
+	}
+}
+
+void Designit::restart()
+{
+	if (trajectoryMode)
+	{
+		IsDryRun = false;
+
+		if (FrameNumber > 0)
+		{
+			for (int k = 0; k<project->get_MySurfaces()->size(); k++)
+			{
+				project->get_MySurfaces()->at(k)->moveMeBackToBase(k);
+			}
+
+			project->manageComputationOfInterpolatedPoints();
+
+			w->updateAllTabs();
+
+			FrameNumber = 0;
+		}
+	}
+}
+
+void Designit::syncCurves(bool b)
+{
+	updateAllTabs();
+}
+
 bool Designit::parsePlane(QString str, PLANE & p)
 {
-	str.toLower();
-
-	if ((str == "xy") || (str == "yx"))
+	if ((QString::compare(str, tr("xy"), Qt::CaseInsensitive) == 0) || (QString::compare(str, tr("yx"), Qt::CaseInsensitive) == 0))
 	{
 		p = XY;
 	}
-	else if ((str == "xz") || (str == "zx"))
+	else if ((QString::compare(str, tr("xz"), Qt::CaseInsensitive) == 0) || (QString::compare(str, tr("zx"), Qt::CaseInsensitive) == 0))
 	{
 		p = XZ;
 	}
-	else if ((str == "yz") || (str == "zy"))
+	else if ((QString::compare(str, tr("yz"), Qt::CaseInsensitive) == 0) || (QString::compare(str, tr("zy"), Qt::CaseInsensitive) == 0))
 	{
 		p = YZ;
 	}
@@ -2226,156 +2230,31 @@ void Designit::showTrajectorySpreadsheet()
 		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "showTrajectorySpreadsheet");
 		// Compute the number of columns and display column headers.============================================================================
 		int noOfSurfaces = project->get_MySurfaces()->size();
+		int noOfSegments = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size();
 		QTableWidget* my_table = ui.trajectorySpreadsheet;
 
-		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size() + 1);
+		my_table->setRowCount(noOfSegments * noOfSurfaces);
 
-		int columnCount = 2 + 6 * noOfSurfaces; // The column count for the FrameNumber, CL, CD, Lift and Drag for each surface.
-
-												// Actually set the column count of the table.
-		my_table->setColumnCount(columnCount);
+		my_table->setColumnCount(9);
 
 		// Now display the column headers.
-		my_table->setHorizontalHeaderItem(0, new QTableWidgetItem("Index"));
-		my_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Frame Number"));
+		my_table->setHorizontalHeaderItem(0, new QTableWidgetItem("Surface index"));
+		my_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Segment index"));
+		my_table->setHorizontalHeaderItem(2, new QTableWidgetItem("End frame"));
+		my_table->setHorizontalHeaderItem(3, new QTableWidgetItem("X"));
+		my_table->setColumnWidth(3, 50);
+		my_table->setHorizontalHeaderItem(4, new QTableWidgetItem("Y"));
+		my_table->setColumnWidth(4, 50);
+		my_table->setHorizontalHeaderItem(5, new QTableWidgetItem("Z"));
+		my_table->setColumnWidth(5, 50);
+		my_table->setHorizontalHeaderItem(6, new QTableWidgetItem("Roll"));
+		my_table->setColumnWidth(6, 50);
+		my_table->setHorizontalHeaderItem(7, new QTableWidgetItem("Pitch"));
+		my_table->setColumnWidth(7, 50);
+		my_table->setHorizontalHeaderItem(8, new QTableWidgetItem("Yaw"));
+		my_table->setColumnWidth(8, 50);
 
-		int columnIndex = 2;
-		for (int k = 0; k < noOfSurfaces; k++)
-		{
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("X %1").arg(k)));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Y %1").arg(k)));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Z %1").arg(k)));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Roll %1").arg(k)));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Pitch %1").arg(k)));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-			my_table->setHorizontalHeaderItem(columnIndex, new QTableWidgetItem(QString("Yaw %1").arg(k)));
-			my_table->setColumnWidth(columnIndex, 50);
-			columnIndex++;
-		}
-
-		// Display first row (p0 of the first segments)
-		columnIndex = 0;
-
-		QTableWidgetItem* new_itemF = new QTableWidgetItem();
-		new_itemF->setText(QString::number(0));  // 
-		my_table->setItem(0, columnIndex, new_itemF);
-		columnIndex++;
-
-		int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_StartKeyFrame();
-		QTableWidgetItem* new_itemT = new QTableWidgetItem();
-		new_itemT->setText(QString::number(currentFrame));  // 
-		my_table->setItem(0, columnIndex, new_itemT);
-		columnIndex++;
-
-		for (int k = 0; k < noOfSurfaces; k++)
-		{
-			// X
-			ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemX = new QTableWidgetItem();
-			new_itemX->setText(QString::number(pX->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemX);
-			columnIndex++;
-			// Y
-			ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemY = new QTableWidgetItem();
-			new_itemY->setText(QString::number(pY->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemY);
-			columnIndex++;
-			// Z
-			ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemZ = new QTableWidgetItem();
-			new_itemZ->setText(QString::number(pZ->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemZ);
-			columnIndex++;
-			// Roll
-			ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemR = new QTableWidgetItem();
-			new_itemR->setText(QString::number(pR->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemR);
-			columnIndex++;
-			// Pitch
-			ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemP = new QTableWidgetItem();
-			new_itemP->setText(QString::number(pP->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemP);
-			columnIndex++;
-			// Yaw
-			ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemB = new QTableWidgetItem();
-			new_itemB->setText(QString::number(pB->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemB);
-			columnIndex++;
-		} // End of k loop.
-
-		  // Display data for each surface.======================================================================================
-		for (int n = 0; n < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++)
-		{
-			int columnIndex = 0;
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "showSpreadsheet. n = %i", n);
-
-			QTableWidgetItem* new_itemF = new QTableWidgetItem();
-			new_itemF->setText(QString::number(n + 1));  // 
-			my_table->setItem(n + 1, columnIndex, new_itemF);
-			columnIndex++;
-
-			int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_EndKeyFrame();
-			QTableWidgetItem* new_itemT = new QTableWidgetItem();
-			new_itemT->setText(QString::number(currentFrame));  // 
-			my_table->setItem(n + 1, columnIndex, new_itemT);
-			columnIndex++;
-
-			for (int k = 0; k < noOfSurfaces; k++)
-			{
-				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 12, "showSpreadsheet 3");
-
-				// X
-				ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
-				QTableWidgetItem* new_itemX = new QTableWidgetItem();
-				new_itemX->setText(QString::number(pX->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemX);
-				columnIndex++;
-				// Y
-				ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
-				QTableWidgetItem* new_itemY = new QTableWidgetItem();
-				new_itemY->setText(QString::number(pY->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemY);
-				columnIndex++;
-				// Z
-				ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
-				QTableWidgetItem* new_itemZ = new QTableWidgetItem();
-				new_itemZ->setText(QString::number(pZ->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemZ);
-				columnIndex++;
-				// Roll
-				ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
-				QTableWidgetItem* new_itemR = new QTableWidgetItem();
-				new_itemR->setText(QString::number(pR->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemR);
-				columnIndex++;
-				// Pitch
-				ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
-				QTableWidgetItem* new_itemP = new QTableWidgetItem();
-				new_itemP->setText(QString::number(pP->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemP);
-				columnIndex++;
-				// Yaw
-				ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
-				QTableWidgetItem* new_itemB = new QTableWidgetItem();
-				new_itemB->setText(QString::number(pB->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemB);
-				columnIndex++;
-			}
-		}
+		updateTrajectorySpreadsheet();
 	}
 }
 
@@ -2467,126 +2346,72 @@ void Designit::updateTrajectorySpreadsheet()
 	// Update the output table tab.
 	if ((MY_RUN_MODE == MYGUI) && (project->get_MySurfaces()->size() != 0))
 	{
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet");
-
 		int noOfSurfaces = project->get_MySurfaces()->size();
-		QTableWidget* my_table = ui.trajectorySpreadsheet;
+		int noOfSegments = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size();
+		QTableWidget* table = ui.trajectorySpreadsheet;
 
-		my_table->setRowCount(project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size() + 1);
-
-		// Display first row (p0 of the first segments)
-		int columnIndex = 0;
-
-		QTableWidgetItem* new_itemF = new QTableWidgetItem();
-		new_itemF->setText(QString::number(0));  // 
-		my_table->setItem(0, columnIndex, new_itemF);
-		columnIndex++;
-
-		int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_StartKeyFrame();
-		QTableWidgetItem* new_itemT = new QTableWidgetItem();
-		new_itemT->setText(QString::number(currentFrame));  // 
-		my_table->setItem(0, columnIndex, new_itemT);
-		columnIndex++;
-
-		for (int k = 0; k < noOfSurfaces; k++)
+		if (getSync())
 		{
-			// X
-			ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemX = new QTableWidgetItem();
-			new_itemX->setText(QString::number(pX->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemX);
-			columnIndex++;
-			// Y
-			ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemY = new QTableWidgetItem();
-			new_itemY->setText(QString::number(pY->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemY);
-			columnIndex++;
-			// Z
-			ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemZ = new QTableWidgetItem();
-			new_itemZ->setText(QString::number(pZ->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemZ);
-			columnIndex++;
-			// Roll
-			ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemR = new QTableWidgetItem();
-			new_itemR->setText(QString::number(pR->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemR);
-			columnIndex++;
-			// Pitch
-			ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemP = new QTableWidgetItem();
-			new_itemP->setText(QString::number(pP->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemP);
-			columnIndex++;
-			// Yaw
-			ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p();
-			QTableWidgetItem* new_itemB = new QTableWidgetItem();
-			new_itemB->setText(QString::number(pB->get_X()));  // 
-			my_table->setItem(0, columnIndex, new_itemB);
-			columnIndex++;
+			noOfSurfaces = 1;
 		}
 
-		// Display data for each segment (after the first).======================================================================================
-		for (int n = 0; n < project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->size(); n++)
+		table->setRowCount(noOfSegments * noOfSurfaces);
+
+		for (int surfaceID = 0; surfaceID < noOfSurfaces; surfaceID++)
 		{
-			int columnIndex = 0;
-
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet. n = %i", n);
-
-			QTableWidgetItem* new_itemF = new QTableWidgetItem();
-			new_itemF->setText(QString::number(n + 1));  // 
-			my_table->setItem(n + 1, columnIndex, new_itemF);
-			columnIndex++;
-
-			int currentFrame = project->get_MySurfaces()->at(0)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_EndKeyFrame();
-			QTableWidgetItem* new_itemT = new QTableWidgetItem();
-			new_itemT->setText(QString::number(currentFrame));  // 
-			my_table->setItem(n + 1, columnIndex, new_itemT);
-			columnIndex++;
-
-			// For the current segment, loop over each surface.
-			for (int k = 0; k < noOfSurfaces; k++)
+			for (int segmentID = 0; segmentID < noOfSegments; segmentID++)
 			{
-				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "updateSpreadsheet 3");
+				// Surface ID
+				QTableWidgetItem* new_itemSID = new QTableWidgetItem();
+				new_itemSID->setText(QString::number(surfaceID));
+				table->setItem(surfaceID * noOfSegments + segmentID, 0, new_itemSID);
+
+				// Segment ID
+				QTableWidgetItem* new_itemF = new QTableWidgetItem();
+				new_itemF->setText(QString::number(segmentID));
+				table->setItem(surfaceID * noOfSegments + segmentID, 1, new_itemF);
+
+				// End frame
+				int currentFrame = project->getTrajectorySegment(surfaceID, 0, segmentID)->get_EndKeyFrame();
+				QTableWidgetItem* new_itemT = new QTableWidgetItem();
+				new_itemT->setText(QString::number(currentFrame));
+				table->setItem(surfaceID * noOfSegments + segmentID, 2, new_itemT);
 
 				// X
-				ITPointTrajectory *pX = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(0)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				ITPointTrajectory *pX = project->getTrajectorySegment(surfaceID, 0, segmentID)->get_P1_p();
 				QTableWidgetItem* new_itemX = new QTableWidgetItem();
 				new_itemX->setText(QString::number(pX->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemX);
-				columnIndex++;
+				table->setItem(surfaceID * noOfSegments + segmentID, 3, new_itemX);
+
 				// Y
-				ITPointTrajectory *pY = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(1)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				ITPointTrajectory *pY = project->getTrajectorySegment(surfaceID, 1, segmentID)->get_P1_p();
 				QTableWidgetItem* new_itemY = new QTableWidgetItem();
 				new_itemY->setText(QString::number(pY->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemY);
-				columnIndex++;
+				table->setItem(surfaceID * noOfSegments + segmentID, 4, new_itemY);
+
 				// Z
-				ITPointTrajectory *pZ = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(2)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				ITPointTrajectory *pZ = project->getTrajectorySegment(surfaceID, 2, segmentID)->get_P1_p();
 				QTableWidgetItem* new_itemZ = new QTableWidgetItem();
 				new_itemZ->setText(QString::number(pZ->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemZ);
-				columnIndex++;
+				table->setItem(surfaceID * noOfSegments + segmentID, 5, new_itemZ);
+
 				// Roll
-				ITPointTrajectory *pR = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(3)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				ITPointTrajectory *pR = project->getTrajectorySegment(surfaceID, 3, segmentID)->get_P1_p();
 				QTableWidgetItem* new_itemR = new QTableWidgetItem();
 				new_itemR->setText(QString::number(pR->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemR);
-				columnIndex++;
+				table->setItem(surfaceID * noOfSegments + segmentID, 6, new_itemR);
+
 				// Pitch
-				ITPointTrajectory *pP = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(4)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				ITPointTrajectory *pP = project->getTrajectorySegment(surfaceID, 4, segmentID)->get_P1_p();
 				QTableWidgetItem* new_itemP = new QTableWidgetItem();
 				new_itemP->setText(QString::number(pP->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemP);
-				columnIndex++;
-				// Yaw (Bearing)
-				ITPointTrajectory *pB = project->get_MySurfaces()->at(k)->get_MyTrajectoryCurves()->at(5)->get_MyTrajectoryCurveSegments()->at(n)->get_P1_p();
+				table->setItem(surfaceID * noOfSegments + segmentID, 7, new_itemP);
+
+				// Yaw
+				ITPointTrajectory *pB = project->getTrajectorySegment(surfaceID, 5, segmentID)->get_P1_p();
 				QTableWidgetItem* new_itemB = new QTableWidgetItem();
 				new_itemB->setText(QString::number(pB->get_X()));  // 
-				my_table->setItem(n + 1, columnIndex, new_itemB);
-				columnIndex++;
+				table->setItem(surfaceID * noOfSegments + segmentID, 8, new_itemB);
 			}
 		}
 	}
@@ -2668,6 +2493,21 @@ void Designit::sendHTTPRequest(QString actionKey, QString actionValue, float ela
 	}
 }
 
+bool Designit::getSync()
+{
+	return ui.syncCurves->isChecked();
+}
+
+bool Designit::getDial()
+{
+	return ui.actionAngle_dial->isChecked();
+}
+
+bool Designit::getVector()
+{
+	return ui.actionDrag_vector->isChecked();
+}
+
 void Designit::on_actionPlayout_Test_triggered()
 {
 	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Inside on_Playout_Test_triggered");
@@ -2729,8 +2569,6 @@ void Designit::updateDataFromSpreadsheet()
 
 	if (list.size() > 0)
 	{
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "List item found. Size: %i", list.size());
-
 		for (int t = 0; t < list.size(); t++)
 		{
 			QModelIndex item = list.at(t);
@@ -2740,51 +2578,36 @@ void Designit::updateDataFromSpreadsheet()
 			int col = item.column();
 			int row = item.row();
 
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Row: %i, Column: %i, Contents: %s", row, col, contentsOfCurrentItem.toStdString().c_str());
-
-			int rowOffset = 0;
-			int lastRowOffset = 0;
-			for (int k = 0; k < project->get_MySurfaces()->size(); k++)
+			if ((col == 3) || (col == 4) || (col == 5))
 			{
-				int noOfRows = project->get_MySurfaces()->at(k)->get_MyControlPoints()->size();
-				int noOfCols = project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(0).size();
-				rowOffset = rowOffset + noOfRows * noOfCols;
+				QString surfaceID = ui.mySpreadsheet->item(row, 0)->text();
+				QString i = ui.mySpreadsheet->item(row, 1)->text();
+				QString j = ui.mySpreadsheet->item(row, 2)->text();
 
-				if ((lastRowOffset <= row) && (row < rowOffset))
-				{
-					// We are editing the current surface.
-					int innerRow = row - lastRowOffset;
-					int i = innerRow / noOfCols;
-					int j = innerRow%noOfCols;
+				QString x = ui.mySpreadsheet->item(row, 3)->text();
+				QString y = ui.mySpreadsheet->item(row, 4)->text();
+				QString z = ui.mySpreadsheet->item(row, 5)->text();
 
-					if (col == 3)
-					{
-						// We are editing an x value.
-						project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_X(contentsOfCurrentItem.toFloat());
-						project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_X(contentsOfCurrentItem.toFloat());
-					}
-					else if (col == 4)
-					{
-						// We are editing a y value.
-						project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Y(contentsOfCurrentItem.toFloat());
-						project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Y(contentsOfCurrentItem.toFloat());
-					}
-					else if (col == 5)
-					{
-						// We are editing a z value.
-						project->get_MySurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Z(contentsOfCurrentItem.toFloat());
-						project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->at(i).at(j)->set_Z(contentsOfCurrentItem.toFloat());
-					}
+				QString message = "updateDataFromSpreadsheet: " + surfaceID + " " + i + " " + j + " " + x + " " + y + " " + z;
 
-					// Update the Bezier data.
-					project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
-				}
-				lastRowOffset = rowOffset;
+				project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, message.toStdString().c_str());
+
+				QStringList command;
+
+				command.push_back("setPoint");
+				command.push_back(surfaceID);
+				command.push_back(i);
+				command.push_back(j);
+				command.push_back(x);
+				command.push_back(y);
+				command.push_back(z);
+
+				executeCommand("SPREADSHEET", command, true);
 			}
 		}
 
-		// Update the spreadsheet.
-		updateSpreadsheet();
+		project->synchronizeSurfaceVectorsFromControl();
+		project->manageComputationOfInterpolatedPoints();
 
 		// Update the plots.
 		updateAllTabs();
@@ -2796,9 +2619,6 @@ void Designit::updateDataFromSpreadsheet()
 
 void Designit::updateTrajectoryFromSpreadsheet()
 {
-	// We are on the spreadsheet widget.
-	project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "We are focused on the spreadsheet");
-
 	// Model of my first QTableWidget
 	QItemSelectionModel *myModel = ui.trajectorySpreadsheet->selectionModel();
 
@@ -2806,8 +2626,6 @@ void Designit::updateTrajectoryFromSpreadsheet()
 
 	if (list.size() > 0)
 	{
-		project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "List item found. Size: %i", list.size());
-
 		for (int t = 0; t < list.size(); t++)
 		{
 			QModelIndex item = list.at(t);
@@ -2817,43 +2635,25 @@ void Designit::updateTrajectoryFromSpreadsheet()
 			int col = item.column();
 			int row = item.row();
 
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Row: %i, Column: %i, Contents: %s", row, col, contentsOfCurrentItem.toStdString().c_str());
+			int surfaceID = ui.trajectorySpreadsheet->item(row, 0)->text().toInt();
+			int segmentID = ui.trajectorySpreadsheet->item(row, 1)->text().toInt();
 
-			int baseCol = col - 2;
-			int surfaceIndex = baseCol / 6.0;
-			int curveIndex = baseCol % 6;
-			int segIndex = row - 1;
-
-			project->printDebug(__FILE__, __LINE__, __FUNCTION__, 2, "Surface Index: %i, curveIndex: %i, segment index: %i", surfaceIndex, curveIndex, segIndex);
-
-			// Update the value.
-			if (segIndex > -1)
+			if ((col != 0) && (col != 1) && (col != 2))
 			{
-				project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex)->get_P1_p()->set_X(contentsOfCurrentItem.toFloat());
-			}
-			else
-			{
-				// Treat the first row differently.
-				project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(0)->get_P0_p()->set_X(contentsOfCurrentItem.toFloat());
-			}
+				QStringList command;
+				command.push_back(tr("setTrajectoryPoint"));
+				command.push_back(QString::number(surfaceID));
+				command.push_back(QString::number(col - 3));
+				command.push_back(QString::number(segmentID + 1));
+				command.push_back(contentsOfCurrentItem);
+				getSync() ? command.push_back("1") : command.push_back("0");
 
-			// See if we need to update the start point of the next curve.
-			int noOfSegments = project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->size();
-
-			if ((segIndex < noOfSegments - 1) && (segIndex > -1))
-			{
-				project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->get_MyTrajectoryCurveSegments()->at(segIndex + 1)->get_P0_p()->set_X(contentsOfCurrentItem.toFloat());
+				executeCommand("TrajectorySpreadsheet", command, true);
 			}
-
-			// Recompute tangents etc.
-			project->get_MySurfaces()->at(surfaceIndex)->get_MyTrajectoryCurves()->at(curveIndex)->computeMySegmentEndTangentVectors();
 
 			// Set flag.
 			UnsavedChanges = true;
 		}
-
-		// Update the spreadsheet.
-		updateTrajectorySpreadsheet();
 
 		// Update the plots.
 		updateAllTabs();
@@ -2865,9 +2665,12 @@ void Designit::toolBoxTabChanged( int index )
 	if (index == 1)
 	{
 		trajectoryMode = true;
+		ui.TrajectoryButtons->setVisible(true);
 	}
 	else {
+		restart();
 		trajectoryMode = false;
+		ui.TrajectoryButtons->setVisible(false);
 	}
 
 	updateAllTabs();
@@ -4180,6 +3983,8 @@ int Designit::duplicateRow(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		int size = project->getSurface(surfaceID)->sizeX();
+
 		project->duplicateRow(surfaceID, i);
 
 		if (reg)
@@ -4188,7 +3993,15 @@ int Designit::duplicateRow(const QStringList & arguments, const bool reg)
 
 			revCommand.push_back("deleteRow");
 			revCommand.push_back(QString::number(surfaceID));
-			revCommand.push_back(QString::number(i + 1));
+			
+			if (size - 1 == i)
+			{
+				revCommand.push_back(QString::number(i));
+			}
+			else
+			{
+				revCommand.push_back(QString::number(i + 1));
+			}
 
 			w->undoRedo.registerCommand(arguments, revCommand);
 		}
@@ -4242,7 +4055,6 @@ int Designit::deleteRow(const QStringList & arguments, const bool reg)
 			std::vector<ITControlPoint*> tmp;
 
 			project->getSurface(surfaceID)->getRowCopy(i, tmp);
-
 
 			project->deleteRow(surfaceID, i);
 
@@ -4338,6 +4150,8 @@ int Designit::duplicateColumn(const QStringList & arguments, const bool reg)
 
 	try
 	{
+		int size = project->getSurface(surfaceID)->sizeY();
+
 		project->duplicateColumn(surfaceID, j);
 
 		if (reg)
@@ -4346,7 +4160,15 @@ int Designit::duplicateColumn(const QStringList & arguments, const bool reg)
 
 			revCommand.push_back("deleteColumn");
 			revCommand.push_back(QString::number(surfaceID));
-			revCommand.push_back(QString::number(j + 1));
+
+			if (size - 1 == j)
+			{
+				revCommand.push_back(QString::number(j));
+			}
+			else
+			{
+				revCommand.push_back(QString::number(j + 1));
+			}
 
 			w->undoRedo.registerCommand(arguments, revCommand);
 		}
@@ -4487,6 +4309,420 @@ int Designit::matePoints(const QStringList & arguments, const bool reg)
 	return 0;
 }
 
+int Designit::mergeSurface(const QStringList & arguments, const bool reg)
+{
+	int firstSurfaceID, secondSurfaceID;
+	MERGE_ROW first, second;
+	bool status;
+
+	if (arguments.size() == 3)
+	{
+		firstSurfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		secondSurfaceID = arguments[2].toInt(&status);
+		if (!status) return 2;
+
+		first = LAST;
+		second = FIRST;
+	}
+	else if (arguments.size() == 5)
+	{
+		firstSurfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+
+		if (QString::compare(arguments[2], tr("first"), Qt::CaseInsensitive) == 0)
+		{
+			first = FIRST;
+		}
+		else if (QString::compare(arguments[2], tr("last"), Qt::CaseInsensitive) == 0)
+		{
+			first = LAST;
+		}
+		else { return 2; }
+
+		secondSurfaceID = arguments[3].toInt(&status);
+		if (!status) return 2;
+
+		if (QString::compare(arguments[4], tr("first"), Qt::CaseInsensitive) == 0)
+		{
+			second = FIRST;
+		}
+		else if (QString::compare(arguments[4], tr("last"), Qt::CaseInsensitive) == 0)
+		{
+			second = LAST;
+		}
+		else { return 2; }
+	}
+	else
+	{
+		return 1;
+	}
+
+	try
+	{
+		if ((secondSurfaceID >= project->get_MySurfaces()->size()) || (secondSurfaceID < 0)) throw std::exception("NO_SURFACE");
+
+		auto tmp = project->getSurface(secondSurfaceID);
+		auto tmpBase = project->getBaseSurface(secondSurfaceID);
+
+		project->mergeSurface(firstSurfaceID, first, secondSurfaceID, second, false);
+
+		w->undoRedo.registerSurface(tmp, tmpBase);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("undoMerge");
+			revCommand.push_back(QString::number(firstSurfaceID));
+			if (first == FIRST)
+			{
+				revCommand.push_back("first");
+			}
+			else
+			{
+				revCommand.push_back("last");
+			}
+			revCommand.push_back(QString::number(tmp->sizeX()));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		if (strcmp(e.what(), "MERGE_IMPOSSIBLE") == 0) { return 7; }
+		if (strcmp(e.what(), "NO_MATCH_COLUMNS") == 0) { return 8; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::mergeSurfaceReversed(const QStringList & arguments, const bool reg)
+{
+	int firstSurfaceID, secondSurfaceID;
+	MERGE_ROW first, second;
+	bool status;
+
+	if (arguments.size() == 3)
+	{
+		firstSurfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		secondSurfaceID = arguments[2].toInt(&status);
+		if (!status) return 2;
+
+		first = LAST;
+		second = FIRST;
+	}
+	else if (arguments.size() == 5)
+	{
+		firstSurfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+
+		if (QString::compare(arguments[2], tr("first"), Qt::CaseInsensitive) == 0)
+		{
+			first = FIRST;
+		}
+		else if (QString::compare(arguments[2], tr("last"), Qt::CaseInsensitive) == 0)
+		{
+			first = LAST;
+		}
+		else { return 2; }
+
+		secondSurfaceID = arguments[3].toInt(&status);
+		if (!status) return 2;
+
+		if (QString::compare(arguments[4], tr("first"), Qt::CaseInsensitive) == 0)
+		{
+			second = FIRST;
+		}
+		else if (QString::compare(arguments[4], tr("last"), Qt::CaseInsensitive) == 0)
+		{
+			second = LAST;
+		}
+		else { return 2; }
+	}
+	else
+	{
+		return 1;
+	}
+
+	try
+	{
+		if ((secondSurfaceID >= project->get_MySurfaces()->size()) || (secondSurfaceID < 0)) throw std::exception("NO_SURFACE");
+
+		auto tmp = project->getSurface(secondSurfaceID);
+		auto tmpBase = project->getBaseSurface(secondSurfaceID);
+
+		project->mergeSurface(firstSurfaceID, first, secondSurfaceID, second, true);
+
+		w->undoRedo.registerSurface(tmp, tmpBase);
+
+		if (reg)
+		{
+			QStringList revCommand;
+
+			revCommand.push_back("undoMerge");
+			revCommand.push_back(QString::number(firstSurfaceID));
+			if (first == FIRST)
+			{
+				revCommand.push_back("first");
+			}
+			else
+			{
+				revCommand.push_back("last");
+			}
+			revCommand.push_back(QString::number(tmp->sizeX()));
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_COLUMN") == 0) { return 5; }
+		if (strcmp(e.what(), "NO_ROW") == 0) { return 6; }
+		if (strcmp(e.what(), "MERGE_IMPOSSIBLE") == 0) { return 7; }
+		if (strcmp(e.what(), "NO_MATCH_COLUMNS") == 0) { return 8; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::setTrajectoryPoint(const QStringList & arguments, const bool reg)
+{
+	int surfaceID, curveID, pointID, tmp;
+	float data;
+	bool status, sync;
+
+	if (arguments.size() == 5)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		curveID = arguments[2].toInt(&status);
+		if (!status) return 2;
+		pointID = arguments[3].toInt(&status);
+		if (!status) return 2;
+		data = arguments[4].toFloat(&status);
+		if (!status) return 2;
+		sync = false;
+	}
+	else if (arguments.size() == 6)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		curveID = arguments[2].toInt(&status);
+		if (!status) return 2;
+		pointID = arguments[3].toInt(&status);
+		if (!status) return 2;
+		data = arguments[4].toFloat(&status);
+		if (!status) return 2;
+		tmp = arguments[5].toInt(&status);
+		if (!status) return 2;
+
+		tmp == 0 ? sync = false : sync = true;
+	}
+	else
+	{
+		return 1;
+	}
+
+	try
+	{
+		if (pointID == 0) { throw std::exception("WRONG_POINTID"); }
+
+		float tmp = project->getTrajectoryPoint(surfaceID, curveID, pointID)->get_X();
+
+		project->setTrajectoryPoint(surfaceID, curveID, pointID, data, sync);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(tmp);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_CURVE") == 0) { return 9; }
+		if (strcmp(e.what(), "WRONG_POINTID") == 0) { return 10; }
+		return 99;
+	}
+
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::moveTrajectoryPoint(const QStringList & arguments, const bool reg)
+{
+	int surfaceID, curveID, pointID, tmp;
+	float data;
+	bool status, sync;
+
+	if (arguments.size() == 5)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		curveID = arguments[2].toInt(&status);
+		if (!status) return 2;
+		pointID = arguments[3].toInt(&status);
+		if (!status) return 2;
+		data = arguments[4].toFloat(&status);
+		if (!status) return 2;
+		sync = false;
+	}
+	else if (arguments.size() == 6)
+	{
+		surfaceID = arguments[1].toInt(&status);
+		if (!status) return 2;
+		curveID = arguments[2].toInt(&status);
+		if (!status) return 2;
+		pointID = arguments[3].toInt(&status);
+		if (!status) return 2;
+		data = arguments[4].toFloat(&status);
+		if (!status) return 2;
+		tmp = arguments[5].toInt(&status);
+		if (!status) return 2;
+
+		tmp == 0 ? sync = false : sync = true;
+	}
+	else
+	{
+		return 1;
+	}
+
+	try
+	{
+		if (pointID == 0) { throw std::exception("WRONG_POINTID"); }
+
+		project->moveTrajectoryPoint(surfaceID, curveID, pointID, data, sync);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[4] = QString::number(-data);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_CURVE") == 0) { return 9; }
+		if (strcmp(e.what(), "WRONG_POINTID") == 0) { return 10; }
+		return 99;
+	}
+
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::setU(const QStringList & arguments, const bool reg)
+{
+	int surfaceID, data;
+	bool status, sync;
+
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	data = arguments[2].toInt(&status);
+	if (!status) return 2;
+	
+
+	try
+	{
+		int dataOrg = project->getSurface(surfaceID)->get_NoOfInterpolatedPointsU();
+
+		project->setU(surfaceID, data);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(dataOrg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_CURVE") == 0) { return 9; }
+		if (strcmp(e.what(), "WRONG_POINTID") == 0) { return 10; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::setV(const QStringList & arguments, const bool reg)
+{
+	int surfaceID, data;
+	bool status, sync;
+
+	if (arguments.size() != 3)
+	{
+		return 1;
+	}
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+	data = arguments[2].toInt(&status);
+	if (!status) return 2;
+
+
+	try
+	{
+		int dataOrg = project->getSurface(surfaceID)->get_NoOfInterpolatedPointsV();
+
+		project->setV(surfaceID, data);
+
+		if (reg)
+		{
+			QStringList revCommand = arguments;
+
+			revCommand[2] = QString::number(dataOrg);
+
+			w->undoRedo.registerCommand(arguments, revCommand);
+		}
+	}
+	catch (std::exception& e) {
+		if (strcmp(e.what(), "NO_SURFACE") == 0) { return 3; }
+		if (strcmp(e.what(), "NO_POINT") == 0) { return 4; }
+		if (strcmp(e.what(), "NO_CURVE") == 0) { return 9; }
+		if (strcmp(e.what(), "WRONG_POINTID") == 0) { return 10; }
+		return 99;
+	}
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+
+	return 0;
+}
+
 int Designit::help(const QStringList & arguments, const bool reg)
 {
 	QMessageBox::StandardButton reply;
@@ -4528,6 +4764,141 @@ int Designit::redoColumnDelete(const QStringList & arguments, const bool reg)
 	w->updateAllTabs();
 
 	project->synchronizeSurfaceVectorsFromControl();
+
+	return 0;
+}
+
+int Designit::undoPointGroupMove(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.undoGroupPointsMove(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+	
+	return 0;
+}
+
+int Designit::undoPointGroupRotate(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.undoGroupPointsRotate(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::redoPointGroupMove(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.redoGroupPointsMove(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::redoPointGroupRotate(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 2)
+	{
+		return 1;
+	}
+
+	bool status;
+	int id;
+
+	id = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.redoGroupPointsRotate(project, id);
+
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
+
+	return 0;
+}
+
+int Designit::undoMerge(const QStringList & arguments, const bool reg)
+{
+	if (arguments.size() != 4)
+	{
+		return 1;
+	}
+
+	int size, surfaceID;
+	MERGE_ROW side;
+	bool status;
+
+	surfaceID = arguments[1].toInt(&status);
+	if (!status) return 2;
+
+	if (QString::compare(arguments[2], tr("first"), Qt::CaseInsensitive) == 0)
+	{
+		side = FIRST;
+	}
+	else if (QString::compare(arguments[2], tr("last"), Qt::CaseInsensitive) == 0)
+	{
+		side = LAST;
+	}
+
+	size = arguments[3].toInt(&status);
+	if (!status) return 2;
+
+	w->undoRedo.redoSurfaceDelete(project);
+
+	for (int i = 0; i < size; i++)
+	{
+		if (side == FIRST)
+		{
+			project->getSurface(surfaceID)->deleteRow(0);
+		}
+		else
+		{
+			project->getSurface(surfaceID)->deleteRow( project->getSurface(surfaceID)->sizeX() - 1 );
+		}
+	}
+	
+	project->synchronizeSurfaceVectorsFromControl();
+	project->manageComputationOfInterpolatedPoints();
+	w->updateAllTabs();
 
 	return 0;
 }

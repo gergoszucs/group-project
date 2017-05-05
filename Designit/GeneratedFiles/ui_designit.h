@@ -33,12 +33,10 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include <myxzview.h>
+#include <view2d.h>
 #include "mygaussianview.h"
 #include "myglgeneraltrajectorycurveview.h"
 #include "myglwidget.h"
-#include "myxyview.h"
-#include "myyzview.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -51,18 +49,14 @@ public:
     QAction *actionExit;
     QAction *actionDrag;
     QAction *actionNew_surface;
-    QAction *actionDrag_all;
     QAction *actionNormals;
-    QAction *actionDrag_row;
-    QAction *actionDrag_col;
     QAction *actionInterpolated_points;
     QAction *actionControl_points;
-    QAction *actionRotate_all;
-    QAction *actionResize_all;
+    QAction *actionRotate;
+    QAction *actionResize;
     QAction *actionShear;
-    QAction *actionPerspective;
     QAction *actionPlayout_Test;
-    QAction *actionFlip_horizontal;
+    QAction *actionFlip;
     QAction *actionClose;
     QAction *actionCopy_surface;
     QAction *actionDelete_surface;
@@ -89,6 +83,8 @@ public:
     QAction *action_Flexit;
     QAction *actionUndo;
     QAction *actionRedo;
+    QAction *actionDrag_vector;
+    QAction *actionAngle_dial;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout_2;
     QSplitter *splitter;
@@ -115,19 +111,27 @@ public:
     QSpacerItem *horizontalSpacer_2;
     QLineEdit *myEditTextDataField;
     MyGLWidget *myGLWidget;
+    QFrame *TrajectoryButtons;
+    QHBoxLayout *horizontalLayout_6;
+    QPushButton *previousFrame;
+    QPushButton *toBegin;
+    QPushButton *stop;
+    QPushButton *start;
+    QPushButton *nextFrame;
+    QPushButton *syncCurves;
     QToolBox *editingTools;
     QWidget *SurfaceTools;
     QHBoxLayout *horizontalLayout;
     QTabWidget *tabsWorkSurface;
     QWidget *tab_XYView;
     QVBoxLayout *verticalLayout_4;
-    MyXYView *myXYView;
+    View2d *myXYView;
     QWidget *tab_XZView;
     QHBoxLayout *horizontalLayout_3;
-    MyXZView *myXZView;
+    View2d *myXZView;
     QWidget *tab_YZView;
     QVBoxLayout *verticalLayout_3;
-    MyYZView *myYZView;
+    View2d *myYZView;
     QWidget *tab_gaussianView;
     QVBoxLayout *verticalLayout_8;
     MyGaussianView *myGaussianView;
@@ -172,158 +176,138 @@ public:
         actionOpen = new QAction(DesignitClass);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         QIcon icon;
-        icon.addFile(QStringLiteral("Resources/icon_open.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/Resources/icon_open.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionOpen->setIcon(icon);
         actionSave_As = new QAction(DesignitClass);
         actionSave_As->setObjectName(QStringLiteral("actionSave_As"));
         QIcon icon1;
-        icon1.addFile(QStringLiteral("Resources/icon_save.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral(":/Resources/icon_save.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionSave_As->setIcon(icon1);
         actionExit = new QAction(DesignitClass);
         actionExit->setObjectName(QStringLiteral("actionExit"));
         QIcon icon2;
-        icon2.addFile(QStringLiteral("Resources/icon_exit.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QStringLiteral(":/Resources/icon_exit.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionExit->setIcon(icon2);
         actionDrag = new QAction(DesignitClass);
         actionDrag->setObjectName(QStringLiteral("actionDrag"));
         QIcon icon3;
-        icon3.addFile(QStringLiteral("Resources/icon_drag.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QStringLiteral(":/Resources/icon_drag.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionDrag->setIcon(icon3);
         actionNew_surface = new QAction(DesignitClass);
         actionNew_surface->setObjectName(QStringLiteral("actionNew_surface"));
         QIcon icon4;
-        icon4.addFile(QStringLiteral("Resources/icon_new_surface.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon4.addFile(QStringLiteral(":/Resources/icon_new_surface.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionNew_surface->setIcon(icon4);
-        actionDrag_all = new QAction(DesignitClass);
-        actionDrag_all->setObjectName(QStringLiteral("actionDrag_all"));
-        QIcon icon5;
-        icon5.addFile(QStringLiteral("Resources/icon_drag_all.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDrag_all->setIcon(icon5);
         actionNormals = new QAction(DesignitClass);
         actionNormals->setObjectName(QStringLiteral("actionNormals"));
-        actionDrag_row = new QAction(DesignitClass);
-        actionDrag_row->setObjectName(QStringLiteral("actionDrag_row"));
-        QIcon icon6;
-        icon6.addFile(QStringLiteral("Resources/icon_drag_row.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDrag_row->setIcon(icon6);
-        actionDrag_col = new QAction(DesignitClass);
-        actionDrag_col->setObjectName(QStringLiteral("actionDrag_col"));
-        QIcon icon7;
-        icon7.addFile(QStringLiteral("Resources/icon_drag_col.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDrag_col->setIcon(icon7);
         actionInterpolated_points = new QAction(DesignitClass);
         actionInterpolated_points->setObjectName(QStringLiteral("actionInterpolated_points"));
         actionControl_points = new QAction(DesignitClass);
         actionControl_points->setObjectName(QStringLiteral("actionControl_points"));
-        actionRotate_all = new QAction(DesignitClass);
-        actionRotate_all->setObjectName(QStringLiteral("actionRotate_all"));
-        QIcon icon8;
-        icon8.addFile(QStringLiteral("Resources/icon_rotate_all.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionRotate_all->setIcon(icon8);
-        actionResize_all = new QAction(DesignitClass);
-        actionResize_all->setObjectName(QStringLiteral("actionResize_all"));
-        QIcon icon9;
-        icon9.addFile(QStringLiteral("Resources/icon_resize_all.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionResize_all->setIcon(icon9);
+        actionRotate = new QAction(DesignitClass);
+        actionRotate->setObjectName(QStringLiteral("actionRotate"));
+        QIcon icon5;
+        icon5.addFile(QStringLiteral(":/Resources/icon_rotate_all.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionRotate->setIcon(icon5);
+        actionResize = new QAction(DesignitClass);
+        actionResize->setObjectName(QStringLiteral("actionResize"));
+        QIcon icon6;
+        icon6.addFile(QStringLiteral(":/Resources/icon_resize_all.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionResize->setIcon(icon6);
         actionShear = new QAction(DesignitClass);
         actionShear->setObjectName(QStringLiteral("actionShear"));
-        QIcon icon10;
-        icon10.addFile(QStringLiteral("Resources/icon_shear.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionShear->setIcon(icon10);
-        actionPerspective = new QAction(DesignitClass);
-        actionPerspective->setObjectName(QStringLiteral("actionPerspective"));
-        QIcon icon11;
-        icon11.addFile(QStringLiteral("Resources/icon_perspective_all.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionPerspective->setIcon(icon11);
+        QIcon icon7;
+        icon7.addFile(QStringLiteral(":/Resources/icon_shear.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionShear->setIcon(icon7);
         actionPlayout_Test = new QAction(DesignitClass);
         actionPlayout_Test->setObjectName(QStringLiteral("actionPlayout_Test"));
-        QIcon icon12;
-        icon12.addFile(QStringLiteral("Resources/icon_test.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionPlayout_Test->setIcon(icon12);
-        actionFlip_horizontal = new QAction(DesignitClass);
-        actionFlip_horizontal->setObjectName(QStringLiteral("actionFlip_horizontal"));
-        QIcon icon13;
-        icon13.addFile(QStringLiteral("Resources/icon_flip_horizontal.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionFlip_horizontal->setIcon(icon13);
+        QIcon icon8;
+        icon8.addFile(QStringLiteral(":/Resources/icon_test.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionPlayout_Test->setIcon(icon8);
+        actionFlip = new QAction(DesignitClass);
+        actionFlip->setObjectName(QStringLiteral("actionFlip"));
+        QIcon icon9;
+        icon9.addFile(QStringLiteral(":/Resources/icon_flip_horizontal.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionFlip->setIcon(icon9);
         actionClose = new QAction(DesignitClass);
         actionClose->setObjectName(QStringLiteral("actionClose"));
-        QIcon icon14;
-        icon14.addFile(QStringLiteral("Resources/icon_close.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionClose->setIcon(icon14);
+        QIcon icon10;
+        icon10.addFile(QStringLiteral(":/Resources/icon_close.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionClose->setIcon(icon10);
         actionCopy_surface = new QAction(DesignitClass);
         actionCopy_surface->setObjectName(QStringLiteral("actionCopy_surface"));
-        QIcon icon15;
-        icon15.addFile(QStringLiteral("Resources/icon_copy.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionCopy_surface->setIcon(icon15);
+        QIcon icon11;
+        icon11.addFile(QStringLiteral(":/Resources/icon_copy.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCopy_surface->setIcon(icon11);
         actionDelete_surface = new QAction(DesignitClass);
         actionDelete_surface->setObjectName(QStringLiteral("actionDelete_surface"));
-        QIcon icon16;
-        icon16.addFile(QStringLiteral("Resources/icon_delete_surface.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDelete_surface->setIcon(icon16);
+        QIcon icon12;
+        icon12.addFile(QStringLiteral(":/Resources/icon_delete_surface.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDelete_surface->setIcon(icon12);
         actionAnnotations = new QAction(DesignitClass);
         actionAnnotations->setObjectName(QStringLiteral("actionAnnotations"));
         actionInsert_row = new QAction(DesignitClass);
         actionInsert_row->setObjectName(QStringLiteral("actionInsert_row"));
-        QIcon icon17;
-        icon17.addFile(QStringLiteral("Resources/icon_insert_row.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionInsert_row->setIcon(icon17);
+        QIcon icon13;
+        icon13.addFile(QStringLiteral(":/Resources/icon_insert_row.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionInsert_row->setIcon(icon13);
         actionDelete_row = new QAction(DesignitClass);
         actionDelete_row->setObjectName(QStringLiteral("actionDelete_row"));
-        QIcon icon18;
-        icon18.addFile(QStringLiteral("Resources/icon_delete_row.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDelete_row->setIcon(icon18);
+        QIcon icon14;
+        icon14.addFile(QStringLiteral(":/Resources/icon_delete_row.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDelete_row->setIcon(icon14);
         actionDuplicate_row = new QAction(DesignitClass);
         actionDuplicate_row->setObjectName(QStringLiteral("actionDuplicate_row"));
-        QIcon icon19;
-        icon19.addFile(QStringLiteral("Resources/icon_duplicate_row.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDuplicate_row->setIcon(icon19);
+        QIcon icon15;
+        icon15.addFile(QStringLiteral(":/Resources/icon_duplicate_row.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDuplicate_row->setIcon(icon15);
         actionInsert_col = new QAction(DesignitClass);
         actionInsert_col->setObjectName(QStringLiteral("actionInsert_col"));
-        QIcon icon20;
-        icon20.addFile(QStringLiteral("Resources/icon_insert_column.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionInsert_col->setIcon(icon20);
+        QIcon icon16;
+        icon16.addFile(QStringLiteral(":/Resources/icon_insert_column.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionInsert_col->setIcon(icon16);
         actionDelete_col = new QAction(DesignitClass);
         actionDelete_col->setObjectName(QStringLiteral("actionDelete_col"));
-        QIcon icon21;
-        icon21.addFile(QStringLiteral("Resources/icon_delete_column.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDelete_col->setIcon(icon21);
+        QIcon icon17;
+        icon17.addFile(QStringLiteral(":/Resources/icon_delete_column.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDelete_col->setIcon(icon17);
         actionDuplicate_col = new QAction(DesignitClass);
         actionDuplicate_col->setObjectName(QStringLiteral("actionDuplicate_col"));
-        QIcon icon22;
-        icon22.addFile(QStringLiteral("Resources/icon_duplicate_column.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDuplicate_col->setIcon(icon22);
+        QIcon icon18;
+        icon18.addFile(QStringLiteral(":/Resources/icon_duplicate_column.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDuplicate_col->setIcon(icon18);
         actionMate_points = new QAction(DesignitClass);
         actionMate_points->setObjectName(QStringLiteral("actionMate_points"));
-        QIcon icon23;
-        icon23.addFile(QStringLiteral("Resources/icon_mate_points.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionMate_points->setIcon(icon23);
+        QIcon icon19;
+        icon19.addFile(QStringLiteral(":/Resources/icon_mate_points.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMate_points->setIcon(icon19);
         actionCopy_surface_mirror = new QAction(DesignitClass);
         actionCopy_surface_mirror->setObjectName(QStringLiteral("actionCopy_surface_mirror"));
-        QIcon icon24;
-        icon24.addFile(QStringLiteral("Resources/icon_copy_mirror.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionCopy_surface_mirror->setIcon(icon24);
+        QIcon icon20;
+        icon20.addFile(QStringLiteral(":/Resources/icon_copy_mirror.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCopy_surface_mirror->setIcon(icon20);
         actionMerge_surfaces_by_row = new QAction(DesignitClass);
         actionMerge_surfaces_by_row->setObjectName(QStringLiteral("actionMerge_surfaces_by_row"));
-        QIcon icon25;
-        icon25.addFile(QStringLiteral("Resources/icon_merge_surfaces.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionMerge_surfaces_by_row->setIcon(icon25);
+        QIcon icon21;
+        icon21.addFile(QStringLiteral(":/Resources/icon_merge_surfaces.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMerge_surfaces_by_row->setIcon(icon21);
         actionReset_all_views = new QAction(DesignitClass);
         actionReset_all_views->setObjectName(QStringLiteral("actionReset_all_views"));
-        QIcon icon26;
-        icon26.addFile(QStringLiteral("Resources/icon_reset_all_views.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionReset_all_views->setIcon(icon26);
+        QIcon icon22;
+        icon22.addFile(QStringLiteral(":/Resources/icon_reset_all_views.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionReset_all_views->setIcon(icon22);
         actionWeb_help = new QAction(DesignitClass);
         actionWeb_help->setObjectName(QStringLiteral("actionWeb_help"));
-        QIcon icon27;
-        icon27.addFile(QStringLiteral("Resources/icon_help.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionWeb_help->setIcon(icon27);
+        QIcon icon23;
+        icon23.addFile(QStringLiteral(":/Resources/icon_help.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionWeb_help->setIcon(icon23);
         actionAbout = new QAction(DesignitClass);
         actionAbout->setObjectName(QStringLiteral("actionAbout"));
         actionGaussian_curvature = new QAction(DesignitClass);
         actionGaussian_curvature->setObjectName(QStringLiteral("actionGaussian_curvature"));
-        QIcon icon28;
-        icon28.addFile(QStringLiteral("Resources/icon_gaussian_curvature.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionGaussian_curvature->setIcon(icon28);
+        QIcon icon24;
+        icon24.addFile(QStringLiteral(":/Resources/icon_gaussian_curvature.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionGaussian_curvature->setIcon(icon24);
         actionInterpolated_points_density_U = new QAction(DesignitClass);
         actionInterpolated_points_density_U->setObjectName(QStringLiteral("actionInterpolated_points_density_U"));
         actionInterpolated_points_density_V = new QAction(DesignitClass);
@@ -332,35 +316,43 @@ public:
         actionGrids->setObjectName(QStringLiteral("actionGrids"));
         actionMerge_surfaces_by_row_reverse = new QAction(DesignitClass);
         actionMerge_surfaces_by_row_reverse->setObjectName(QStringLiteral("actionMerge_surfaces_by_row_reverse"));
-        QIcon icon29;
-        icon29.addFile(QStringLiteral("Resources/icon_merge_surfaces_reverse.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionMerge_surfaces_by_row_reverse->setIcon(icon29);
+        QIcon icon25;
+        icon25.addFile(QStringLiteral(":/Resources/icon_merge_surfaces_reverse.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMerge_surfaces_by_row_reverse->setIcon(icon25);
         actionMeasure_distance = new QAction(DesignitClass);
         actionMeasure_distance->setObjectName(QStringLiteral("actionMeasure_distance"));
-        QIcon icon30;
-        icon30.addFile(QStringLiteral("Resources/icon_measure_distance.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionMeasure_distance->setIcon(icon30);
+        QIcon icon26;
+        icon26.addFile(QStringLiteral(":/Resources/icon_measure_distance.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMeasure_distance->setIcon(icon26);
         actionCentred_rotate = new QAction(DesignitClass);
         actionCentred_rotate->setObjectName(QStringLiteral("actionCentred_rotate"));
-        QIcon icon31;
-        icon31.addFile(QStringLiteral("Resources/icon_centred_rotate.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionCentred_rotate->setIcon(icon31);
+        QIcon icon27;
+        icon27.addFile(QStringLiteral(":/Resources/icon_centred_rotate.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCentred_rotate->setIcon(icon27);
         action_Flexit = new QAction(DesignitClass);
         action_Flexit->setObjectName(QStringLiteral("action_Flexit"));
         action_Flexit->setCheckable(false);
-        QIcon icon32;
-        icon32.addFile(QStringLiteral("Resources/flexit.ico"), QSize(), QIcon::Normal, QIcon::Off);
-        action_Flexit->setIcon(icon32);
+        QIcon icon28;
+        icon28.addFile(QStringLiteral(":/Resources/flexit.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        action_Flexit->setIcon(icon28);
         actionUndo = new QAction(DesignitClass);
         actionUndo->setObjectName(QStringLiteral("actionUndo"));
-        QIcon icon33;
-        icon33.addFile(QStringLiteral("Resources/undo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionUndo->setIcon(icon33);
+        QIcon icon29;
+        icon29.addFile(QStringLiteral(":/Resources/undo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionUndo->setIcon(icon29);
         actionRedo = new QAction(DesignitClass);
         actionRedo->setObjectName(QStringLiteral("actionRedo"));
-        QIcon icon34;
-        icon34.addFile(QStringLiteral("Resources/redo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionRedo->setIcon(icon34);
+        QIcon icon30;
+        icon30.addFile(QStringLiteral(":/Resources/redo_icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionRedo->setIcon(icon30);
+        actionDrag_vector = new QAction(DesignitClass);
+        actionDrag_vector->setObjectName(QStringLiteral("actionDrag_vector"));
+        actionDrag_vector->setCheckable(true);
+        actionDrag_vector->setChecked(true);
+        actionAngle_dial = new QAction(DesignitClass);
+        actionAngle_dial->setObjectName(QStringLiteral("actionAngle_dial"));
+        actionAngle_dial->setCheckable(true);
+        actionAngle_dial->setChecked(true);
         centralWidget = new QWidget(DesignitClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout_2 = new QHBoxLayout(centralWidget);
@@ -447,7 +439,7 @@ public:
         splitter->addWidget(tabsAdditionalData);
         frame_2 = new QFrame(splitter);
         frame_2->setObjectName(QStringLiteral("frame_2"));
-        frame_2->setMinimumSize(QSize(400, 400));
+        frame_2->setMinimumSize(QSize(400, 713));
         frame_2->setMaximumSize(QSize(100000, 16777215));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
@@ -488,6 +480,66 @@ public:
 
         verticalLayout_2->addWidget(myGLWidget);
 
+        TrajectoryButtons = new QFrame(frame_2);
+        TrajectoryButtons->setObjectName(QStringLiteral("TrajectoryButtons"));
+        TrajectoryButtons->setMinimumSize(QSize(0, 50));
+        TrajectoryButtons->setMaximumSize(QSize(16777215, 50));
+        TrajectoryButtons->setFrameShape(QFrame::StyledPanel);
+        TrajectoryButtons->setFrameShadow(QFrame::Raised);
+        horizontalLayout_6 = new QHBoxLayout(TrajectoryButtons);
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        previousFrame = new QPushButton(TrajectoryButtons);
+        previousFrame->setObjectName(QStringLiteral("previousFrame"));
+        QIcon icon31;
+        icon31.addFile(QStringLiteral(":/Resources/button_black_first.png"), QSize(), QIcon::Normal, QIcon::Off);
+        previousFrame->setIcon(icon31);
+
+        horizontalLayout_6->addWidget(previousFrame);
+
+        toBegin = new QPushButton(TrajectoryButtons);
+        toBegin->setObjectName(QStringLiteral("toBegin"));
+        QIcon icon32;
+        icon32.addFile(QStringLiteral(":/Resources/button_black_repeat.png"), QSize(), QIcon::Normal, QIcon::Off);
+        toBegin->setIcon(icon32);
+
+        horizontalLayout_6->addWidget(toBegin);
+
+        stop = new QPushButton(TrajectoryButtons);
+        stop->setObjectName(QStringLiteral("stop"));
+        QIcon icon33;
+        icon33.addFile(QStringLiteral(":/Resources/button_black_pause.png"), QSize(), QIcon::Normal, QIcon::Off);
+        stop->setIcon(icon33);
+
+        horizontalLayout_6->addWidget(stop);
+
+        start = new QPushButton(TrajectoryButtons);
+        start->setObjectName(QStringLiteral("start"));
+        QIcon icon34;
+        icon34.addFile(QStringLiteral(":/Resources/button_black_play.png"), QSize(), QIcon::Normal, QIcon::Off);
+        start->setIcon(icon34);
+
+        horizontalLayout_6->addWidget(start);
+
+        nextFrame = new QPushButton(TrajectoryButtons);
+        nextFrame->setObjectName(QStringLiteral("nextFrame"));
+        QIcon icon35;
+        icon35.addFile(QStringLiteral(":/Resources/button_black_last.png"), QSize(), QIcon::Normal, QIcon::Off);
+        nextFrame->setIcon(icon35);
+
+        horizontalLayout_6->addWidget(nextFrame);
+
+        syncCurves = new QPushButton(TrajectoryButtons);
+        syncCurves->setObjectName(QStringLiteral("syncCurves"));
+        syncCurves->setCheckable(true);
+        syncCurves->setChecked(false);
+
+        horizontalLayout_6->addWidget(syncCurves);
+
+
+        verticalLayout_2->addWidget(TrajectoryButtons);
+
         splitter->addWidget(frame_2);
         editingTools = new QToolBox(splitter);
         editingTools->setObjectName(QStringLiteral("editingTools"));
@@ -511,7 +563,7 @@ public:
         verticalLayout_4->setSpacing(6);
         verticalLayout_4->setContentsMargins(11, 11, 11, 11);
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        myXYView = new MyXYView(tab_XYView);
+        myXYView = new View2d(tab_XYView);
         myXYView->setObjectName(QStringLiteral("myXYView"));
 
         verticalLayout_4->addWidget(myXYView);
@@ -523,7 +575,7 @@ public:
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        myXZView = new MyXZView(tab_XZView);
+        myXZView = new View2d(tab_XZView);
         myXZView->setObjectName(QStringLiteral("myXZView"));
 
         horizontalLayout_3->addWidget(myXZView);
@@ -535,7 +587,7 @@ public:
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        myYZView = new MyYZView(tab_YZView);
+        myYZView = new View2d(tab_YZView);
         myYZView->setObjectName(QStringLiteral("myYZView"));
 
         verticalLayout_3->addWidget(myYZView);
@@ -694,18 +746,17 @@ public:
         menuView->addAction(actionAnnotations);
         menuView->addAction(actionGrids);
         menuView->addAction(actionReset_all_views);
+        menuView->addSeparator();
+        menuView->addAction(actionDrag_vector);
+        menuView->addAction(actionAngle_dial);
         menuEdit->addAction(actionDrag);
         menuEdit->addAction(actionCentred_rotate);
-        menuEdit->addAction(actionDrag_row);
-        menuEdit->addAction(actionDrag_col);
-        menuEdit->addAction(actionDrag_all);
         menuEdit->addSeparator();
-        menuEdit->addAction(actionRotate_all);
-        menuEdit->addAction(actionResize_all);
+        menuEdit->addAction(actionRotate);
+        menuEdit->addAction(actionResize);
         menuEdit->addSeparator();
         menuEdit->addAction(actionShear);
-        menuEdit->addAction(actionPerspective);
-        menuEdit->addAction(actionFlip_horizontal);
+        menuEdit->addAction(actionFlip);
         menuEdit->addAction(actionCopy_surface);
         menuEdit->addAction(actionCopy_surface_mirror);
         menuEdit->addSeparator();
@@ -741,16 +792,12 @@ public:
         mainToolBar->addAction(actionDelete_surface);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionDrag);
+        mainToolBar->addAction(actionRotate);
         mainToolBar->addAction(actionCentred_rotate);
-        mainToolBar->addAction(actionDrag_row);
-        mainToolBar->addAction(actionDrag_col);
-        mainToolBar->addAction(actionDrag_all);
-        mainToolBar->addAction(actionResize_all);
         mainToolBar->addSeparator();
-        mainToolBar->addAction(actionRotate_all);
         mainToolBar->addAction(actionShear);
-        mainToolBar->addAction(actionPerspective);
-        mainToolBar->addAction(actionFlip_horizontal);
+        mainToolBar->addAction(actionResize);
+        mainToolBar->addAction(actionFlip);
         mainToolBar->addAction(actionCopy_surface);
         mainToolBar->addAction(actionCopy_surface_mirror);
         mainToolBar->addSeparator();
@@ -773,6 +820,12 @@ public:
         mainToolBar->addAction(actionWeb_help);
 
         retranslateUi(DesignitClass);
+        QObject::connect(start, SIGNAL(released()), DesignitClass, SLOT(startTest()));
+        QObject::connect(toBegin, SIGNAL(released()), DesignitClass, SLOT(restart()));
+        QObject::connect(previousFrame, SIGNAL(released()), DesignitClass, SLOT(previousFrame()));
+        QObject::connect(nextFrame, SIGNAL(released()), DesignitClass, SLOT(nextFrame()));
+        QObject::connect(stop, SIGNAL(released()), DesignitClass, SLOT(stopTest()));
+        QObject::connect(syncCurves, SIGNAL(toggled(bool)), DesignitClass, SLOT(syncCurves(bool)));
 
         tabsAdditionalData->setCurrentIndex(0);
         editingTools->setCurrentIndex(0);
@@ -791,19 +844,27 @@ public:
         actionSave_As->setText(QApplication::translate("DesignitClass", "Save As ...", Q_NULLPTR));
         actionExit->setText(QApplication::translate("DesignitClass", "Exit", Q_NULLPTR));
         actionDrag->setText(QApplication::translate("DesignitClass", "Drag", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionDrag->setToolTip(QApplication::translate("DesignitClass", "Drag points", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         actionNew_surface->setText(QApplication::translate("DesignitClass", "New surface", Q_NULLPTR));
-        actionDrag_all->setText(QApplication::translate("DesignitClass", "Drag all", Q_NULLPTR));
         actionNormals->setText(QApplication::translate("DesignitClass", "Normals", Q_NULLPTR));
-        actionDrag_row->setText(QApplication::translate("DesignitClass", "Drag row", Q_NULLPTR));
-        actionDrag_col->setText(QApplication::translate("DesignitClass", "Drag col", Q_NULLPTR));
         actionInterpolated_points->setText(QApplication::translate("DesignitClass", "Interpolated points", Q_NULLPTR));
         actionControl_points->setText(QApplication::translate("DesignitClass", "Control points", Q_NULLPTR));
-        actionRotate_all->setText(QApplication::translate("DesignitClass", "Rotate all", Q_NULLPTR));
-        actionResize_all->setText(QApplication::translate("DesignitClass", "Resize all", Q_NULLPTR));
+        actionRotate->setText(QApplication::translate("DesignitClass", "Rotate", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionRotate->setToolTip(QApplication::translate("DesignitClass", "Rotate points", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionResize->setText(QApplication::translate("DesignitClass", "Resize", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionResize->setToolTip(QApplication::translate("DesignitClass", "Resize surfaces", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         actionShear->setText(QApplication::translate("DesignitClass", "Shear", Q_NULLPTR));
-        actionPerspective->setText(QApplication::translate("DesignitClass", "Perspective", Q_NULLPTR));
         actionPlayout_Test->setText(QApplication::translate("DesignitClass", "Playout Test", Q_NULLPTR));
-        actionFlip_horizontal->setText(QApplication::translate("DesignitClass", "Flip all horizontal", Q_NULLPTR));
+        actionFlip->setText(QApplication::translate("DesignitClass", "Flip surface", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionFlip->setToolTip(QApplication::translate("DesignitClass", "Flip surface", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         actionClose->setText(QApplication::translate("DesignitClass", "Close", Q_NULLPTR));
         actionCopy_surface->setText(QApplication::translate("DesignitClass", "Copy surface", Q_NULLPTR));
         actionDelete_surface->setText(QApplication::translate("DesignitClass", "Delete surface", Q_NULLPTR));
@@ -844,12 +905,20 @@ public:
         actionRedo->setToolTip(QApplication::translate("DesignitClass", "Redo action.", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
         actionRedo->setShortcut(QApplication::translate("DesignitClass", "Ctrl+Y", Q_NULLPTR));
+        actionDrag_vector->setText(QApplication::translate("DesignitClass", "Drag vector", Q_NULLPTR));
+        actionAngle_dial->setText(QApplication::translate("DesignitClass", "Angle dial", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_statusWindow), QApplication::translate("DesignitClass", "Status window", Q_NULLPTR));
         collapseAllButton->setText(QApplication::translate("DesignitClass", "Collapse All", Q_NULLPTR));
         expandAllButton->setText(QApplication::translate("DesignitClass", "Expand All", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_viewJSON), QApplication::translate("DesignitClass", "JSON view", Q_NULLPTR));
         tabsAdditionalData->setTabText(tabsAdditionalData->indexOf(tab_dataFile), QApplication::translate("DesignitClass", "Data file", Q_NULLPTR));
         label_2->setText(QApplication::translate("DesignitClass", "3D view", Q_NULLPTR));
+        previousFrame->setText(QApplication::translate("DesignitClass", "Previous", Q_NULLPTR));
+        toBegin->setText(QApplication::translate("DesignitClass", "Restart", Q_NULLPTR));
+        stop->setText(QApplication::translate("DesignitClass", "Stop", Q_NULLPTR));
+        start->setText(QApplication::translate("DesignitClass", "Start", Q_NULLPTR));
+        nextFrame->setText(QApplication::translate("DesignitClass", "Next", Q_NULLPTR));
+        syncCurves->setText(QApplication::translate("DesignitClass", "Sync Curves", Q_NULLPTR));
         tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XYView), QApplication::translate("DesignitClass", "XY view", Q_NULLPTR));
         tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_XZView), QApplication::translate("DesignitClass", "XZ view", Q_NULLPTR));
         tabsWorkSurface->setTabText(tabsWorkSurface->indexOf(tab_YZView), QApplication::translate("DesignitClass", "YZ view", Q_NULLPTR));

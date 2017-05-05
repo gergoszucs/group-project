@@ -1,6 +1,7 @@
 #include "ITPoint.h"
 #include "ITSurface.h"
 #include "global.h"
+#include "UtililityFunctions.h"
 
 ITPoint::ITPoint(float x, float y, float z)
 {
@@ -70,6 +71,11 @@ float ITPoint::distanceFrom(ITPoint* secondPoint)
 		+ (this->get_Y() - secondPoint->get_Y())*(this->get_Y() - secondPoint->get_Y())
 		+ (this->get_Z() - secondPoint->get_Z())*(this->get_Z() - secondPoint->get_Z())
 	);
+}
+
+QString ITPoint::getAnnotationText()
+{
+	return QString("k: %1, i: %2, j: %3, \r \n x: %4, y: %5, z: %6").arg(_k).arg(_i).arg(_j).arg(_X).arg(_Y).arg(_Z);
 }
 
 void ITPoint::propagateMe(ITPoint* cp, ITPoint* rotationPoint, ITPoint* translationPoint)
@@ -156,6 +162,11 @@ void ITPoint::rotateAround(ITPoint& center, const float angle, PLANE p)
 	set_X(pxNew);
 	set_Y(pyNew);
 	set_Z(pzNew);
+}
+
+Point3 ITPoint::getCoordinates()
+{
+	return Point3(_X, _Y, _Z);
 }
 
 // Accessors.

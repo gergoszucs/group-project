@@ -10,8 +10,8 @@
 #define PI 4 * atan( 1.0 )
 #define G -9.81
 
-#define DEG_TO_RAD(x) x / 180 * PI
-#define RAD_TO_DEG(x) x * 180 / PI
+#define DEG_TO_RAD(x) x / 180 * M_PI
+#define RAD_TO_DEG(x) x / M_PI * 180
 
 extern Designit* w;
 extern ITProject* project;
@@ -41,37 +41,9 @@ extern bool UnsavedChanges;
 extern bool IsDataLoaded;
 
 // OpenGL view parameters.
-extern float glXYViewHalfExtent;
-extern float glXYPanCentreX;
-extern float glXYPanCentreY;
-
-extern float glXZViewHalfExtent;
-extern float glXZPanCentreX;
-extern float glXZPanCentreY;
-
-extern float glYZViewHalfExtent;
-extern float glYZPanCentreX;
-extern float glYZPanCentreY;
-
 extern float glGaussianViewHalfExtent;
 extern float glGaussianPanCentreX;
 extern float glGaussianPanCentreY;
-
-extern float gl3DViewHalfExtent;
-extern float gl3DPanCentreX;
-extern float gl3DPanCentreY;
-
-extern float glXViewHalfExtent;
-extern float glXPanCentreX;
-extern float glXPanCentreY;
-
-extern float glYViewHalfExtent;
-extern float glYPanCentreX;
-extern float glYPanCentreY;
-
-extern float glZViewHalfExtent;
-extern float glZPanCentreX;
-extern float glZPanCentreY;
 
 // Drawing semaphores.
 extern bool drawRotateXHorizontal;
@@ -90,37 +62,51 @@ extern bool IsHorizontalDragOnly;
 
 extern bool trajectoryMode;
 
+
+
 // Editing mode flags.
-enum EDIT_MODES_ENUM {NONE, 
-					  DRAG, 
-					  DRAG_ROW, 
-					  DRAG_COL, 
-					  DRAG_ALL, 
-					  RESIZE_ALL, 
-					  ROTATE_ALL, 
-					  SHEAR_ALL, 
-					  PERSPECTIVE_ALL, 
-					  FLIP_HORIZONTAL_ALL,
-					  COPY_SURFACE,
-					  DELETE_SURFACE,
-					  INSERT_ROW,
-					  DELETE_ROW,
-					  DUPLICATE_ROW,
-					  INSERT_COL,
-					  DELETE_COL,
-					  DUPLICATE_COL,
-					  MATE_POINTS,
-					  COPY_SURFACE_MIRROR,
-					  MERGE_SURFACES_BY_ROW,
-					  MERGE_SURFACES_BY_ROW_REVERSE,
-					  MEASURE_DISTANCE,
-					  CENTRED_ROTATE,
-					  DRAG_TRAJECTORY_POINT };
+enum EDIT_MODES_ENUM 
+{	
+	NONE, 
+	DRAG, 
+	RESIZE, 
+	ROTATE, 
+	CENTRED_ROTATE,
+	SHEAR, 
+	FLIP,
+	COPY_SURFACE,
+	DELETE_SURFACE,
+	INSERT_ROW,
+	DELETE_ROW,
+	DUPLICATE_ROW,
+	INSERT_COL,
+	DELETE_COL,
+	DUPLICATE_COL,
+	MATE_POINTS,
+	COPY_SURFACE_MIRROR,
+	MERGE_SURFACES_BY_ROW,
+	MERGE_SURFACES_BY_ROW_REVERSE,
+	MEASURE_DISTANCE,
+	DRAG_TRAJECTORY_POINT
+};
 
 extern EDIT_MODES_ENUM MY_EDIT_MODE; // GUI, BATCH.
 
 // Window cintrol flag.
 enum WIDGET_CONTROL_ENUM { X, Y, Z, R, P, S, NO };
 extern WIDGET_CONTROL_ENUM MY_WIDGET_CONTROL;
+
+// Selection mode.
+enum SELECT_MODE
+{
+	POINT_M,
+	ROW_M,
+	COLUMN_M,
+	SURFACE_M
+};
+
+extern SELECT_MODE _selectMode;
+
+class Point3;
 
 #endif /*  GLOBAL_H */

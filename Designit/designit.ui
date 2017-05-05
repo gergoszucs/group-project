@@ -131,7 +131,7 @@
        <property name="minimumSize">
         <size>
          <width>400</width>
-         <height>400</height>
+         <height>713</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -204,6 +204,98 @@
         <item>
          <widget class="MyGLWidget" name="myGLWidget"/>
         </item>
+        <item>
+         <widget class="QFrame" name="TrajectoryButtons">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QPushButton" name="previousFrame">
+             <property name="text">
+              <string>Previous</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_first.png</normaloff>:/Resources/button_black_first.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="toBegin">
+             <property name="text">
+              <string>Restart</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_repeat.png</normaloff>:/Resources/button_black_repeat.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stop">
+             <property name="text">
+              <string>Stop</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_pause.png</normaloff>:/Resources/button_black_pause.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="start">
+             <property name="text">
+              <string>Start</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_play.png</normaloff>:/Resources/button_black_play.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="nextFrame">
+             <property name="text">
+              <string>Next</string>
+             </property>
+             <property name="icon">
+              <iconset resource="designit.qrc">
+               <normaloff>:/Resources/button_black_last.png</normaloff>:/Resources/button_black_last.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="syncCurves">
+             <property name="text">
+              <string>Sync Curves</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QToolBox" name="editingTools">
@@ -258,7 +350,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="MyXYView" name="myXYView"/>
+              <widget class="View2d" name="myXYView"/>
              </item>
             </layout>
            </widget>
@@ -268,7 +360,7 @@
             </attribute>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="MyXZView" name="myXZView"/>
+              <widget class="View2d" name="myXZView"/>
              </item>
             </layout>
            </widget>
@@ -278,7 +370,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="MyYZView" name="myYZView"/>
+              <widget class="View2d" name="myYZView"/>
              </item>
             </layout>
            </widget>
@@ -311,8 +403,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>218</width>
-          <height>418</height>
+          <width>304</width>
+          <height>659</height>
          </rect>
         </property>
         <attribute name="label">
@@ -428,6 +520,9 @@
     <addaction name="actionAnnotations"/>
     <addaction name="actionGrids"/>
     <addaction name="actionReset_all_views"/>
+    <addaction name="separator"/>
+    <addaction name="actionDrag_vector"/>
+    <addaction name="actionAngle_dial"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -435,16 +530,12 @@
     </property>
     <addaction name="actionDrag"/>
     <addaction name="actionCentred_rotate"/>
-    <addaction name="actionDrag_row"/>
-    <addaction name="actionDrag_col"/>
-    <addaction name="actionDrag_all"/>
     <addaction name="separator"/>
-    <addaction name="actionRotate_all"/>
-    <addaction name="actionResize_all"/>
+    <addaction name="actionRotate"/>
+    <addaction name="actionResize"/>
     <addaction name="separator"/>
     <addaction name="actionShear"/>
-    <addaction name="actionPerspective"/>
-    <addaction name="actionFlip_horizontal"/>
+    <addaction name="actionFlip"/>
     <addaction name="actionCopy_surface"/>
     <addaction name="actionCopy_surface_mirror"/>
     <addaction name="separator"/>
@@ -522,16 +613,12 @@
    <addaction name="actionDelete_surface"/>
    <addaction name="separator"/>
    <addaction name="actionDrag"/>
+   <addaction name="actionRotate"/>
    <addaction name="actionCentred_rotate"/>
-   <addaction name="actionDrag_row"/>
-   <addaction name="actionDrag_col"/>
-   <addaction name="actionDrag_all"/>
-   <addaction name="actionResize_all"/>
    <addaction name="separator"/>
-   <addaction name="actionRotate_all"/>
    <addaction name="actionShear"/>
-   <addaction name="actionPerspective"/>
-   <addaction name="actionFlip_horizontal"/>
+   <addaction name="actionResize"/>
+   <addaction name="actionFlip"/>
    <addaction name="actionCopy_surface"/>
    <addaction name="actionCopy_surface_mirror"/>
    <addaction name="separator"/>
@@ -594,6 +681,9 @@
    <property name="text">
     <string>Drag</string>
    </property>
+   <property name="toolTip">
+    <string>Drag points</string>
+   </property>
   </action>
   <action name="actionNew_surface">
    <property name="icon">
@@ -604,36 +694,9 @@
     <string>New surface</string>
    </property>
   </action>
-  <action name="actionDrag_all">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_drag_all.png</normaloff>:/Resources/icon_drag_all.png</iconset>
-   </property>
-   <property name="text">
-    <string>Drag all</string>
-   </property>
-  </action>
   <action name="actionNormals">
    <property name="text">
     <string>Normals</string>
-   </property>
-  </action>
-  <action name="actionDrag_row">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_drag_row.png</normaloff>:/Resources/icon_drag_row.png</iconset>
-   </property>
-   <property name="text">
-    <string>Drag row</string>
-   </property>
-  </action>
-  <action name="actionDrag_col">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_drag_col.png</normaloff>:/Resources/icon_drag_col.png</iconset>
-   </property>
-   <property name="text">
-    <string>Drag col</string>
    </property>
   </action>
   <action name="actionInterpolated_points">
@@ -646,22 +709,28 @@
     <string>Control points</string>
    </property>
   </action>
-  <action name="actionRotate_all">
+  <action name="actionRotate">
    <property name="icon">
     <iconset resource="designit.qrc">
      <normaloff>:/Resources/icon_rotate_all.png</normaloff>:/Resources/icon_rotate_all.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate all</string>
+    <string>Rotate</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate points</string>
    </property>
   </action>
-  <action name="actionResize_all">
+  <action name="actionResize">
    <property name="icon">
     <iconset resource="designit.qrc">
      <normaloff>:/Resources/icon_resize_all.png</normaloff>:/Resources/icon_resize_all.png</iconset>
    </property>
    <property name="text">
-    <string>Resize all</string>
+    <string>Resize</string>
+   </property>
+   <property name="toolTip">
+    <string>Resize surfaces</string>
    </property>
   </action>
   <action name="actionShear">
@@ -673,15 +742,6 @@
     <string>Shear</string>
    </property>
   </action>
-  <action name="actionPerspective">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_perspective_all.png</normaloff>:/Resources/icon_perspective_all.png</iconset>
-   </property>
-   <property name="text">
-    <string>Perspective</string>
-   </property>
-  </action>
   <action name="actionPlayout_Test">
    <property name="icon">
     <iconset resource="designit.qrc">
@@ -691,13 +751,16 @@
     <string>Playout Test</string>
    </property>
   </action>
-  <action name="actionFlip_horizontal">
+  <action name="actionFlip">
    <property name="icon">
     <iconset resource="designit.qrc">
      <normaloff>:/Resources/icon_flip_horizontal.png</normaloff>:/Resources/icon_flip_horizontal.png</iconset>
    </property>
    <property name="text">
-    <string>Flip all horizontal</string>
+    <string>Flip surface</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip surface</string>
    </property>
   </action>
   <action name="actionClose">
@@ -935,6 +998,28 @@
     <string>Ctrl+Y</string>
    </property>
   </action>
+  <action name="actionDrag_vector">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Drag vector</string>
+   </property>
+  </action>
+  <action name="actionAngle_dial">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Angle dial</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -942,21 +1027,6 @@
    <class>MyGLWidget</class>
    <extends>QOpenGLWidget</extends>
    <header>myglwidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyXYView</class>
-   <extends>QOpenGLWidget</extends>
-   <header>myxyview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyXZView</class>
-   <extends>QOpenGLWidget</extends>
-   <header location="global">myxzview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyYZView</class>
-   <extends>QOpenGLWidget</extends>
-   <header>myyzview.h</header>
   </customwidget>
   <customwidget>
    <class>MyGaussianView</class>
@@ -968,9 +1038,119 @@
    <extends>QOpenGLWidget</extends>
    <header>myglgeneraltrajectorycurveview.h</header>
   </customwidget>
+  <customwidget>
+   <class>View2d</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">view2d.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="designit.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>start</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>startTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>595</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toBegin</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>restart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>437</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>previousFrame</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>previousFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nextFrame</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>nextFrame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stop</sender>
+   <signal>released()</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>stopTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>516</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>syncCurves</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DesignitClass</receiver>
+   <slot>syncCurves(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>754</x>
+     <y>741</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>startTest()</slot>
+  <slot>stopTest()</slot>
+  <slot>restart()</slot>
+  <slot>previousFrame()</slot>
+  <slot>nextFrame()</slot>
+  <slot>syncCurves(bool)</slot>
+ </slots>
 </ui>

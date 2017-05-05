@@ -12,20 +12,21 @@
 #include "rapidjson/prettywriter.h"
 
 #include "Enums.h"
+#include "Point3.h"
+
 
 using namespace rapidjson;
 
 // Forward declarations.
+class ITControlPoint;
 class ITSurface;
+class ITPointTrajectory;
+class ITTrajectoryCurveSegment;
 
-struct Point3
+enum MERGE_ROW
 {
-public:
-	float x, y, z;
-
-	Point3() : x(0), y(0), z(0) {}
-
-	Point3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+	FIRST,
+	LAST
 };
 
 class ITProject
@@ -124,14 +125,25 @@ public:
 	void duplicateColumn(const int surfaceID, const int j);
 	void deleteColumn(const int surfaceID, const int j);
 
+	void mergeSurface(const unsigned int firstSurfaceID, const MERGE_ROW firstMergeRow,  const unsigned int secondSurfaceID, const MERGE_ROW secondMergeRow, const bool reversed);
+
 	void matePoints(const int baseSurfaceID, const int baseI, const int baseJ, const int targetSurfaceID, const int targetI, const int targetJ);
+
+	void setTrajectoryPoint(const unsigned int surfaceID, const int curveID, const int pointID, const float data, const bool sync);
+	void moveTrajectoryPoint(const unsigned int surfaceID, const int curveID, const int pointID, const float diff, const bool sync);
+
+	void setU(const unsigned int surfaceID, const int data);
+	void setV(const unsigned int surfaceID, const int data);
 
 	Point3 getPointData(const int surfaceID, const int i, const int j);
 	Point3 getSurfaceCenter(const int surfaceID);
 
+	ITControlPoint* getControlPoint(const unsigned int surfaceID, const unsigned int i, const unsigned int j);
+
 	void createNewTrajectoryCurve(const int k);
 
 	void synchronizeSurfaceVectorsFromControl();
+	void manageComputationOfInterpolatedPoints();
 
 	// Admin methods.
 	void currentDateTime(char * currentTime);
@@ -243,4 +255,7 @@ public:
 	ITSurface* getSurface(const int k);
 
 	ITSurface* getBaseSurface(const int k);
+
+	ITTrajectoryCurveSegment* getTrajectorySegment(const unsigned int surfaceID, const unsigned int curveID, const unsigned int segmentID);
+	ITPointTrajectory* getTrajectoryPoint(const unsigned int surfaceID, const unsigned int curveID, const unsigned int pointID);
 };

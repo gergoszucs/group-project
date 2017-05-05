@@ -6,8 +6,44 @@
 #include "ITControlPoint.h"
 
 UndoRedoSystem::UndoRedoSystem()
-	: commandPointer(0)
+	: commandPointer(-1)
 {
+}
+
+void UndoRedoSystem::reset()
+{
+	for (auto it : deletedRows)
+	{
+		for (auto itt : std::get<2>(it))
+		{
+			delete(itt);
+		}
+	}
+	deletedRows.erase(deletedRows.begin(), deletedRows.end());
+
+	for (auto it : deletedColumns)
+	{
+		for (auto itt : std::get<2>(it))
+		{
+			delete(itt);
+		}
+	}
+	deletedColumns.erase(deletedColumns.begin(), deletedColumns.end());
+
+	for (auto it : deletedSurfaces)
+	{
+		delete(std::get<1>(it));
+		delete(std::get<2>(it));
+	}
+	deletedSurfaces.erase(deletedSurfaces.begin(), deletedSurfaces.end());
+
+	pointGroupsMove.erase(pointGroupsMove.begin(), pointGroupsMove.end());
+	pointGroupsRotate.erase(pointGroupsRotate.begin(), pointGroupsRotate.end());
+
+	commands.erase(commands.begin(), commands.end());
+	reverseCommands.erase(reverseCommands.begin(), reverseCommands.end());
+	
+	commandPointer = -1;
 }
 
 void UndoRedoSystem::registerCommand(QStringList command, QStringList reverseCommand)
@@ -69,6 +105,8 @@ void UndoRedoSystem::registerSurface(ITSurface * s, ITSurface * bs)
 void UndoRedoSystem::redoSurfaceDelete(ITProject* p)
 {
 	if (deletedSurfaces.size() == 0) throw std::exception("NOTHING_TO_REDO");
+
+	w->setMyTextDataField(QString::number(deletedSurfaces.size()));
 
 	int originalSurfaceID = std::get<0>(deletedSurfaces.back());
 
@@ -165,4 +203,84 @@ void UndoRedoSystem::redoColumnDelete(ITProject* p)
 	p->getSurface(surfaceID)->manageComputationOfInterpolatedPoints();
 
 	deletedColumns.pop_back();
+}
+
+void UndoRedoSystem::undoGroupPointsMove(ITProject * p, const unsigned int id)
+{
+	auto data = pointGroupsMove[id];
+
+	for (auto it : std::get<0>(data))
+	{
+		int surfaceID = it->get_K();
+		int i = it->get_I();
+		int j = it->get_J();
+		float posX = -std::get<1>(data);
+		float posY = -std::get<2>(data);
+		float posZ = -std::get<3>(data);
+
+		p->movePoint(surfaceID, i, j, posX, posY, posZ, false);
+	}
+}
+
+void UndoRedoSystem::undoGroupPointsRotate(ITProject * p, const unsigned int id)
+{
+	for (auto it : std::get<0>(pointGroupsRotate[id]))
+	{
+		int surfaceID = it->get_K();
+		int i = it->get_I();
+		int j = it->get_J();
+		float posX = std::get<1>(pointGroupsRotate[id]);
+		float posY = std::get<2>(pointGroupsRotate[id]);
+		float posZ = std::get<3>(pointGroupsRotate[id]);
+		float angle = -std::get<4>(pointGroupsRotate[id]);
+		PLANE plane = std::get<5>(pointGroupsRotate[id]);
+
+		p->rotatePoint(surfaceID, i, j, posX, posY, posZ, angle, plane, false);
+	}
+}
+
+void UndoRedoSystem::redoGroupPointsMove(ITProject * p, const unsigned int id)
+{
+	auto data = pointGroupsMove[id];
+
+	for (auto it : std::get<0>(data))
+	{
+		int surfaceID = it->get_K();
+		int i = it->get_I();
+		int j = it->get_J();
+		float posX = std::get<1>(data);
+		float posY = std::get<2>(data);
+		float posZ = std::get<3>(data);
+
+		p->movePoint(surfaceID, i, j, posX, posY, posZ, false);
+	}
+}
+
+void UndoRedoSystem::redoGroupPointsRotate(ITProject * p, const unsigned int id)
+{
+	for (auto it : std::get<0>(pointGroupsRotate[id]))
+	{
+		int surfaceID = it->get_K();
+		int i = it->get_I();
+		int j = it->get_J();
+		float posX = std::get<1>(pointGroupsRotate[id]);
+		float posY = std::get<2>(pointGroupsRotate[id]);
+		float posZ = std::get<3>(pointGroupsRotate[id]);
+		float angle = std::get<4>(pointGroupsRotate[id]);
+		PLANE plane = std::get<5>(pointGroupsRotate[id]);
+
+		p->rotatePoint(surfaceID, i, j, posX, posY, posZ, angle, plane, false);
+	}
+}
+
+unsigned int UndoRedoSystem::registerPointsGroupMove(std::vector<ITControlPoint*> vec, const float dx, const float dy, const float dz)
+{
+	pointGroupsMove.push_back(std::make_tuple(vec, dx, dy, dz));
+	return pointGroupsMove.size() - 1;
+}
+
+unsigned int UndoRedoSystem::registerPointsGroupRotate(std::vector<ITControlPoint*> vec, const float dAngle, const float centerX, const float centerY, const float centerZ, const PLANE plane)
+{
+	pointGroupsRotate.push_back(std::make_tuple(vec, centerX, centerY, centerZ, dAngle, plane));
+	return pointGroupsRotate.size() - 1;
 }
