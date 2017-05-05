@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Surfit</string>
+   <string>DesignIT</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="designit.qrc">
+    <normaloff>:/Resources/designit.png</normaloff>:/Resources/designit.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -955,7 +959,7 @@
    </property>
    <property name="icon">
     <iconset resource="designit.qrc">
-     <normaloff>:/Resources/flexit.ico</normaloff>:/Resources/flexit.ico</iconset>
+     <normaloff>:/Resources/flexit.png</normaloff>:/Resources/flexit.png</iconset>
    </property>
    <property name="text">
     <string>action_Flexit</string>

@@ -70,5 +70,7 @@
         <file>Resources/button_black_pause.png</file>
         <file>Resources/button_black_play.png</file>
         <file>Resources/button_black_repeat.png</file>
+        <file>Resources/designit.png</file>
+        <file>Resources/flexit.png</file>
     </qresource>
 </RCC>
