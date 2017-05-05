@@ -243,7 +243,25 @@ As this was a group project, most of our achievements would not had been possibl
 
 \chapter{Research}
 
+We have put a lot of effort into research during our project. Our goal was to make sure, we are developing something that is \textbf{wanted by the customers}, \textbf{adds considerable value to the application} and is \textbf{possible} to carry out \textbf{in such a limited time window}. In this chapter we will present our ideas and the results of the research we had done, while the next chapter will be about the actual development we managed to do.
+
 \section{Market analysis}
+
+In order to understand what our potential customers would really want, we asked some of our colleagues (27 people filled our survey) about their opinion. The survey contained a brief description of the software, what it is made for, how to use it and a download link for the exe file with one JSON file.
+
+Our questions were mainly focused on the interface, whether they like the \textbf{orientation of the GUI}, the \textbf{handling of the software} and if they are satisfied with the \textbf{performance}.
+
+Most of the replies contained concerns about the \textbf{necessity of having three separate applications}. This led us to the decision of \textbf{merging} two of them, as \textbf{SurfIT and MoveIT} were quite similar. We had the feeling that combining FlexIT as well would create and overwhelmingly complicated software, so instead of doing that, we added a functionality which allows the user to \textbf{transfer the current DesignIT project to FlexIT by one mouse click} and return to DesignIT at any time.
+
+Regarding the question, whether they would use the software as it is, we got mixed feedback, but the problem is that we did not receive any details on what they would like us to improve. We have added the command line feature to allow more precise work on the meshes, advanced mouse features for easier camera movement and implemented numerous changes on the interface to make it more user-friendly. We also merged most of the third party dependencies into the program, and created an installer which includes the necessary files. This \textbf{allows our users to start working on their project as soon as they receive our application}.
+
+We had other minor feedbacks as well, which we did not have the time to work on, but they should be considered for future development. One of these concerns was the absence of \textbf{supporting multiple file formats for input}. Right now there is no way to import any type of third-party meshes to the application, which requires the user to learn how to use our program, and then possibly recreate already existing objects. We have done a lot of research on the possibility of importing objects from AutoCAD, but we did not manage to implement it in time.
+
+Yet another problem was that the \textbf{coefficients} for the simulation \textbf{are} all \textbf{hardcoded} into the program. This seemed to be a small task, but the lack of our knowledge in aeroelasticity and the limited amount of time we had halted the completion of this very useful feature.
+
+About the speed of the program itself, the users were quite satisfied (at least those with better GPUs), however, we still decided to research possible improvements on the algorithms and the CUDA code. For the latter, we did not have enough time, but in general, by merging the two programs, providing an installer, making the user interface easier to use, we possibly saved more time than by improving a bit on the GPU code.
+
+Combining the results from the collected surveys and our own experience with the software, we have decided that \textbf{our main goal should be improving the overall user-experience}. The program was already working properly, and we did not posses the necessary knowledge to improve the aeroelasticity part of the code. Instead we focused on providing a smooth and joyful experience for the customer, while also focusing on researching possible future improvements and granting a considerable speed up, by making the usage of the software easier and the code more efficient.
 
 \section{Mathematics and algorithms}
 
@@ -413,9 +431,9 @@ As we have seen, there are many different possibilities to import CAD objects to
 
 \section{Installer}
 
-After putting a lot of effort on the customer experience, we realised that even if the program is easier to use, if the user has troubles at the beginning, while setting up the application, it might affect the overall experience. Hence, we have decided to create a standalone installer for the application. It can be found in the GitHub repository, as well as the submitted code package.
+After putting a lot of effort on the customer experience, we realised that even if the program is easier to use, if the user has troubles at the beginning, while setting up the application, it might affect the overall experience. Hence, we have decided to create a \textbf{standalone installer} for the application. It can be found in the GitHub repository, as well as the submitted code package.
 
-The setup file deploys both programs (DesignIT and FlexIT) to a selected location and it will also create two shortcuts on the Desktop for them, if requested. To make sure the user does not have to install any third party software in order to run our applications, we are providing all the necessary DLL (Dynamic Linking Library) files within the package. This means, after the installation is finished, the user can run the program without having to install or configure anything else.
+The setup file deploys both programs (DesignIT and FlexIT) to a selected location and it will also create two shortcuts on the Desktop for them, if requested. To make sure the user does not have to install any third party software in order to run our applications, we are \textbf{providing all the necessary DLL} (Dynamic Linking Library) \textbf{files} within the package. This means, after the installation is finished, \textbf{the user can run the program without having to install or configure anything} else.
 
 The package includes the following DLL files.
 
@@ -437,11 +455,11 @@ The package includes the following DLL files.
 
 \section{Code refactoring}
 
-The major problem we had with the source code was inconsistency. Throughout the code we saw different coding styles, lots of redundant codes and unnecessary comments, which made us spend more time on understanding the code base. During this period, we have tried our best to reformat the code. To do so, we were following the conventions described in Google's C++ style guide [6]. 
+The major problem we had with the source code was \textbf{inconsistency}. Throughout the code we saw different coding styles, lots of redundant codes and unnecessary comments, which made us spend more time on understanding the code base. During this period, we have tried our best to reformat the code. To do so, we were following the conventions described in \textbf{Google's C++ style guide} [6]. 
 
-The first step was to reorganize the projects. Initially we had 3 separate projects, we moved them under one solution, so they can share settings and dependencies (later we also merged two of these project, namely SurfIT and MoveIT into DesignIT), while also allowing us to access them more conveniently.
+The first step was to reorganize the projects. Initially we had 3 separate projects, we moved them under \textbf{one solution}, so they can share settings and dependencies (later we also merged two of these project, namely SurfIT and MoveIT into DesignIT), while also allowing us to access them more conveniently.
 
-After that we spent a few days on looking through the source code, while also making it easier to read and shorter, due to removing redundant code chunks and functions. In overall we have managed to reduce the amount of source code by x \% (from y lines of code to z lines of code), while preserving every functionality and also adding many features and bugfixes.
+After that we spent a few days on looking through the source code, while also making it easier to read and shorter, due to \textbf{removing redundant code chunks and functions}. In overall we have managed to reduce the amount of source code by x \% (from y lines of code to z lines of code), while preserving every functionality and also adding many features and bugfixes.
 
 \todo{add actual numbers}
 
@@ -467,6 +485,18 @@ During the development we have fixed numerous bugs in the code, improving the ov
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Conclusion}
+
+In general, we feel that we learned a lot of thing during the last 9 weeks. The best part of the project was \textbf{working with people from different countries and cultures}, while also bringing \textbf{different vision} due to the previous studies we have had. It was interesting to see, what ideas each team member had for the development and what we were interested in working on.
+
+The best part was the initial phase, where we could \textbf{freely think and talk about our ideas}, resulting in many great meetings and conversations. After the first few days, however, we had to scrap many of these ideas and focus on those that we decided to be \textbf{valuable and manageable} for this short project.
+
+After the first development phase, we had another amazing time, while working on the presentation. We have decided to \textbf{make a video about our project}, to have something creative in our presentation, while also creating a lasting memory, which we can watch years later to remember these good times.
+
+Looking back on our work during the weeks, we see that we might have spent more time on research then we should have. However, we think that it was worth the effort. Even though we did not manage to implement many of our good ideas, but we still \textbf{learned a lot of creative ways of solving} those \textbf{issues}.
+
+However, the development we had done is definitely a great improvement for the program. Combining two of the existing programs into one, and allowing to user to quickly transition between the remaining two will make the life of the future users a lot easier. All the useful features and bugfixes we had discussed in these report, as well as the installer are also big \textbf{improvements on user-experience}.
+
+Apart from the user side, we worked a lot on the source code itself, making it more readable, shorter and efficient. In overall, we enjoyed working on the project and hopefully carried out satisfying work with great results. \textbf{We would like to thank both Dominique and Irene for your hard work on setting up the project for us and the opportunity itself!}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
