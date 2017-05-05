@@ -1,0 +1,536 @@
+{
+    "Project Properties": {
+        "Date and Time": " 2017-03-17 07:39:10",
+        "Debug level": 1,
+		"Comment": "Run for performance measurement for comparison with Dario's code."
+    },
+    "ITProject Data": {
+        "General Data": {
+            "FileName": "",
+            "FileNameWithPath": "",
+            "ProgramName": "",
+            "ProgramNameWithPath": ""
+        },
+        "Design Properties": {
+            "Number of Surfaces": 1
+        },
+        "FlowitCudaUnsteady Data": {
+            "MaxPropagationGeneration": 20,
+            "FlowitPressureEps": -200.0,
+            "IsConstantSpeedTrajectories": 1,
+            "IsDoVelocityField": 1,
+            "RankineAlgorithm": "D",
+            "RankineCoreRadius": 0.019999999552965165,
+            "VelocityFieldConstantPlane": "X",
+            "VelocityFieldNx": 62,
+            "VelocityFieldNy": 62,
+            "VelocityFieldNz": 62,
+            "VelocityFieldMinx": -30.0,
+            "VelocityFieldMiny": -60.0,
+            "VelocityFieldMinz": -60.0,
+            "VelocityFieldMaxx": 40.0,
+            "VelocityFieldMaxy": 60.0,
+            "VelocityFieldMaxz": 60.0,
+            "Rho": 1.2, "Comment": "Sea level",
+            "FramesPerSecond": 40,
+            "PressureDisplayFactor": 0.00019999999494757503,
+            "VorticityDisplayFactor": 0.20000000298023225,
+            "VelocityFieldDisplayFactor": 0.30000001192092898,
+            "IsSurfaceHierarchy": 0,
+            "IsGust": 0,
+            "ReplayDeltaTMSecs": 50.0,
+            "IsActiveControlSurfaces": 0,
+			"IsDoHistory": 0
+        }
+    },
+    "ITSurfaces": [
+        {
+            "Properties": {
+                "Name": "0",
+                "Number of rows of control points": 3,
+                "Number of cols of control points": 3,
+                "Number of rows of interpolated points": 33,
+                "Number of cols of interpolated points": 5,
+                "IsWake": 1,
+                "IsMorph": 1,
+                "MorphStartFrame": 1184,
+                "MorphEndFrame": 20,
+                "MorphType": "",
+                "ParentSurfaceIndex": 20,
+                "IsPistolesiPanelOffset": 0,
+                "PistolesiPanelOffsetFraction": 0,
+                "FuselageRadius": 0,
+				"PatchType": "B"
+            },
+            "Control Points": [
+                {
+                    "Indices": {
+                        "row": 0,
+                        "col": 0,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 0,
+                        "col": 1,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": -0.5,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 0,
+                        "col": 2,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": -1.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 1,
+                        "col": 0,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": 0.0,
+                        "y": 2.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 1,
+                        "col": 1,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": -0.5,
+                        "y": 2.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 1,
+                        "col": 2,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": -1.0,
+                        "y": 2.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 2,
+                        "col": 0,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": 0.0,
+                        "y": 4.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 2,
+                        "col": 1,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": -0.5,
+                        "y": 4.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                },
+                {
+                    "Indices": {
+                        "row": 2,
+                        "col": 2,
+                        "surface": 0
+                    },
+                    "Properties": {
+                        "Name": "",
+                        "x": -1.0,
+                        "y": 4.0,
+                        "z": 0.0,
+                        "vx": 0.0,
+                        "vy": 0.0,
+                        "vz": 0.0,
+                        "U": 0.0,
+                        "V": 0.0,
+                        "mass": 0.0
+                    }
+                }
+            ],
+			
+			
+			
+			
+			
+			"Beam": {
+				"Beam Nodes": [
+					{
+						"Index": 0,
+						"x": -64.227699,
+						"y": -8.736216,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 1,
+						"x": -64.227699,
+						"y": -6.994493,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 2,
+						"x": -64.227699,
+						"y": -5.252770,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 3,
+						"x": -64.227699,
+						"y": -3.511046,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 4,
+						"x": -64.227699,
+						"y": -1.769323,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 5,
+						"x": -64.227699,
+						"y": -0.027600,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 6,
+						"x": -64.227699,
+						"y": 1.714123,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 7,
+						"x": -64.227699,
+						"y": 3.455846,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 8,
+						"x": -64.227699,
+						"y": 5.197569,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 9,
+						"x": -64.227699,
+						"y": 6.939292,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					},
+					{
+						"Index": 10,
+						"x": -64.227699,
+						"y": 8.681017,
+						"z": 3.872203,
+						"Mass": 100,
+						"E": 70.0e9,
+						"Ix": 0.0050505,
+						"Iz": 0.000247789337186
+					}					
+				]
+			},
+			
+			
+			
+			
+            "Trajectory Translation Curve": {
+                "Control Points": [
+                    {
+                        "Indices": {
+                            "row": 0,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 0
+                        }
+                    },
+                    {
+                        "Indices": {
+                            "row": 1,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 12.5,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 50
+                        }
+                    },
+                    {
+                        "Indices": {
+                            "row": 2,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 25.0,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 100
+                        }
+                    },
+                    {
+                        "Indices": {
+                            "row": 3,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 37.5,
+                            "y": 0.0,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 150
+                        }
+                    }
+                ]
+            },
+            "Trajectory Rotation Curve": {
+                "Centre of Rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Control Points": [
+                    {
+                        "Indices": {
+                            "row": 0,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 0.0,
+                            "y": -0.0873,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 0
+                        }
+                    },
+                    {
+                        "Indices": {
+                            "row": 1,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 0.0,
+                            "y": -0.0873,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 50
+                        }
+                    },
+                    {
+                        "Indices": {
+                            "row": 2,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 0.0,
+                            "y": -0.0873,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 100
+                        }
+                    },
+                    {
+                        "Indices": {
+                            "row": 3,
+                            "col": 0,
+                            "surface": 0
+                        },
+                        "Properties": {
+                            "Name": "",
+                            "x": 0.0,
+                            "y": -0.0873,
+                            "z": 0.0,
+                            "vx": 0.0,
+                            "vy": 0.0,
+                            "vz": 0.0,
+                            "U": 4.2244916778030976e-39,
+                            "V": 1.1020422089580807e-38,
+                            "mass": 0.0,
+                            "KeyFrame": 150
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
