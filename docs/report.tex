@@ -265,28 +265,51 @@ Combining the results from the collected surveys and our own experience with the
 
 \section{Mathematics and algorithms}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Cloud computing}
 
-In order to support the program on any device it could be hosted in the cloud. We investigated the possibility of running the program on AWS (Amazon Web Services). 
 
-The selected instance is called g2.2xlarge which is an instance with a Graphics Card.
-Additional Storrage of 60GB had to be added in order to support the whole development kit.
-The instance runs Windows Server 2016 Base. 
+\subsection{Objective}
 
-The following software had to be installed: Visual Studio, QT extensions and CUDA drivers.
-After that the program could be compiled on the cloud instance.
+There are two main goals why we wanted to make FlexIT run in the cloud. First of all it is one possibility to solve the distribution problem. If you have an image with a working FlexIT installation that can be copied to as many instances as required then the client does not have to install any software locally but just use those instances. The second goal is to figure out if using different hardware changes the performance of the program. Ideally if you have a better GPU one would expect that the performance increases. This can be tested with a cloud service because they provide several types of instances which run on different hardware set-up. 
 
-When running the program it did not produce correct results. All results were NaN (not a number).
-Furthermore it crashed after a few frames. This behaviour was also observed on other (non-cloud based) hardware.
+\subsection{Providers}
 
-Initially the graphics could not be displayed either but after removing the OpenGL \texttt{renderText} calls 
-they seemed to work. 
+Currently there are three big cloud service providers, namely Google with their Google Cloud, Microsoft with Azure and Amazon with Amazon Web Services (AWS). Google focuses more on Software as a Service (SaaS) and Platform as a Service (Paas), AWS is Infrastructure as a Service (IaaS) and Microsoft does a mixture of PaaS and IaaS. To have the most control and to be able to use the code provided we require IaaS. Therefore AWS is a good choice.
 
-No speedup could be seen when running on the cloud instance. Therefore we dropped the idea of supporting the program on AWS.
-However, it is a theoretically possible way of distributing the software by giving access to a coud instance 
-which would not require any installation or special hardware at the client computer. 
+Furthermore the team has already been working with AWS in previous project. The university was able to provide an AWS account to cover costs of 40\$. So we were able to use AWS resources. 
 
-One possible future option to try would be using p2 AWS instance which are tuned for GPU computations. Due to financial restrictions we could not do this in the course of this project.
+
+\subsection{Implementation}
+
+On AWS we selected the a \texttt{g2.2xlarge} instance since it is the cheapest one with a GPU. Additional SSD storage space of 60GB was added because the installation of all the development kits that are required at this stage take up a lot of space. On this instance we chose Windows Server 2016 Base as an operating system since FlexIT requires Windows. 
+
+Once the instance was started the software could be installed. To allow development we had to install Visual Studio 2015. It is important to install the 2015 version and not a newer version since it the Qt plug-ins are not supported in higher versions. A Qt installation as well as the appropriate CUDA drivers had to be installed as well. 
+
+Then the GIT repository could be cloned and the project opened and executed in Visual Studio. 
+
+\subsection{Results}
+
+The first thing that could be observed is that the Graphics were not showing properly. The areas that were supposed to render something just stayed black. This issue could be resolved by removing all the OpenGL \texttt{renderText} calls. 
+
+When running the simulation the program behaves normally for the first few frames but then it crashed abruptly. This behavior was also found on different hardware for instance a local computer of one of our colleagues. So it is very likely that it has to do with the hardware. As for now we were not able to fix this issue. 
+
+No significant runtime difference was found between the execution on AWS and the execution on the lab computer. However this was just the weakest GPU that AWS has to offer. There are other instance types that support better graphic cards and are specialized on number crunching. 
+
+The biggest problem however is that the results that are produced are not correct. In fact there are no real results produced. The floating point operations return NaN (not a number). This could be tracked down to a part of the software that used CUDA. So maybe there is a problem with the CUDA installation or the GPU. 
+
+\subsection{Conclusion}
+
+We were not able to increase performance by using cloud infrastructure. However it seems feasible that after the crashing bugs have been sorted out the program could be distributed in this way. Then the customer only needs a Remote Desktop Client and they could rent a system on an hourly basis. 
+
+Future work would be to test the program using a different instance like \texttt{p2.xlarge} which are intended for computing on GPUs. It is possible that the \texttt{p2} instances support CUDA and the \texttt{g2} instances do not. This could solve the NaN problem but in order not to exceed the budged provided we had to stop our investigation.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \section{Importing CAD models}
    
@@ -486,7 +509,7 @@ During the development we have fixed numerous bugs in the code, improving the ov
 
 \chapter{Conclusion}
 
-In general, we feel that we learned a lot of thing during the last 9 weeks. The best part of the project was \textbf{working with people from different countries and cultures}, while also bringing \textbf{different vision} due to the previous studies we have had. It was interesting to see, what ideas each team member had for the development and what we were interested in working on.
+We learned a lot of things during the past nine weeks. The best part of the project was \textbf{working with people from different countries and cultures}, while also bringing \textbf{different vision} due to the previous studies we have had. It was interesting to see, what ideas each team member had for the development and what we were interested in working on.
 
 The best part was the initial phase, where we could \textbf{freely think and talk about our ideas}, resulting in many great meetings and conversations. After the first few days, however, we had to scrap many of these ideas and focus on those that we decided to be \textbf{valuable and manageable} for this short project.
 
