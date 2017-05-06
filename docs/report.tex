@@ -195,7 +195,6 @@ As this was a group project, most of our achievements would not had been possibl
 	\item Fixing packaging issues
 	\item DesignIT and FlexIT interfacing
 	\item Preparing the presentation
-	\item Detecting and fixing memory leaks
 	\item Testing 
 	\item Graceful handling of errors and exceptions
 	\item Bugfixing
@@ -273,13 +272,13 @@ Combining the results from the collected surveys and our own experience with the
 
 \subsection{Objective}
 
-There are two main goals why we wanted to make FlexIT run in the cloud. First of all it is one possibility to solve the distribution problem. If you have an image with a working FlexIT installation that can be copied to as many instances as required then the client does not have to install any software locally but just use those instances. The second goal is to figure out if using different hardware changes the performance of the program. Ideally if you have a better GPU one would expect that the performance increases. This can be tested with a cloud service because they provide several types of instances which run on different hardware set-up. 
+There are two main goals why we wanted to make FlexIT run in the cloud. First of all it is one possibility to \textbf{solve the distribution problem}. If you have an image with a working FlexIT installation that can be copied to as many instances as required then the client does not have to install any software locally but just use those instances. The second goal is to figure out if using different hardware \textbf{change}s the \textbf{performance} of the program. Ideally if you have a better GPU one would expect that the performance increases. This can be tested with a cloud service because they provide several types of instances which run on different hardware set-up. 
 
 \subsection{Providers}
 
-Currently there are three big cloud service providers, namely Google with their Google Cloud, Microsoft with Azure and Amazon with Amazon Web Services (AWS). Google focuses more on Software as a Service (SaaS) and Platform as a Service (Paas), AWS is Infrastructure as a Service (IaaS) and Microsoft does a mixture of PaaS and IaaS. To have the most control and to be able to use the code provided we require IaaS. Therefore AWS is a good choice.
+Currently there are three big cloud service providers, namely Google with their Google Cloud, Microsoft with Azure and Amazon with \textbf{Amazon Web Services (AWS)}. Google focuses more on Software as a Service (SaaS) and Platform as a Service (Paas), AWS is Infrastructure as a Service (IaaS) and Microsoft does a mixture of PaaS and IaaS. To have the most control and to be able to use the code provided we require IaaS. Therefore AWS is a good choice.
 
-Furthermore the team has already been working with AWS in previous project. The university was able to provide an AWS account to cover costs of 40\$. So we were able to use AWS resources. 
+Furthermore the team has already been working with AWS in previous project. The university was able to provide an AWS account to cover costs of 40\$, so we were able to use AWS resources. 
 
 
 \subsection{Implementation}
@@ -292,7 +291,7 @@ Then the GIT repository could be cloned and the project opened and executed in V
 
 \subsection{Results}
 
-The first thing that could be observed is that the Graphics were not showing properly. The areas that were supposed to render something just stayed black. This issue could be resolved by removing all the OpenGL \texttt{renderText} calls. 
+The first thing that could be observed is that the graphics were not showing properly. The areas that were supposed to render something just stayed black. This issue could be resolved by \textbf{removing all the OpenGL \texttt{renderText} calls}. 
 
 When running the simulation the program behaves normally for the first few frames but then it crashed abruptly. This behavior was also found on different hardware for instance a local computer of one of our colleagues. So it is very likely that it has to do with the hardware. As for now we were not able to fix this issue. 
 
@@ -302,20 +301,15 @@ The biggest problem however is that the results that are produced are not correc
 
 \subsection{Conclusion}
 
-We were not able to increase performance by using cloud infrastructure. However it seems feasible that after the crashing bugs have been sorted out the program could be distributed in this way. Then the customer only needs a Remote Desktop Client and they could rent a system on an hourly basis. 
+We were not able to increase performance by using cloud infrastructure. However it seems feasible that after the crashing bugs have been sorted out the program could be distributed in this way. Then the customer only needs a Remote Desktop Client and they could \textbf{rent a system on an hourly basis}. 
 
 Future work would be to test the program using a different instance like \texttt{p2.xlarge} which are intended for computing on GPUs. It is possible that the \texttt{p2} instances support CUDA and the \texttt{g2} instances do not. This could solve the NaN problem but in order not to exceed the budged provided we had to stop our investigation.
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 \section{Importing CAD models}
    
-There are many CAD programs but the most popular program in the world is Autocad. It allows you to design two- and three-dimensional coordinate systems and save drawings to a DWG file.
+There are many CAD programs but the most popular program in the world is \textbf{Autocad}. It allows you to design two- and three-dimensional coordinate systems and save drawings to a DWG file.
 
-DWG files are a standard for CAD applications. Unfortunately due to the fact that it is a closed binary format reserved by Autodesk, Autocad is required for DWG files. Fortunately, you can also use breaking monopoly programming libraries created by other companies such as Open Design Alliance (formerly OpenDWG).
+\textbf{DWG} files are a standard for CAD applications. Unfortunately due to the fact that it is a \textbf{closed binary format reserved by Autodesk}, Autocad is required for DWG files. Fortunately, you can also use breaking monopoly programming libraries created by other companies such as Open Design Alliance (formerly OpenDWG).
 
 Autodesk has released a number of specialized overlays such as AutoCAD Electrical, AutoCAD Mechanical, Mechanical Desktop, Architectural Desktop, and Civil Design that require AutoCAD to be the "engine" that manages their work.
 
@@ -329,7 +323,7 @@ The great advantage of Autolisp is that you do not need much programming knowled
 
 Another advantage is its portability, as Autodesk did not develop it by moving its attention to another VisualLisp language, it was implemented in the same form in most "clones", so the application written in Autolisp should equally work in Autocad as in Intellicad.
 
-AutoLisp is a scripting language which on the one hand can be considered as an advantage (no special programming environment is needed) and on the other hand, it is a big disadvantage, because the scripting language is interpreted during execution, so extensions in it are characterized by slow action.
+\textbf{AutoLisp is a scripting language} which on the one hand can be considered as an advantage (no special programming environment is needed) and on the other hand, it is a big disadvantage, because the scripting language is interpreted during execution, so extensions in it are characterized by slow action.
 
 The entire application code written in AutoLisp is visible to anyone who opens code files which is a big minus for commercial programs, no one wants his hard work to be used illegally by others.
 
@@ -337,7 +331,7 @@ In summary, AutoLisp is rather an enhancement for engineers wishing to accelerat
 
 \subsection{VisualLisp}
 
-VisualLisp was designed as an extension of AutoLisp functionality. Its capabilities are much more powerful than AutoLisp, it has access to the Autocad object model. In addition, the development environment has been implemented in Autocad so developers no longer need to use external editors (as opposed to AutoLisp).
+\textbf{VisualLisp} was designed as an extension of AutoLisp functionality. Its capabilities are much more powerful than AutoLisp, it \textbf{has access to the Autocad object model}. In addition, the development environment has been implemented in Autocad so developers no longer need to use external editors (as opposed to AutoLisp).
 
 It was introduced in the Autocad version 14 as a paid add-on, then later added permanently. But since then, it has been abandoned by Autodesk, which has focused its efforts on more powerful programming interfaces.
 
@@ -363,7 +357,7 @@ Autodesk has pushed out unauthorized Microsoft support to 2010, currently no lon
 
 \subsection{ADS}
 
-Autocad Development System is a set of libraries written in C language. This interface allows you to create applications for Autocad in C and C++.
+\textbf{Autocad Development System} is a set of libraries written in C language. This interface \textbf{allows you to create applications for Autocad in C and C++}.
 
 An external programming environment and programming expertise is needed to create an overlay using ADS.
 
@@ -488,55 +482,65 @@ After that we spent a few days on looking through the source code, while also ma
 
 \section{DesignIT}
 
-At the beginning we decided that three pieces of software, seeing how much they were individually doing, were too much, especially since the "middle" piece of software - MoveIT - was doing considerably less than other two software pieces, while still being equally important. We initially made decision to combine all three pieces of software, but we quickly backed out from that idea and decided to merge only SurfIT and MoveIT. From that merge new software called DesignIT emerged. DesignIT combines functions of it's parents, while at the same time it builds on them and expand. Furthermore DesignIT keeps place originally belonging to SurfIT in work pipeline of *IT software, since it's loads files formatted like for SurfIT and outputs files formatted in same way as MoveIT, additionally since SurfIT outputted files with movement data, files outputted by DesignIT could be used in MoveIT and any software that would utilize files at that point *IT work pipeline. The only difference between DesignIT and SurfIT output files is that the second outputted hard coded dummy movement data, while the first outputs actual user defined data.
+At the beginning we decided that three pieces of software, seeing how much they were individually doing, were too much, especially since the "middle" piece of software - MoveIT - was doing considerably less than other two software pieces, while still being equally important. 
+
+We initially made decision to combine all three pieces of software, but we quickly backed out from that idea and decided to \textbf{merge} only \textbf{SurfIT and MoveIT}. From that merge new software called \textbf{DesignIT emerged}. DesignIT combines functions of it's parents, while at the same time it builds on them and expand. 
+
+Furthermore DesignIT keeps place originally belonging to SurfIT in work pipeline of *IT software, since it's loads files formatted like for SurfIT and outputs files formatted in same way as MoveIT, additionally since SurfIT outputted files with movement data, files outputted by DesignIT could be used in MoveIT and any software that would utilize files at that point *IT work pipeline. The only difference between DesignIT and SurfIT output files is that the second outputted hard coded dummy movement data, while the first outputs actual user defined data.
 
 \subsection{GUI improvements}
 
-In case of main window changes were more or less cosmetic. On main tool bar some buttons were added, repositioned and removed to reflect new functions and changes to existing ones. The main part of window was divided into 3 areas using splitters. Most left area originally contained only command window, now 2 more tabs, previously placed on right side, were added to it. Those contain information about loaded .json file. Below those new command line input box was added. In centre nearly no changes ware introduced. In trajectory mode central part contains some controls connected with movement simulation. Right side of main window contains all editing tabs like views, plots and spreadsheets, divided into surface and trajectory parts using toolbox. The idea behind new GUI was to divide main window into two clear parts information part (left side) and work side (centre and right side). Other idea was to only show tools when they are required.
+In case of main window changes were more or less cosmetic. On main tool bar some buttons were added, repositioned and removed to reflect new functions and changes to existing ones. 
 
-In terms of user experience, not much have changed with GL widgets used to display all program data. Biggest change would be adding new camera control allowing user to freely move it with mouse only. Rotations are done by holding left mouse button, translations - right, and zoom by using mouse wheel. At the same time original controls ware mostly left unmodified.And so "ctrl" still allows for precise camera movement, and arrows can be used for translations. The same can't be said for original zoom method (using "shift" key), which was scrapped.
+The main part of window was divided into 3 areas using splitters. Most left area originally contained only command window, now 2 more tabs, previously placed on right side, were added to it. Those contain information about loaded .json file. Below those new command line input box was added. In centre nearly no changes were introduced. In trajectory mode central part contains some controls connected with movement simulation. 
 
-In case of code though changes are more apparent. First of all three widgets that originally ware used to display 2d views of model ware converted into one class with different drawing methods depending on plane they are supposed to represent. This changed allowed to easily implement all methods previously working only on XY view to all 2d views. Second big change in terms of code was completely changing way camera movement are handled. In original changes were done to orthographic projection. Since those are handled in openGl using stack of matrices it created strange bugs whenever openGl matrix based function ware called. This method was replaced by more openGl-like method of transforming draw area using translation, rotation and scaling matrix. Currently all openGL widgets use this method of handling camera movement.
+Right side of main window contains all editing tabs like views, plots and spreadsheets, divided into surface and trajectory parts using toolbox. \textbf{The idea behind new GUI was to divide main window into two clear parts information part} (left side) \textbf{and work side} (centre and right side). Other idea was to only show tools when they are required.
+
+In terms of user experience, not much have changed with GL widgets used to display all program data. Biggest change would be adding new camera control allowing user to freely move it with mouse only. Rotations are done by holding left mouse button, translations - right, and zoom by using mouse wheel. At the same time original controls were mostly left unmodified, so "ctrl" still allows for precise camera movement, and arrows can be used for translations. The same cannot be said for original zoom method (using "shift" key) which was removed.
+
+In case of the code our changes are more apparent. First of all, three widgets that originally were used to display \textbf{2d views of the model were converted into one class} with different drawing methods depending on plane they are supposed to represent. This changed allowed to easily implement all methods previously working only on XY view to all 2d views. 
+
+Second big change in terms of code was completely changing way camera movement is handled. In original changes were done to orthographic projection. Since those are handled in OpenGl, using stack of matrices it created strange bugs whenever OpenGl matrix based functions ware called. This method was replaced by the standard method of transforming draw area using translation, rotation and scaling matrix. Currently all OpenGL widgets use this method of handling camera movement.
 
 \subsection{Command line}
 
-Command line was addition inspired by similar solutions found in professional engineering software, namely AutoCAD. There ware two biggest reasons fro including it into DesignIT. Firstly having command line would allow user to make precise edits impossible (or at least very hard) with strictly mouse based editing. Second one was fact that we wanted to base our undo/redo functionality on command system.
+Command line was an addition inspired by similar solutions found in professional engineering software, namely AutoCAD. There were two big reasons for including it into DesignIT. Firstly, \textbf{having no command line makes precise editing impossible} (or at least very hard) with only mouse based controls. Second one was the fact that we wanted to \textbf{base our undo/redo functionality on command system}.
 
-In terms of code, command line system uses a list of keys (commands) and static functions that are part of main window class (designit), stored in form of unordered map. The functions that are called by command names using this map are responsible for parsing and initial validation of command string, as well as registering proper reverse function on undo/redo stack. The actual transformation is handled by calling accompanying function that is part of ITProject class.
+In terms of code, \textbf{command line system uses a list of keys} (commands) \textbf{and static functions} that are part of main window class (DesignIT), stored in form of unordered map. The functions (that are called by command names using this map) are responsible for parsing and initial validation of command string, as well as registering proper reverse function on undo/redo stack. The actual transformation is handled by calling accompanying function that is part of ITProject class.
 
 Working methods of ITProject class handle actual command specific transformations. All transformation are handled on control surface, not accompanying base surface (base surface are used to actually write data to file, while control surface is used for non permanent transformations). Synchronization between two is done only after command has successfully finished.
 
 \subsection{User help tools}
 
-In order to make working with software easier to user we have included a lot of small features.
+In order to make working with the software easier for users we have included a lot of small features.
 
 \subsubsection{Zoom to cursor}
 
-For all 2d views we introduced zoom to cursor feature. What it means is that when user is zooming Rather than just scaling view we actually also do translations. It creates effect of zooming to point specified by user similarly to the way Google Maps handle zooming.
+For all 2d views we introduced zoom to cursor feature. It means that when the user is zooming - rather than just scaling the view - we actually also do translations. It makes zooming to a point specified by user similar to how Google Maps handles zooming.
 
 \subsubsection{Selection modes}
 
-Originally in program there ware a lot of similar operations differing only by the way data was being selected (for example drag row, drag column). We decided to get  rid of those and instead to introduce selection modes. By using "alt" key user can change way points will be selected. System offers four modes: point, column, row, surface. It works with dragging, rotating around any point and rotating around central point of group of selected points.
+Originally in program there were a lot of similar operations differing only in the way data was being selected (for example drag row, drag column). We decided to get rid of those and instead introduce \textbf{selection modes}. By using the "alt" key, the user can change the way points will be selected. This system offers four modes: point, column, row, surface. It works with dragging, rotating around any point and rotating around central point of group of selected points.
 
 \subsubsection{Selection highlight}
 
-In order to make it easier for user to choose points, we have added highlighting system. If user will put mouse cursor close enough to the point he wants to choose point will be dynamically highlighted. Furthermore the system uses selection mode to show user what he will actually select (for example if surface mode is set, and user is pointing and one point of surface , entire surface will be highlighted). This function also spreads to click based modes to highlight what exactly operation will be executed on (for example row in while using delete row mode).
+In order to make it easier for user to choose points, we have added \textbf{highlighting system}. If user will put mouse cursor close enough to the point he wants to choose point will be dynamically highlighted. Furthermore the system uses selection mode to show user what he will actually select (for example if surface mode is set, and user is pointing and one point of surface, entire surface will be highlighted). This function also spreads to click based modes to highlight what exactly operation will be executed on (for example row in while using delete row mode).
 
 \subsubsection{Reference point}
 
-Originally reference point (or as it was called in code scratch point) was used only to store point data for operations that required more than one point to be conducted (i.e. mate points), currently scratch point functionality was slightly expanded. Reference point is currently also drawn giving user visual reference for a lot of operations (like rotations) since ic code it is also used to determine those operations.
+Originally reference point (or as it was called in code scratch point) was used only to store point data for operations that required more than one point to be conducted (i.e. mate points), currently scratch point functionality was slightly expanded. \textbf{Reference point is currently also drawn} giving user visual reference for a lot of operations (like rotations) since in the code it is also used to determine those operations.
 
 \subsubsection{Angle dial}
 
-On top of showing the reference point for rotations we have introduced visual device to show angle user have rotated points by and original position rotation started from. Since that kind of help, while useful, might make view in some situations crowded we have also given user ability to turn it off.
+On top of showing the reference point for rotations we have introduced visual device to show the angle which the user have rotated points by and the original position where the rotation started from. Since that kind of help, while useful, might make view in some situations crowded, so we have given the user the ability to turn it off.
 
 \subsubsection{Drag vector}
 
-In order to give user similar kind of help tool for liner transformations as th angle dial is for rotations, we have introduced drag vector. It is drawn whenever drag based transformation is handled, similarly to angle dial it shows origin point (represented by reference point) and values point was dragged in the corresponding plane. As was the case with angle dial it can be turned off.
+In order to give user similar kind of help tool for liner transformations as the angle dial is for rotations, we have introduced drag vector. It is drawn whenever drag based transformation is handled, similarly to angle dial, it shows origin point (represented by reference point) and values point was dragged in the corresponding plane. As was the case with angle dial, it can also be turned off.
 
 \subsubsection{Trajectory auto edit mode}
 
-In case of parts of MoveIT that ware programmed into DesignIT we decided to change a little the way MoveIT edit modes ware handled. Since there was only one of those and was not conflicting with anything we have made it activate automatically whenever needed. When user clicks trajectory point edit mode is changed to dragging trajectory point. It makes using trajectory editing quicker and easier.
+In case of parts of MoveIT that were programmed into DesignIT we decided to change a little the way MoveIT edit modes ware handled. Since there was only one of those and was not conflicting with anything we have made it activate automatically whenever needed. When user clicks trajectory point edit mode is changed to dragging trajectory point. It makes using trajectory editing quicker and easier.
 
 \subsubsection{Trajectory sync mode}
 
@@ -544,13 +548,17 @@ Since in many cases aircraft designed in DesignIT will be one plane built from m
 
 \subsection{Undo/redo system}
 
-Undo/redo system designed by us uses command pattern, and is design to hold all operations from loading the project effectively allowing user to return to original state of system at any moment. Every command line command (if executed with register mode) has ability to create reverse command. The pair of original command and reverse command is saved into undo/redo stack. Since on stack one command translates system from original state to modified and accompanying one from modified to original state, the job of undo/redo system is only to keep track of pointer to command in this stack and properly change it on execution of undo or redo command. This is at least the case for most commands there are a few special cases. First of all deleting operations (delete row, delete column, delete surface) are handled a little differently. Those register special system only undo command on top of entire deleted entity into undo/redo system. In this case undo command actually moves object from system's inner bin back to it's original place. This might create problems with memory use especially for bigger projects and when user does a lot of delete operations, but since stacks holding removed items are cleared on closing project it is not as big problem as it could be. Other operations that are handled differently are group transformations. Those are only dragging/rotating by mouse, since they have no limitations on set of points user can choose to modify. Those operations register list of points original transformation was run on and transformation parameters. Special command basically only runs those transformation on all registered points with one view update.
+Our undo/redo system uses a command pattern, and \textbf{it is designed to hold all operations from loading the project efficiently}, allowing user to return to original state of system at any moment. Every command line command (if executed with register mode) has ability to create reverse command. The pair of original command and reverse command is saved into undo/redo stack. Since on the stack one command translates the system from original state to modified and accompanying one from modified to original state, the job of undo/redo system is only to keep track of pointer to command in this stack and properly change it on execution of undo or redo command. 
+
+This is at least the case for most commands, but there are a few special cases. First of all delete operations (delete row, delete column, delete surface) are handled differently. Those register special system only undo command on top of entire deleted entity into undo/redo system. In this case undo command actually moves the object from the system's inner bin back to its original place. This might create problems with memory usage, especially for bigger projects and when the user does a lot of delete operations, but since stacks holding removed items are cleared on closing project it is not as big problem as it could be. 
+
+Other operations that are handled differently are \textbf{group transformations}. Those are only dragging/rotating by mouse, since they have no limitations on set of points user can choose to modify. Those operations register list of points original transformation was run on and transformation parameters. Special command basically only runs those transformation on all registered points with one view update.
 
 \subsection{Other code changes}
 
-On top of those multiple features a lot of changes were done to code in general. Many working method ware added to different objects like for example ITSurface in order to make accessing data easier, and also to verify calls (for example throwing exception on trying to access non existent surface). On top of that some methods for computing things ware added like for example computing centre of surface or centre of vector of points. A lot of methods ware especially added to ITSurface class. Those are accessing methods to rows and columns, used to create copies, inputting new ones or deleting existing. 
+On top of these features a lot of changes were done to the code in general. Many working method were added to different objects, for example ITSurface, to make accessing data easier, and also to verify calls (for example throwing exception on trying to access non existent surface). Some methods for computing things were added, for example computing centre of surface or centre of vector of points. A lot of methods were also added to ITSurface class. Those are accessing methods to rows and columns, used to create copies, adding new or deleting existing ones. 
 
-All those new methods ware used in parts of code that ware modified while working on DesignIT, but no full scale redesigning and rewriting of all code was done at any moment so a lot of system still use original access methods and design choices (like for example always keeping copy of a surface in memory, just for the purpose of easily handling dry run). We have upgraded a lot of code to work better, but still there is a lot of room for improvements solely in the way code is written.
+All those new methods were used in parts of code, that were modified while working on DesignIT, but no full scale redesigning and rewriting of all code was done at any moment, so a lot of system still use original access methods and design choices (for example always keeping copy of a surface in memory, just for the purpose of easily handling dry run). We have upgraded a lot of the code to work better, but still there is room for improvements.
 
 \section{Bugfixes}
 
