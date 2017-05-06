@@ -488,7 +488,37 @@ After that we spent a few days on looking through the source code, while also ma
 
 \section{DesignIT}
 
-\section{GUI improvements}
+At the beginning we decided that three pieces of software, seeing how much they were individually doing, were too much, especially since the "middle" piece of software - MoveIT - was doing considerably less than other two software pieces, while still being equally important. We initially made decision to combine all three pieces of software, but we quickly backed out from that idea and decided to merge only SurfIT and MoveIT. From that merge new software called DesignIT emerged. DesignIT combines functions of it's parents, while at the same time it builds on them and expand. Furthermore DesignIT keeps place originally belonging to SurfIT in work pipeline of *IT software, since it's loads files formatted like for SurfIT and outputs files formatted in same way as MoveIT, additionally since SurfIT outputted files with movement data, files outputted by DesignIT could be used in MoveIT and any software that would utilize files at that point *IT work pipeline. The only difference between DesignIT and SurfIT output files is that the second outputted hard coded dummy movement data, while the first outputs actual user defined data.
+
+\subsection{GUI improvements}
+
+\todo{Describe new GUI, and idea behind it}
+
+\todo{Work area (moving GUI elements)}
+\todo{Changes in gl widgets (adding move controls)}
+\todo{Changes in code (unifying class, changing way 3d ih drawn)}
+
+\subsection{Command line}
+
+\todo{describe way command line is used within program}
+
+\todo{commands}
+\todo{window part vs project part}
+
+\subsection{User help tools}
+
+\todo{selection modes}
+\todo{selection highlight}
+\todo{scratch control point}
+\todo{angle dial}
+\todo{drag vector}
+\todo{trajectory auto edit mode}
+\todo{sync mode}
+
+\subsection{Undo/redo system}
+
+\todo{undo model}
+\todo{special undo commands handling}
 
 \section{Bugfixes}
 
