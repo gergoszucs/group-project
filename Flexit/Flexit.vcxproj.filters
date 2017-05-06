@@ -266,6 +266,9 @@
     <ClInclude Include="CudaKernels.cuh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="CudaUtilities.cu">
@@ -277,5 +280,11 @@
     <CudaCompile Include="CudaKernels.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Flexit.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="myappicon.ico" />
   </ItemGroup>
 </Project>

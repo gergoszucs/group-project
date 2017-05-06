@@ -20,18 +20,7 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 	yRot = 0;
 	zRot = 0;
 
-	glViewHalfExtent = 50.0;
-	glPanCentreX = 0.0;
-	glPanCentreY = 0.0;
-
 	setFocusPolicy(Qt::StrongFocus);
-
-	centerX = 0.0;
-	centerY = 0.0;
-	centerZ = 0.0;
-	azimuth = M_PI + M_PI_2;
-	polar = M_PI_2;
-	radius = 20;
 
 	eyeX = 0.0;
 	eyeY = 0.0;
@@ -40,9 +29,9 @@ MyGLWidget::MyGLWidget(QWidget *parent)
 
 void MyGLWidget::setDrawParameters(float glPanCenterX, float glPanCenterY, float glViewHalfExtent)
 {
-	this->glPanCentreX = glPanCenterX;
-	this->glPanCentreY = glPanCenterY;
-	this->glViewHalfExtent = glViewHalfExtent;
+	this->eyeX = glPanCenterX;
+	this->eyeY = glPanCenterY;
+	this->eyeZoom = glViewHalfExtent;
 }
 
 void MyGLWidget::initializeGL()
@@ -472,18 +461,6 @@ void MyGLWidget::drawSphere(double r, int lats, int longs, float R, float GG, fl
 	}
 }
 
-void MyGLWidget::modPolar(float p)
-{
-	float tmp = polar + DEG_TO_RAD(p);
-
-	if ((tmp < M_PI) && (tmp > 0)) polar = tmp;
-}
-
-void MyGLWidget::modAzimuth(float a)
-{
-	azimuth += DEG_TO_RAD(a);
-}
-
 //Control slots
 
 void MyGLWidget::keyPressEvent(QKeyEvent * event)
@@ -504,19 +481,19 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
 
 	if (event->key() == Qt::Key_Up)
 	{
-		glPanCentreY += factor;
+		eyeY += factor;
 	}
 	else if (event->key() == Qt::Key_Down)
 	{
-		glPanCentreY -= factor;
+		eyeY -= factor;
 	}
 	else if (event->key() == Qt::Key_Left)
 	{
-		glPanCentreX -= factor;
+		eyeX -= factor;
 	}
 	else if (event->key() == Qt::Key_Right)
 	{
-		glPanCentreX += factor;
+		eyeX += factor;
 	}
 
 	// Adjust viewport view.
@@ -611,21 +588,9 @@ void MyGLWidget::wheelEvent(QWheelEvent *event)
 		factor = 1.0;
 	}
 
-	/*float tmpAx, tmpAy, tmpBx, tmpBy;
-
-	getInAxesPosition(tmpAx, tmpAy, event->x(), event->y(), this->width(), this->height(), glPanCentreX, glPanCentreY, glViewHalfExtent);
-	*/
 	float tmp = eyeZoom + 0.01 * factor * dy;
-	
-	if (tmp >= 0.0) eyeZoom = tmp;
-	/*
-	getinaxesposition(tmpbx, tmpby, event->x(), event->y(), this->width(), this->height(), glpancentrex, glpancentrey, glviewhalfextent);
-	
-	glPanCentreX += tmpAx - tmpBx;
-	glPanCentreY += tmpAy - tmpBy;*/
 
-	// Adjust viewport view.
-	//this->setViewOrtho(myWidth, myHeight);
+	if (tmp >= 0.0) eyeZoom = tmp;
 
 	// Redraw everything.
 	update();

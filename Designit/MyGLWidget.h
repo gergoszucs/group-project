@@ -35,16 +35,6 @@ private:
 
 	QPoint lastPos;
 
-	float glViewHalfExtent;
-	float glPanCentreX;
-	float glPanCentreY;
-
-	float centerX;
-	float centerY;
-	float centerZ;
-	float azimuth;
-	float polar;
-	float radius;
 	float eyeX;
 	float eyeY;
 	float eyeZoom;
@@ -61,6 +51,5 @@ private:
 
 	void drawSphere(double r, int lats, int longs, float R, float GG, float B);
 
-	void modPolar(float p);
-	void modAzimuth(float a);
+	void getAxesPos(float & pX, float & pY, const int x, const int y);
 };

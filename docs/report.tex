@@ -492,33 +492,65 @@ At the beginning we decided that three pieces of software, seeing how much they 
 
 \subsection{GUI improvements}
 
-\todo{Describe new GUI, and idea behind it}
+In case of main window changes were more or less cosmetic. On main tool bar some buttons were added, repositioned and removed to reflect new functions and changes to existing ones. The main part of window was divided into 3 areas using splitters. Most left area originally contained only command window, now 2 more tabs, previously placed on right side, were added to it. Those contain information about loaded .json file. Below those new command line input box was added. In centre nearly no changes ware introduced. In trajectory mode central part contains some controls connected with movement simulation. Right side of main window contains all editing tabs like views, plots and spreadsheets, divided into surface and trajectory parts using toolbox. The idea behind new GUI was to divide main window into two clear parts information part (left side) and work side (centre and right side). Other idea was to only show tools when they are required.
 
-\todo{Work area (moving GUI elements)}
-\todo{Changes in gl widgets (adding move controls)}
-\todo{Changes in code (unifying class, changing way 3d ih drawn)}
+In terms of user experience, not much have changed with GL widgets used to display all program data. Biggest change would be adding new camera control allowing user to freely move it with mouse only. Rotations are done by holding left mouse button, translations - right, and zoom by using mouse wheel. At the same time original controls ware mostly left unmodified.And so "ctrl" still allows for precise camera movement, and arrows can be used for translations. The same can't be said for original zoom method (using "shift" key), which was scrapped.
+
+In case of code though changes are more apparent. First of all three widgets that originally ware used to display 2d views of model ware converted into one class with different drawing methods depending on plane they are supposed to represent. This changed allowed to easily implement all methods previously working only on XY view to all 2d views. Second big change in terms of code was completely changing way camera movement are handled. In original changes were done to orthographic projection. Since those are handled in openGl using stack of matrices it created strange bugs whenever openGl matrix based function ware called. This method was replaced by more openGl-like method of transforming draw area using translation, rotation and scaling matrix. Currently all openGL widgets use this method of handling camera movement.
 
 \subsection{Command line}
 
-\todo{describe way command line is used within program}
+Command line was addition inspired by similar solutions found in professional engineering software, namely AutoCAD. There ware two biggest reasons fro including it into DesignIT. Firstly having command line would allow user to make precise edits impossible (or at least very hard) with strictly mouse based editing. Second one was fact that we wanted to base our undo/redo functionality on command system.
 
-\todo{commands}
-\todo{window part vs project part}
+In terms of code, command line system uses a list of keys (commands) and static functions that are part of main window class (designit), stored in form of unordered map. The functions that are called by command names using this map are responsible for parsing and initial validation of command string, as well as registering proper reverse function on undo/redo stack. The actual transformation is handled by calling accompanying function that is part of ITProject class.
+
+Working methods of ITProject class handle actual command specific transformations. All transformation are handled on control surface, not accompanying base surface (base surface are used to actually write data to file, while control surface is used for non permanent transformations). Synchronization between two is done only after command has successfully finished.
 
 \subsection{User help tools}
 
-\todo{selection modes}
-\todo{selection highlight}
-\todo{scratch control point}
-\todo{angle dial}
-\todo{drag vector}
-\todo{trajectory auto edit mode}
-\todo{sync mode}
+In order to make working with software easier to user we have included a lot of small features.
+
+\subsubsection{Zoom to cursor}
+
+For all 2d views we introduced zoom to cursor feature. What it means is that when user is zooming Rather than just scaling view we actually also do translations. It creates effect of zooming to point specified by user similarly to the way Google Maps handle zooming.
+
+\subsubsection{Selection modes}
+
+Originally in program there ware a lot of similar operations differing only by the way data was being selected (for example drag row, drag column). We decided to get  rid of those and instead to introduce selection modes. By using "alt" key user can change way points will be selected. System offers four modes: point, column, row, surface. It works with dragging, rotating around any point and rotating around central point of group of selected points.
+
+\subsubsection{Selection highlight}
+
+In order to make it easier for user to choose points, we have added highlighting system. If user will put mouse cursor close enough to the point he wants to choose point will be dynamically highlighted. Furthermore the system uses selection mode to show user what he will actually select (for example if surface mode is set, and user is pointing and one point of surface , entire surface will be highlighted). This function also spreads to click based modes to highlight what exactly operation will be executed on (for example row in while using delete row mode).
+
+\subsubsection{Reference point}
+
+Originally reference point (or as it was called in code scratch point) was used only to store point data for operations that required more than one point to be conducted (i.e. mate points), currently scratch point functionality was slightly expanded. Reference point is currently also drawn giving user visual reference for a lot of operations (like rotations) since ic code it is also used to determine those operations.
+
+\subsubsection{Angle dial}
+
+On top of showing the reference point for rotations we have introduced visual device to show angle user have rotated points by and original position rotation started from. Since that kind of help, while useful, might make view in some situations crowded we have also given user ability to turn it off.
+
+\subsubsection{Drag vector}
+
+In order to give user similar kind of help tool for liner transformations as th angle dial is for rotations, we have introduced drag vector. It is drawn whenever drag based transformation is handled, similarly to angle dial it shows origin point (represented by reference point) and values point was dragged in the corresponding plane. As was the case with angle dial it can be turned off.
+
+\subsubsection{Trajectory auto edit mode}
+
+In case of parts of MoveIT that ware programmed into DesignIT we decided to change a little the way MoveIT edit modes ware handled. Since there was only one of those and was not conflicting with anything we have made it activate automatically whenever needed. When user clicks trajectory point edit mode is changed to dragging trajectory point. It makes using trajectory editing quicker and easier.
+
+\subsubsection{Trajectory sync mode}
+
+Since in many cases aircraft designed in DesignIT will be one plane built from multiple surfaces we decided to make it easier to define trajectory for all surfaces at once, hence we created sync mode. If it is toggled editing any surface's trajectory curve will also set other the same value for other surfaces.
 
 \subsection{Undo/redo system}
 
-\todo{undo model}
-\todo{special undo commands handling}
+Undo/redo system designed by us uses command pattern, and is design to hold all operations from loading the project effectively allowing user to return to original state of system at any moment. Every command line command (if executed with register mode) has ability to create reverse command. The pair of original command and reverse command is saved into undo/redo stack. Since on stack one command translates system from original state to modified and accompanying one from modified to original state, the job of undo/redo system is only to keep track of pointer to command in this stack and properly change it on execution of undo or redo command. This is at least the case for most commands there are a few special cases. First of all deleting operations (delete row, delete column, delete surface) are handled a little differently. Those register special system only undo command on top of entire deleted entity into undo/redo system. In this case undo command actually moves object from system's inner bin back to it's original place. This might create problems with memory use especially for bigger projects and when user does a lot of delete operations, but since stacks holding removed items are cleared on closing project it is not as big problem as it could be. Other operations that are handled differently are group transformations. Those are only dragging/rotating by mouse, since they have no limitations on set of points user can choose to modify. Those operations register list of points original transformation was run on and transformation parameters. Special command basically only runs those transformation on all registered points with one view update.
+
+\subsection{Other code changes}
+
+On top of those multiple features a lot of changes were done to code in general. Many working method ware added to different objects like for example ITSurface in order to make accessing data easier, and also to verify calls (for example throwing exception on trying to access non existent surface). On top of that some methods for computing things ware added like for example computing centre of surface or centre of vector of points. A lot of methods ware especially added to ITSurface class. Those are accessing methods to rows and columns, used to create copies, inputting new ones or deleting existing. 
+
+All those new methods ware used in parts of code that ware modified while working on DesignIT, but no full scale redesigning and rewriting of all code was done at any moment so a lot of system still use original access methods and design choices (like for example always keeping copy of a surface in memory, just for the purpose of easily handling dry run). We have upgraded a lot of code to work better, but still there is a lot of room for improvements solely in the way code is written.
 
 \section{Bugfixes}
 
@@ -526,8 +558,14 @@ During the development we have fixed numerous bugs in the code, improving the ov
 
 \begin{itemize}
 \item Menu icons are not visible in the distributed program
-\item The icon of the exe files are not visible
+\item The icon of the .exe files are not visible
 \item Cancelling the 'Save As' operation results in error
+\item Pasting data into table would not update model data
+\item GL views affecting each other (strange resizing of window)
+\item Removing last row/column with delete mode crash program
+\item Modification done in program would not be saved to file
+\item Memory leak on deleting column/row
+\item Inputting data to spreadsheet would require double conformation to take effect
 \todo{list more bugfixes}
 \end{itemize}
 

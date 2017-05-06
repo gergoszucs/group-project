@@ -1640,6 +1640,7 @@ void View2d::wheelEvent(QWheelEvent *event)
 	float tmp = eyeZoom + 0.01 * factor * dy;
 
 	if (tmp >= 0.0) eyeZoom = tmp;
+	paintGL();
 
 	getAxesPos(tmpBx, tmpBy, event->x(), event->y());
 
