@@ -211,6 +211,7 @@ As this was a group project, most of our achievements would not have been possib
 	\item Command line feature
 	\item Preparing the presentation
 	\item Merging views to one class
+	\item Virtual help tools
 	\item GUI redesign
 	\item Undo-redo functionality
 	\item Testing 
@@ -483,7 +484,7 @@ Furthermore DesignIT keeps place originally belonging to SurfIT in work pipeline
 
 In the case of the main window, changes were more or less cosmetic. On the main toolbar, some buttons were added, repositioned and removed to reflect new functions and modifications to existing ones. 
 
-The main part of the window was divided into three areas using splitters. The most left area originally contained only command window, now two more tabs, previously placed on the right side, were added to it. Those contain information about loaded .json file. Below those new command line, a new input box was added. In the centre, nearly no changes were introduced. In trajectory mode, the central part contains some controls connected with movement simulation. 
+The main part of the window was divided into three areas using splitters. The most left area originally contained only command window, now two more tabs, previously placed on the right side, were added to it. Those contain information about loaded .json file. Below those new command line, a new input box was added (figure \ref{gui_surface}). In the centre, nearly no changes were introduced. In trajectory mode, the central part contains some controls connected with movement simulation (figure \ref{gui_trajectory}). 
 
 The right side of the main window contains all the editing tabs like views, plots and spreadsheets, divided into surface and trajectory parts using a toolbox. \textbf{The idea behind the new GUI was to split the main window into two clear parts, information part} (left side) \textbf{and work side} (centre and right side). The other idea was only to show tools when they are required.
 
@@ -492,6 +493,26 @@ Regarding user experience, not much have changed with GL widgets used to display
 In the case of the code, our changes are more apparent. First of all, the three widgets that originally were used to display \textbf{2d views of the model were converted into one class} with different drawing methods, depending on the plane they are supposed to represent. This change allowed us to easily implement all the methods that were previously working only on XY view to all 2d views. 
 
 The second big change regarding the code was completely changing the way of how the camera movement was being handled. Changes were done to orthographic projection since those are handled in OpenGL, using a stack of matrices, and it created strange bugs whenever OpenGL's matrix-based functions were called. This method was replaced by the standard method of transforming draw area using translation, rotation and scaling matrices. Currently, all OpenGL widgets use this method of handling camera movement.
+
+\begin{figure}[!h]
+	\centering
+	
+	\includegraphics[width=\textwidth]{images/main_window.png}
+	
+	\caption{Main window with most important features highlighted}
+	
+	\label{gui_surface}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	
+	\includegraphics[width=\textwidth]{images/trajectory_window.png}
+	
+	\caption{Main window in trajectory mode}
+	
+	\label{gui_trajectory}
+\end{figure}
 
 \subsection{Command line}
 
@@ -511,23 +532,63 @@ For all the 2D views we introduced zoom to cursor feature. It means that when th
 
 \subsubsection{Selection modes}
 
-Originally in the program, there were a lot of similar operations differing only in the way data was being selected (for example drag row, drag column). We decided to get rid of those and instead introduce \textbf{selection modes}. By using the "alt" key, the user can change the way of how points will be selected. This system offers four modes: point, column, row, surface. It works with dragging, rotating around any point and rotating around the central point of a group of selected points.
+Originally in the program, there were a lot of similar operations differing only in the way data was being selected (for example drag row, drag column). We decided to get rid of those and instead introduce \textbf{selection modes} (figure \ref{highlight_selection}). By using the "alt" key, the user can change the way of how points will be selected. This system offers four modes: point, column, row, surface. It works with dragging, rotating around any point and rotating around the central point of a group of selected points.
 
 \subsubsection{Selection highlight}
 
-To make it easier for users to choose points, we have added a \textbf{highlighting system}. If the user puts the mouse cursor close enough to the point he wants to choose, that point will be dynamically highlighted. Furthermore, the system uses selection mode to show the user what he will select (for example, if the surface mode is set and the user is pointing at a point on the surface, the entire surface will be highlighted). This function also spreads to click-based modes to highlight what exactly the operation will be executed on (for example, row in a while using delete row mode).
+To make it easier for users to choose points, we have added a \textbf{highlighting system} (figure \ref{highlight_selection}). If the user puts the mouse cursor close enough to the point he wants to choose, that point will be dynamically highlighted. Furthermore, the system uses selection mode to show the user what he will select (for example, if the surface mode is set and the user is pointing at a point on the surface, the entire surface will be highlighted). This function also spreads to click-based modes to highlight what exactly the operation will be executed on (for example, row in a while using delete row mode).
+
+\begin{figure}[!h]
+	\centering
+	
+	\includegraphics[width=10cm]{images/highlight_feature.png}
+	
+	\caption{Presentation of highlight feature, and selection modes. On left and centre in drag mode, on right in surface copy mode}
+	
+	\label{highlight_selection}
+\end{figure}
 
 \subsubsection{Reference point}
 
-Originally the reference point (or as it was called in code scratch point) was used only to store point data for operations that required more than one point to be conducted (i.e. mate points), but this functionality was slightly expanded. \textbf{Reference point is now also drawn}, giving user visual reference for a lot of operations (like rotations) since in the code it is also used to determine those operations.
+Originally the reference point (or as it was called in code scratch point) was used only to store point data for operations that required more than one point to be conducted (i.e. mate points), but this functionality was slightly expanded. \textbf{Reference point is now also drawn} (figure \ref{Reference}), giving user visual reference for a lot of operations (like rotations) since in the code it is also used to determine those operations.
+
+\begin{figure}[!h]
+	\centering
+	
+	\includegraphics[width=10cm]{images/reference_point.png}
+	
+	\caption{Presentation of reference point in rotation.}
+	
+	\label{Reference}
+\end{figure}
 
 \subsubsection{Angle dial}
 
-On top of showing the reference point for rotations, we have introduced a visual device to show the angle which the user have rotated points by and the original position where the rotation started from. Since that kind of help, while useful, might make the view in some situations crowded, so we have given the user the ability to turn it off.
+On top of showing the reference point for rotations, we have introduced a visual device to show the angle which the user have rotated points by and the original position where the rotation started from (figure \ref{angleDial}). Since that kind of help, while useful, might make the view in some situations crowded, so we have given the user the ability to turn it off.
+
+\begin{figure}[!h]
+	\centering
+	
+	\includegraphics[width=10cm]{images/angle_dial.png}
+	
+	\caption{Presentation of angle dial feature.}
+	
+	\label{angleDial}
+\end{figure}
 
 \subsubsection{Drag vector}
 
-To give the user similar kind of help tool for liner transformations as the angle dial is for rotations, we have introduced the drag vector. It is drawn whenever a drag based transformation is handled, similarly to angle dial, it shows origin point (represented by reference point), and values point was dragged in the corresponding plane. As was the case with angle dial, it can also be turned off.
+To give the user similar kind of help tool for liner transformations as the angle dial is for rotations, we have introduced the drag vector (figure \ref{dragVector}). It is drawn whenever a drag based transformation is handled, similarly to angle dial, it shows origin point (represented by reference point), and values point was dragged in the corresponding plane. As was the case with angle dial, it can also be turned off.
+
+\begin{figure}[!h]
+	\centering
+	
+	\includegraphics[width=10cm]{images/drag_vector.png}
+	
+	\caption{Presentation of drag vector feature.}
+	
+	\label{dragVector}
+\end{figure}
 
 \subsubsection{Trajectory auto edit mode}
 
