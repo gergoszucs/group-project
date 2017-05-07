@@ -504,11 +504,10 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew"/>
+    <addaction name="actionClose"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave_As"/>
     <addaction name="actionExit"/>
-    <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -602,7 +601,6 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionSave_As"/>
-   <addaction name="actionClose"/>
    <addaction name="actionExit"/>
    <addaction name="actionReset_all_views"/>
    <addaction name="actionUndo"/>
@@ -641,7 +639,7 @@
    <addaction name="actionWeb_help"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionNew">
+  <action name="actionClose">
    <property name="text">
     <string>New...</string>
    </property>
@@ -761,15 +759,6 @@
    </property>
    <property name="toolTip">
     <string>Flip surface</string>
-   </property>
-  </action>
-  <action name="actionClose">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_close.png</normaloff>:/Resources/icon_close.png</iconset>
-   </property>
-   <property name="text">
-    <string>Close</string>
    </property>
   </action>
   <action name="actionCopy_surface">

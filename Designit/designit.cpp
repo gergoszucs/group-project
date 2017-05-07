@@ -766,7 +766,6 @@ void Designit::on_actionClose_triggered()
 
 	// Make sure the OpenGL windows are cleared.
 	updateAllTabs();
-
 }
 
 // Detect user clicking the 'x' close window button.
@@ -1046,61 +1045,61 @@ void Designit::on_actionDrag_triggered()
 void Designit::resetModeButtons()
 {
 	// Set all the buttons to "normal" icons.
-	QIcon icon1 = QIcon("Resources/icon_drag.png");
+	QIcon icon1 = QIcon(":/Resources/icon_drag.png");
 	this->ui.actionDrag->setIcon(icon1);
 
-	QIcon icon5 = QIcon("Resources/icon_rotate_all.png");
+	QIcon icon5 = QIcon(":/Resources/icon_rotate_all.png");
 	this->ui.actionRotate->setIcon(icon5);
 
-	QIcon icon6 = QIcon("Resources/icon_resize_all.png");
+	QIcon icon6 = QIcon(":/Resources/icon_resize_all.png");
 	this->ui.actionResize->setIcon(icon6);
 
-	QIcon icon7 = QIcon("Resources/icon_shear.png");
+	QIcon icon7 = QIcon(":/Resources/icon_shear.png");
 	this->ui.actionShear->setIcon(icon7);
 
-	QIcon icon9 = QIcon("Resources/icon_flip_horizontal.png");
+	QIcon icon9 = QIcon(":/Resources/icon_flip_horizontal.png");
 	this->ui.actionFlip->setIcon(icon9);
 
-	QIcon icon10 = QIcon("Resources/icon_copy.png");
+	QIcon icon10 = QIcon(":/Resources/icon_copy.png");
 	this->ui.actionCopy_surface->setIcon(icon10);
 
-	QIcon icon11 = QIcon("Resources/icon_delete_surface.png");
+	QIcon icon11 = QIcon(":/Resources/icon_delete_surface.png");
 	this->ui.actionDelete_surface->setIcon(icon11);
 
-	QIcon icon12 = QIcon("Resources/icon_insert_row.png");
+	QIcon icon12 = QIcon(":/Resources/icon_insert_row.png");
 	this->ui.actionInsert_row->setIcon(icon12);
 
-	QIcon icon13 = QIcon("Resources/icon_delete_row.png");
+	QIcon icon13 = QIcon(":/Resources/icon_delete_row.png");
 	this->ui.actionDelete_row->setIcon(icon13);
 
-	QIcon icon14 = QIcon("Resources/icon_duplicate_row.png");
+	QIcon icon14 = QIcon(":/Resources/icon_duplicate_row.png");
 	this->ui.actionDuplicate_row->setIcon(icon14);
 
-	QIcon icon15 = QIcon("Resources/icon_insert_column.png");
+	QIcon icon15 = QIcon(":/Resources/icon_insert_column.png");
 	this->ui.actionInsert_col->setIcon(icon15);
 
-	QIcon icon16 = QIcon("Resources/icon_delete_column.png");
+	QIcon icon16 = QIcon(":/Resources/icon_delete_column.png");
 	this->ui.actionDelete_col->setIcon(icon16);
 
-	QIcon icon17 = QIcon("Resources/icon_duplicate_column.png");
+	QIcon icon17 = QIcon(":/Resources/icon_duplicate_column.png");
 	this->ui.actionDuplicate_col->setIcon(icon17);
 
-	QIcon icon18 = QIcon("Resources/icon_mate_points.png");
+	QIcon icon18 = QIcon(":/Resources/icon_mate_points.png");
 	this->ui.actionMate_points->setIcon(icon18);
 
-	QIcon icon19 = QIcon("Resources/icon_copy_mirror.png");
+	QIcon icon19 = QIcon(":/Resources/icon_copy_mirror.png");
 	this->ui.actionCopy_surface_mirror->setIcon(icon19);
 
-	QIcon icon20 = QIcon("Resources/icon_merge_surfaces.png");
+	QIcon icon20 = QIcon(":/Resources/icon_merge_surfaces.png");
 	this->ui.actionMerge_surfaces_by_row->setIcon(icon20);
 
-	QIcon icon21 = QIcon("Resources/icon_merge_surfaces_reverse.png");
+	QIcon icon21 = QIcon(":/Resources/icon_merge_surfaces_reverse.png");
 	this->ui.actionMerge_surfaces_by_row_reverse->setIcon(icon21);
 
-	QIcon icon22 = QIcon("Resources/icon_measure_distance.png");
+	QIcon icon22 = QIcon(":/Resources/icon_measure_distance.png");
 	this->ui.actionMeasure_distance->setIcon(icon22);
 
-	QIcon icon23 = QIcon("Resources/icon_centred_rotate.png");
+	QIcon icon23 = QIcon(":/Resources/icon_centred_rotate.png");
 	this->ui.actionCentred_rotate->setIcon(icon23);
 }
 
