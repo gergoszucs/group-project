@@ -223,6 +223,18 @@ As this was a group project, most of our achievements would not have been possib
 	\item Preparing the portfolio
 \end{itemize}
 
+\noindent \\ Xin \textbf{Lu}
+\begin{itemize}
+	\itme Lecture review
+	\item Market analysis
+	\itme Bugs finding
+	\item Test plan
+	\item Mathematics research
+	\item Preparing the presentation
+	\item Implementing new liner equation solver
+	\item Preparing the portfolio
+\end{itemize}
+
 \noindent \\ Piotr \textbf{Kaźmierczak} 
 \begin{itemize}
 	\item Market analysis
@@ -232,15 +244,6 @@ As this was a group project, most of our achievements would not have been possib
 	\item Preparing the portfolio
 \end{itemize}
 
-\noindent \\ Xin \textbf{Lu}
-\begin{itemize}
-	\item Market analysis
-	\item Test plan
-	\item Mathematics research
-	\item Preparing the presentation
-	\item Implementing new liner equation solver
-	\item Preparing the portfolio
-\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -267,6 +270,57 @@ About the speed of the program itself, the users were quite satisfied (at least 
 Combining the results from the collected surveys and our experience with the software, we have decided that \textbf{our main goal should be improving the overall user-experience}. The program was already working correctly, and we did not have the necessary knowledge to improve the aeroelasticity part of the code. Instead, we focused on providing a smooth and joyful experience for the customer, while also focusing on researching possible future improvements and granting a considerable speed up, by making the usage of the software easier and the code more efficient.
 
 \section{Mathematics and algorithms}
+
+\subsection{Objective}
+
+After reviewing the slides, one of the ideas of improving effieciency of the programme was to optimize the algorithm used in computations. Since the efficiency of computation is highly related to the complexity of the algorithm used, optimization of the algorithm should lead to significant improvement. In order to reduce the complexity, we studied the original discretization used in the programme to calculate the vector \textbf{V} and studied its implementation, then compared it with other feasible discretizations. On the other hand, we noticed that a linear system has to be solved in the programme, therefore we did research on finding out the proper linear system solver. After analysis, we implemented the improved algorithm and test the behavior.
+
+\subsection{Original method}
+
+First, we did some research about the \textbf{Unsteady Vortex Lattice Method} (UVLM) and analysed the implementation. The discretization considers the lattice over a (wing) surface, and it adopts a labelling scheme where each panel is labelled from 1 to N (the software uses a lattice row and column indexing scheme). These “representative” points are called colocation points and they are located at the centroid of each panel and the total velocity potential is the sum the contributions of all the vortex line segments along the edges of all the panels in the lattice. However, the mesh generated doesn't take the thickness of wings into consideration, we studied other numerical methods to achieve this improvement.
+
+\subsection{Other discretizations}
+
+We modelized the problem and it can be simplified as solving a partial differential equation - three dimensional Laplace equation with one Dirichlet condition (The velocity tends to zero as the distance tends to infinity) and one Neumann condition (The flow is tangential to the surface of the vehicle). To our knowledge, four discretizations were studied.
+\begin{itemize}
+\item Separation of variables
+\item Finite Difference
+\item Spectral
+\item Finite Element
+\end{itemize}
+
+\subsubsection{Separation of variables}
+
+Given that the problem is a three dimensional partial differential equation, the separation of variables would be very hard, therefore we haven't done further research about Separation of variables.
+
+\subsubsection{Finite Difference}
+
+Finite difference method is the most common method to solve partial differential equations. In this case, the mesh generation of Finite difference would be difficult because normally the shape of wings are not regular, also we used the central scheme to calculate the formula expansion and noticed that the computation of next point needs 16 values of previous points, it implies that the communication for parallelizaition would be huge. Afterwards, we tested an external application using finite difference method and the performance was not efficient. After discussion, we decided not to implement this method.
+
+\subsubsection{Spectral} 
+
+The conditions of using spectral method is restrict and only few documents can be found in library and internet, unfortunately this method is not suggested for solving Laplace equation according to existed research, therefore we didn't focus on spectral method.
+
+\subsubsection{Finite element}
+
+To solve the problem, finite element method subdivides a large problem into smaller, simpler parts that are called finite elements. The simple equations that model these finite elements are then assembled into a larger system of equations that models the entire problem. It is similar to the original UVLM method, however it is able to discretise the thickness of wings. For each small simple part, interpolations will be used to calculate the value. We tried to implement finite element method in the programme, however there were so many codes that has to be changed which means basically change every part of the \textbf{FLEXIT} and also proper interpolation has to be take into consideration, therefore we decided to ramain the original method and focus on the linear system solver.
+
+\subsection{Linear system solver}
+
+At the end of the computation, a linear system Ax=b will be solved where A is obtained by GPU computation and b is the known value from the velocity w and the normal vector n. Several methods can be used to solve linear system, what we have done were studying characteristics of each method and comparing their performance.
+
+\subsubsection{Optimization}
+
+The programme uses Gaussian elimination and LU decomposition to solve the system, which is effective for matrix with small size. To gain better performance, we studied other methods and compare them with the original Gaussian elimination.
+
+\begin{itemize}
+\item Cholesky method - is effective for definite positive matrix which is not satisfied in this case.
+\item Successive overrelaxation mathod - works better for huge sparse matrix and it not as effective as Gaussian elimination in this case.
+\end{itemize}
+
+\subsubsection{Implementation}
+
+Since our software includes Eigen which provides lots of external functions to solve linear system, we called function for Successive overrelaxation mathod from Eigen libraries and applied it in our programme. After testing the time consumed, we found out that the Gaussian Elimination is more effective than Successive overrelaxation method.
 
 \section{Cloud computing}
 
