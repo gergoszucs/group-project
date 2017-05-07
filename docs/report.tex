@@ -6,6 +6,7 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage{todonotes}
+\usepackage[nottoc,numbib]{tocbibind}
 
 \begin{document}
 
@@ -55,6 +56,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \tableofcontents
+\newpage
+
+\listoffigures
 \newpage
 
 \chapter{Introduction}
@@ -468,9 +472,7 @@ The major problem we had with the source code was \textbf{inconsistency}. Throug
 
 The first step was to reorganise the projects. Initially, we had three separate projects, we moved them under \textbf{one solution}, so they can share settings and dependencies (later we also merged two of these project, namely SurfIT and MoveIT into DesignIT), while also allowing us to access them more conveniently.
 
-After that, we spent a few days on looking through the source code, while also making it easier to read and shorter, due to \textbf{removing redundant code chunks and functions}. In overall we have managed to reduce the amount of source code by x \% (from y lines of code to z lines of code) while preserving every functionality and also adding many features and bugfixes.
-
-\todo{add actual numbers}
+After that, we spent a few days on looking through the source code, while also making it easier to read and shorter, due to \textbf{removing redundant code chunks and functions}. We have managed to reduce the amount of source code by a great amount, while preserving every functionality and also adding many features and bugfixes.
 
 \section{DesignIT}
 
@@ -499,7 +501,7 @@ The second big change regarding the code was completely changing the way of how 
 	
 	\includegraphics[width=\textwidth]{images/main_window.png}
 	
-	\caption{Main window with most important features highlighted}
+	\caption{Main window with the most important features highlighted}
 	
 	\label{gui_surface}
 \end{figure}
@@ -543,7 +545,7 @@ To make it easier for users to choose points, we have added a \textbf{highlighti
 	
 	\includegraphics[width=10cm]{images/highlight_feature.png}
 	
-	\caption{Presentation of highlight feature, and selection modes. On left and centre in drag mode, on right in surface copy mode}
+	\caption{Highlight feature and selection modes. On the left and the centre in drag mode, on the right in surface copy mode}
 	
 	\label{highlight_selection}
 \end{figure}
@@ -557,7 +559,7 @@ Originally the reference point (or as it was called in code scratch point) was u
 	
 	\includegraphics[width=10cm]{images/reference_point.png}
 	
-	\caption{Presentation of reference point in rotation.}
+	\caption{Reference point in rotation}
 	
 	\label{Reference}
 \end{figure}
@@ -571,7 +573,7 @@ On top of showing the reference point for rotations, we have introduced a visual
 	
 	\includegraphics[width=10cm]{images/angle_dial.png}
 	
-	\caption{Presentation of angle dial feature.}
+	\caption{Angle dial feature}
 	
 	\label{angleDial}
 \end{figure}
@@ -585,7 +587,7 @@ To give the user similar kind of help tool for liner transformations as the angl
 	
 	\includegraphics[width=10cm]{images/drag_vector.png}
 	
-	\caption{Presentation of drag vector feature.}
+	\caption{Drag vector feature}
 	
 	\label{dragVector}
 \end{figure}
@@ -605,6 +607,14 @@ Our undo/redo system uses a command pattern, and \textbf{it is designed to hold 
 This is at least the case for most commands, but there are a few special cases. First of all, delete operations (delete row, delete column, delete surface) are handled differently. Those register special system only undo command on top of the entire deleted entity into undo/redo system. In this case, undo command moves the object from the system's inner bin, back to its original place. This might create problems with memory usage, especially for bigger projects, and when the user does a lot of delete operations. However, since stacks holding removed items are cleared on closing the project, it is not a big problem. 
 
 Another operation that is handled differently is the \textbf{group transformations}. Those are only dragging/rotating by mouse since they have no limitations on the set of points which the user can choose to modify. Those operations register a list of points on which the original transformation was run on and transformation parameters. A special command only runs those transformation on all registered points with one view update.
+
+\subsection{Interfacing between DesignIT and FlexIT}
+
+Another improvement to the DesignIT program is the capability of transferring the current work into FlexIT by one click. 
+
+In the background this process creates a temporary "autosave.json" file, which contains all the data from the current DesignIT project. Using this file, we can launch a new instance of FlexIT to work on the current file. While the user works on FlexIT and checks if the design is working well, DesignIT will keep running in the background. Due to this, if the user finds any problem, he/she can close FlexIT and return to the design phase at any time.
+
+Note that this functionality is only available if there is a project open in DesignIT and also requires the Flexit.exe file to be in the same directory as the Designit.exe application.
 
 \subsection{Other code changes}
 
@@ -626,12 +636,17 @@ During the development we have fixed numerous bugs in the code, improving the ov
 \item Modification done in program would not be saved to file
 \item Memory leak on deleting column/row
 \item Inputting data to spreadsheet would require double conformation to take effect
-\todo{list more bugfixes}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Testing and results}
+
+We were testing our application throughout the whole development phase, but we also concluded one final testing after we finished working on the code. For the measurement we have used the provided "baseAR4Alpha5deg.json" input data file.
+
+It is important to note, that due to the time limit we had, most of our work was on the user interface, not the performance. However, we still believe \textbf{we have managed to reduce the time the user needs to spend on each project, by making the software easier and quicker to use}.
+
+First we will go through our test cases, then discuss the results. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
