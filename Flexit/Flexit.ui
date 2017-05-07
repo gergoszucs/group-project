@@ -222,9 +222,9 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionSave_As"/>
     <addaction name="actionClose"/>
     <addaction name="actionExit"/>
-    <addaction name="actionSave_As"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -303,11 +303,6 @@
     </property>
     <addaction name="actionTrim"/>
    </widget>
-   <widget class="QMenu" name="menuAccount">
-    <property name="title">
-     <string>Account</string>
-    </property>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuModes"/>
@@ -315,7 +310,6 @@
    <addaction name="menuPrepocessing"/>
    <addaction name="menuCompute"/>
    <addaction name="menuReplay"/>
-   <addaction name="menuAccount"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -326,19 +320,18 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
+   <addaction name="actionSave_As"/>
+   <addaction name="actionClose"/>
+   <addaction name="actionExit"/>
    <addaction name="separator"/>
    <addaction name="actionDry_run"/>
    <addaction name="actionTrim"/>
    <addaction name="actionStep"/>
    <addaction name="actionStart"/>
    <addaction name="actionPause"/>
-   <addaction name="actionReset"/>
-   <addaction name="actionStartReplay"/>
    <addaction name="actionStop"/>
-   <addaction name="separator"/>
-   <addaction name="actionSave_As"/>
-   <addaction name="actionClose"/>
-   <addaction name="actionExit"/>
+   <addaction name="actionStartReplay"/>
+   <addaction name="actionReset"/>
    <addaction name="separator"/>
    <addaction name="actionWeb_help"/>
   </widget>
