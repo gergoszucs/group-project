@@ -10,7 +10,7 @@
 // Global variables.
 Flexit* w; // The GUI Object.
 ITProject *project;
-QString PROGRAM_VERSION = QString("0.1.003"); // (student pack version) Updated on 20170225.
+QString PROGRAM_VERSION = QString("1.0"); // (student pack version) Updated on 20170225.
 QString GPUName; // Assumes a single GPU.
 
 // Data file name strings.
