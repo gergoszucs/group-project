@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{float}
+\usepackage{textcomp}
 \usepackage{todonotes}
 \usepackage[nottoc,numbib]{tocbibind}
 
@@ -646,7 +647,665 @@ We were testing our application throughout the whole development phase, but we a
 
 It is important to note, that due to the time limit we had, most of our work was on the user interface, not the performance. However, we still believe \textbf{we have managed to reduce the time the user needs to spend on each project, by making the software easier and quicker to use}.
 
-First we will go through our test cases, then discuss the results. 
+First we will go through our test cases, then discuss the results. Note that wherever applicable the test cases have to be (and they were) \textbf{test}ed \textbf{with their toolbar equivalent button}.
+
+\section{Common test cases}
+
+\subsection{Install DesignIT \& FlexIT}
+
+\noindent \textbf{Scenario:} Launch the provided setup.exe from the package, select a path for installation and allow the installer to create shortcuts on the desktop.
+\\
+\noindent \textbf{Result:} The launcher finishes without any errors, the files can be found under the selected location and the shortcuts exist on the desktop.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\section{Test cases - DesignIT}
+
+\subsection{Launch the application}
+
+\noindent \textbf{Scenario:} Launch the exe file using the shortcut located on the desktop.
+\\
+\noindent \textbf{Result:} The application opens without any errors.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Icon visibility}
+
+\noindent \textbf{Scenario:} Check if the shortcut and the exe file have visible icons. Also check whether the menu and toolbar icons are visible in the program.
+\\
+\noindent \textbf{Result:} Every icon is visible in the program.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{New}
+
+\noindent \textbf{Scenario:} Click File$\,\to\,$New and make sure the program remains in the new project state. 
+\\
+\noindent \textbf{Result:} The application did not change.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{New - unsaved changes}
+
+\noindent \textbf{Scenario:} Add a new surface to an empty project and click File$\,\to\,$New and make sure the program warns you about the unsaved changes. Click "Yes" and verify that an empty project is loaded.
+\\
+\noindent \textbf{Result:} The application gives a warning. By clicking "Yes" it loads the empty project without saving, by clicking "No" it remains in the original state and allows the saving of the project.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Open}
+
+\noindent \textbf{Scenario:} While having an empty project, click File$\,\to\,$Open and select a valid JSON input file. Verify that the data is loaded correctly.
+\\
+\noindent \textbf{Result:} Using the supplied "baseAR4Alpha5deg.json" file the program loaded the data as expected.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Open - unsaved changes}
+
+\noindent \textbf{Scenario:} Add a new surface to an empty project and click File$\,\to\,$Open and verify that the program warns you about the unsaved changes and prompts you to open a new project before loading a file.
+\\
+\noindent \textbf{Result:} The application gives a warning and after clicking File$\,\to\,$New, the file can be loaded properly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Save As}
+
+\noindent \textbf{Scenario:} While having an empty project, click File$\,\to\,$Save As and verify you get a warning, that there is no data to save.
+\\
+\noindent \textbf{Result:} Clicking the Save Us button resulted in the expected warning message.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Save As - unsaved changes}
+
+\noindent \textbf{Scenario:} Add a new surface to an empty project and click File$\,\to\,$Save As. Verify that a file chooser appears, save the file and then open it. Check if the file contains your previous data.
+\\
+\noindent \textbf{Result:} Both save and load was successful.data
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Exit}
+
+\noindent \textbf{Scenario:} Click File$\,\to\,$Exit and make sure the program terminates correctly.
+\\
+\noindent \textbf{Result:} The application exited without problems.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Exit - unsaved changes}
+
+\noindent \textbf{Scenario:} Add a new surface to an empty project and click File$\,\to\,$Exit and make sure the program warns you about the unsaved changes.
+\\
+\noindent \textbf{Result:} The application gives a warning. By clicking "Yes" it terminates the program without saving, by clicking "No" it remains open and allows the saving of the project.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Reset all views}
+
+\noindent \textbf{Scenario:} Open a valid JSON file, move the camera and change the view settings, then click "Reset all Views" on the toolbar. Verify that the view returns to the original state.
+\\
+\noindent \textbf{Result:} The feature works unpredictably, sometimes it returns to the original state, sometimes it yields some intermediate state.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass(partially)}
+
+\subsection{Add new surface}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface". Verify that the surface appears in the origo.
+\\
+\noindent \textbf{Result:} The shape is visible.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Undo}
+
+\noindent \textbf{Scenario:} From the previous test's state, click the "Drag points" button and change the shape of the surface using one of the views on the right side. After that, click "Undo" and verify that the shape returns to its original form.
+\\
+\noindent \textbf{Result:} The shape returned to its original form.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Redo}
+
+\noindent \textbf{Scenario:} From the previous test's state, click "Redo" and verify that the shape is changed again. Try the Undo - Redo combination a few times and verify it works as expected.
+\\
+\noindent \textbf{Result:} Both Undo and Redo works properly, even when clicked multiple times.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Delete surface}
+
+\noindent \textbf{Scenario:} From the previous test's state, click "Delete surface" and select the surface on the right side, then verify it's deletion.
+\\
+\noindent \textbf{Result:} The surface was deleted properly, it can be undone as expected.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Interfacing with FlexIT}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface". Verify that the surface appears in the origo, then click "Open the current project in FlexIT". Make sure FlexIT opens with the current project, and DesignIT continues running in the background. Test if FlexIT is working properly, then close it and verify that DesignIT is still functional.
+\\
+\noindent \textbf{Result:} Everything working as described.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Drag points}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Drag points" button and change the shape of the surface using one of the views on the right side. Verify that the shape of the surface is changed according to your actions.
+\\
+\noindent \textbf{Result:} The surface was reshaped correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Rotate points}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Rotate points" button and change the rotation of some points using one of the views on the right side. Verify that the shape of the surface is changed according to your actions.
+\\
+\noindent \textbf{Result:} The surface was reshaped correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Centered rotate}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Centered rotate" button and change the rotation of some points using one of the views on the right side. Verify that the shape of the surface is changed according to your actions.
+\\
+\noindent \textbf{Result:} The surface was reshaped correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Shear}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Shear" button. Select one point to rotate around on the right side, then click on another one to rotate the model. Verify that the shape of the surface is changed according to your actions.
+\\
+\noindent \textbf{Result:} The surface was reshaped correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Resize surfaces}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Resize surfaces" button, then select the surface on the right side. Enter the desired scaling value into the input box and verify that the shape of the surface is changed according to your actions.
+\\
+\noindent \textbf{Result:} The surface was reshaped correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Flip surface}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Flip surface" button, then select the surface on the right side. Choose the desired axis to flip around and verify that the shape of the surface is changed according to your actions.
+\\
+\noindent \textbf{Result:} The surface was reshaped correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Copy surface}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Copy surface" button, then select the surface on the right side. Verify that a new copy of the surface has appeared.
+\\
+\noindent \textbf{Result:} The new surface is visible.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Copy surface mirror}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Copy surface mirror" button, then select the surface on the right side. Select the desired axis to mirror around and verify that a new copy of the surface has appeared, mirrored by the desired axis.
+\\
+\noindent \textbf{Result:} The new surface is visible and mirrored correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Insert row}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Insert row" button, then select a point of the surface on the right side. Verify that a new row is inserted.
+\\
+\noindent \textbf{Result:} The row has been added.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Delete row}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Delete row" button, then select a point of the surface on the right side. Verify that a new row is deleted.
+\\
+\noindent \textbf{Result:} The row has been deleted.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Duplicate row}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Duplicate row" button, then select a point of the surface on the right side. Verify that the row is duplicated.
+\\
+\noindent \textbf{Result:} The row has been duplicated.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Insert column}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Insert column" button, then select a point of the surface on the right side. Verify that a new column is inserted.
+\\
+\noindent \textbf{Result:} The column has been added.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Delete column}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Delete column" button, then select a point of the surface on the right side. Verify that a new column is deleted.
+\\
+\noindent \textbf{Result:} The column has been deleted.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Duplicate column}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Duplicate column" button, then select a point of the surface on the right side. Verify that the column is duplicated.
+\\
+\noindent \textbf{Result:} The column has been duplicated.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Mate points}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Mate points" button, then select a master point of the surface, and another one on the right side. Verify that the second point is merged into the master point.
+\\
+\noindent \textbf{Result:} The two points have been merged.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Gaussian curvature}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Gaussian curvature" button. On the right side click the "Gaussian curvature" tab and you can see the curvature of the surface.
+\\
+\noindent \textbf{Result:} The curvature can be seen.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Merge surfaces by row}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", copy the surface, then click the "Merge surfaces by row" button. Select both surfaces and choose the type of merge and verify its success.
+\\
+\noindent \textbf{Result:} The two surfaces have been merged.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Merge surfaces by row reverse}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", copy the surface, then click the "Merge surfaces by row reverse" button. Select both surfaces and choose the type of merge and verify its success.
+\\
+\noindent \textbf{Result:} The two surfaces have been merged.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Measure distance}
+
+\noindent \textbf{Scenario:} Create a new project and click "New surface", then click the "Measure distance" button. Select two different points of the surface and verify that the distance is written to the text box on the top-center of the screen.
+\\
+\noindent \textbf{Result:} The distance is visible in the input field.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{JSON view}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files and select "JSON view" on the left side. Verify that you can see the structure of the JSON file in a tree view.
+\\
+\noindent \textbf{Result:} The JSON structure is visible.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Data file}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files and select "Data file" on the left side. Verify that you can see the structure and content of the JSON file.
+\\
+\noindent \textbf{Result:} The JSON data is visible.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{XY view}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files and select "XY view" on the right side. Verify that you can see the surface from the correct view.
+\\
+\noindent \textbf{Result:} The surface can be seen from the correct point of view.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{XZ view}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files and select "XZ view" on the right side. Verify that you can see the surface from the correct view.
+\\
+\noindent \textbf{Result:} The surface can be seen from the correct point of view.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{YZ view}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files and select "YZ view" on the right side. Verify that you can see the surface from the correct view.
+\\
+\noindent \textbf{Result:} The surface can be seen from the correct point of view.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Surface Spreadsheet}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files and select "Spreadsheet" on the right side. Verify that you can see the data of the surface in a table format and also whether it is editable.
+\\
+\noindent \textbf{Result:} The data appears and can be freely edited.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Trajectory tools}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files and select "Trajectory tools" on the right side. Verify that you can see the trajectory of the surface (red lines) and if you click "Start" the surface moves in the direction of the line.
+\\
+\noindent \textbf{Result:} The trajectory behaves as expected.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Translations}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files, open the "Trajectory Tools" and select "Translations" on the right side. Verify that you can drag the points on any axis and the change is reflected in the trajectory of the surface.
+\\
+\noindent \textbf{Result:} The points can be dragged and the trajectory changes properly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Rotations}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files, open the "Trajectory Tools" and select "Rotations" on the right side. Verify that you can drag the points on any axis and the change is reflected in the trajectory of the surface.
+\\
+\noindent \textbf{Result:} The points can be dragged and the trajectory changes properly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Trajectory Spreadsheet}
+
+\noindent \textbf{Scenario:} Load one of the supplied JSON files, open the "Trajectory Tools" and select "Spreadsheet" on the right side. Verify that you can see the data of the surface in a table format and also whether it is editable.
+\\
+\noindent \textbf{Result:} The data appears and can be freely edited.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Web help}
+
+\noindent \textbf{Scenario:} Click the "Web help" button and verify that a new browser windows appears opening the website with the documentation to the software
+\\
+\noindent \textbf{Result:} The documentation appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{About}
+
+\noindent \textbf{Scenario:} Click the "About" button and verify that a windows with data about the authors appear.
+\\
+\noindent \textbf{Result:} The window appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\section{Test cases - FlexIT}
+
+\subsection{Launch the application}
+
+\noindent \textbf{Scenario:} Launch the exe file using the shortcut located on the desktop.
+\\
+\noindent \textbf{Result:} The application opens without any errors.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Icon visibility}
+
+\noindent \textbf{Scenario:} Check if the shortcut and the exe file have visible icons. Also check whether the menu and toolbar icons are visible in the program.
+\\
+\noindent \textbf{Result:} Every icon is visible in the program.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Open}
+
+\noindent \textbf{Scenario:} While having an empty project, click File$\,\to\,$Open and select a valid JSON input file. Verify that the data is loaded correctly.
+\\
+\noindent \textbf{Result:} Using the supplied "baseAR4Alpha5deg.json" file the program loaded the data as expected.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Open - unsaved changes}
+
+\noindent \textbf{Scenario:} Add a new surface to an empty project and click File$\,\to\,$Open and verify that the program warns you about the unsaved changes and prompts you to open a new project before loading a file.
+\\
+\noindent \textbf{Result:} The application gives a warning and after clicking File$\,\to\,$New, the file can be loaded properly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Save As}
+
+\noindent \textbf{Scenario:} While having an empty project, click File$\,\to\,$Save As and verify you get a warning, that there is no data to save.
+\\
+\noindent \textbf{Result:} Clicking the Save Us button resulted in the expected warning message.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Save As - unsaved changes}
+
+\noindent \textbf{Scenario:} Add a new surface to an empty project and click File$\,\to\,$Save As. Verify that a file chooser appears, save the file and then open it. Check if the file contains your previous data.
+\\
+\noindent \textbf{Result:} Both save and load was successful.data
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Close}
+
+\noindent \textbf{Scenario:} Open any of the supplied JSON files and click File$\,\to\,$Close and make sure the program closes the current project. 
+\\
+\noindent \textbf{Result:} The application closed the current project.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Close - unsaved changes}
+
+\noindent \textbf{Scenario:} Make an unsaved changed and click File$\,\to\,$Close. Make sure the program warns you about the unsaved changes. Click "Yes" and verify that an empty project is loaded.
+\\
+\noindent \textbf{Result:} The application gives a warning. By clicking "Yes" it loads the empty project without saving, by clicking "No" it remains in the original state and allows the saving of the project.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Exit}
+
+\noindent \textbf{Scenario:} Click File$\,\to\,$Exit and make sure the program terminates correctly.
+\\
+\noindent \textbf{Result:} The application exited without problems.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Exit - unsaved changes}
+
+\noindent \textbf{Scenario:} Add a new surface to an empty project and click File$\,\to\,$Exit and make sure the program warns you about the unsaved changes.
+\\
+\noindent \textbf{Result:} The application gives a warning. By clicking "Yes" it terminates the program without saving, by clicking "No" it remains open and allows the saving of the project.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Hardware}
+
+\noindent \textbf{Scenario:} Open one of the supplied JSON files and click the "Hardware" tab. Verify that a detailed description of your hardware is visible.
+\\
+\noindent \textbf{Result:} The hardware specification appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Data file}
+
+\noindent \textbf{Scenario:} Open one of the supplied JSON files and click the "Data file" tab. Verify that the JSON data is visible.
+\\
+\noindent \textbf{Result:} The JSON data appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{JSON tree}
+
+\noindent \textbf{Scenario:} Open one of the supplied JSON files and click the "JSON tree" tab. Verify that the JSON structure is visible.
+\\
+\noindent \textbf{Result:} The JSON structure appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Graphics}
+
+\noindent \textbf{Scenario:} Open one of the supplied JSON files and click the "Graphics" tab. Verify that the graphical representation of the data is visible.
+\\
+\noindent \textbf{Result:} The model appears correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Dry run}
+
+\noindent \textbf{Scenario:} While having the previous JSON loaded and the graphics tab opened, click the "Dry run" button. Verify that the movement of the surface is played without any calculations.
+\\
+\noindent \textbf{Result:} The model moves correctly.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Step}
+
+\noindent \textbf{Scenario:} While having the previous JSON loaded and the graphics tab opened, click the "Step" button. Verify that one frame is calculated (check the bottom of the screen) and the airflow is visible.
+\\
+\noindent \textbf{Result:} The model moved and the airflow appeared.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Start}
+
+\noindent \textbf{Scenario:} While having the previous JSON loaded and the graphics tab opened, click the "Start" button. Verify that the calculation start for all frames (check the bottom of the screen) and the airflow is visible.
+\\
+\noindent \textbf{Result:} The model moves and the airflow appears continuously.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Pause}
+
+\noindent \textbf{Scenario:} While having the previous JSON loaded, the graphics tab opened and the simulation running, click the "Pause" button. Verify that the calculation halts when the calculation of the current frame is done.
+\\
+\noindent \textbf{Result:} The calculations stops at the next frame.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Continue}
+
+\noindent \textbf{Scenario:} While having a simulation paused, click the "Pause" button again. Verify that the calculation continues.
+\\
+\noindent \textbf{Result:} The calculation resumed.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Stop}
+
+\noindent \textbf{Scenario:} While having the previous JSON loaded, the graphics tab opened and the simulation running, click the "Stop" button. Verify that the calculation halts when the calculation of the current frame is done. Make sure you cannot continue the simulation, only restart it.
+\\
+\noindent \textbf{Result:} The calculations stops at the next frame and it cannot be continued, only restarted.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Replay}
+
+\noindent \textbf{Scenario:} After running a complete simulation, click the "Replay" button. Verify that the whole simulation with the airflow is replayed, but much faster, without doing any calculation.
+\\
+\noindent \textbf{Result:} The simulation is quickly replayed.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Reset}
+
+\noindent \textbf{Scenario:} After running a complete simulation or stopping one, click the "Reset" button. Verify that the calculations, the airflow are deleted and the model is restored to its original state and that you get a warning notification.
+\\
+\noindent \textbf{Result:} The simulation was reset, after having the notification.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Trajectories}
+
+\noindent \textbf{Scenario:} After running a simulation click the "Trajectories" tab. Verify that the roll-pitch-yaw trajectories appear correctly for the time steps.
+\\
+\noindent \textbf{Result:} The trajectory is clearly visible.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{B matrix}
+
+\noindent \textbf{Scenario:} After running a simulation click the "B matrix" tab. Verify that the matrix appears in a visual format.
+\\
+\noindent \textbf{Result:} The matrix appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Influence matrix}
+
+\noindent \textbf{Scenario:} After running a simulation click the "Influence matrix" tab. Verify that the matrix appears in a table format.
+\\
+\noindent \textbf{Result:} The matrix appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Data view}
+
+\noindent \textbf{Scenario:} After running a simulation click the "Data view" tab. Verify that the simulation data appears in a list format.
+\\
+\noindent \textbf{Result:} The data appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Output table}
+
+\noindent \textbf{Scenario:} After running a simulation click the "Output table" tab. Verify that the simulation data appears in a table format.
+\\
+\noindent \textbf{Result:} The data appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Output graphics}
+
+\noindent \textbf{Scenario:} After running a simulation click the "Output graphics" tab. Verify that the simulation data appears in a graphical format.
+\\
+\noindent \textbf{Result:} The data appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Euler-Bernoulli}
+
+\noindent \textbf{Scenario:} After running a simulation click the "Euler-Bernoulli" tab. Verify that the simulation data appears in a graphical format.
+\\
+\noindent \textbf{Result:} The data appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{Web help}
+
+\noindent \textbf{Scenario:} Click the "Web help" button and verify that a new browser windows appears opening the website with the documentation to the software
+\\
+\noindent \textbf{Result:} The documentation appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\subsection{About}
+
+\noindent \textbf{Scenario:} Click the "About" button and verify that a windows with data about the authors appear.
+\\
+\noindent \textbf{Result:} The window appears.
+\\
+\noindent \textbf{Status:} \textcolor{green}{Pass}
+
+\section{Results}
+
+As we have discussed before, the major speed-up we have achieved is due to the feature we have implemented to the user interface. We did not have enough time to work on the calculations of FlexIT. However, after looking at the code, we have seen some possibilities to improve its performance. We could \textbf{reduce the amount of memory used on the GPU in each consecutive frame}, as there is no need to store the data for every previous step.
+
+Another improvement would be the usage of \textbf{texture memory} in CUDA. Storing the most frequently used data here would result in a high amount of cache-hits, improving the usage of the cache memory and resulting in a possibly major speed-up.
+
+However, we still did the tests with the provided file (baseAR4Alpha5deg) on one of the computers in Building 90. Just to see the the difference between GPUs, we have also tested the same input data on one of our laptops, equipped with an NVIDIA GeForce GTX980M 4GB GDDR5 video card. The comparison is between the calculation time of the last frame (as it takes the most time of all the frames). 
+
+The results were the following for the calculation of the 149th frame in milliseconds.
+
+\begin{center}
+\begin{tabular}{ c c c }
+ & \textbf{Lab PC} & \textbf{Our Laptop} \\
+ \textbf{Dominique's code} & 1332ms & 198ms \\ 
+ \textbf{Our code} & 1321ms & 195ms   
+\end{tabular}
+\end{center}
+
+As expected, the results are quite similar, having only a tiny speed-up in our program. On the other hand, running the code on a stronger GPU gives us \textbf{a speed-up of 6.7}, which is quite good. This also showed us that we made the good decision, to spend more then on the usability of the software, as the CUDA code is quite efficient already. The whole simulation took only 1-2 minutes (depending on the computer), and even if this data was not too complicated, we feel that we have managed to save more time by improving the interface, instead of working on only the performance of the code (surely, if we would have more time, it would have been good to improve the efficiency here as well).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
