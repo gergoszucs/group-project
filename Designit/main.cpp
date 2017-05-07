@@ -31,7 +31,7 @@
 Designit* w;
 ITProject *project;
 bool IsScrutiny = false; // Enable HTTP logging.
-QString PROGRAM_VERSION = QString("0.1.100");
+QString PROGRAM_VERSION = QString("1.0");
 
 // Simulation progress variables.
 int FrameNumber = 0;

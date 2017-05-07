@@ -725,7 +725,7 @@ void Designit::on_actionReset_all_views_triggered()
 	drawAnnotations = true;
 	drawNormals = true;
 
-	QIcon icon = QIcon("Resources/blackDot.png");
+	QIcon icon = QIcon(":/Resources/blackDot.png");
 
 	// Default display OpenGL axes enabled.
 	ui.actionControl_points->setIcon(icon);
@@ -953,7 +953,6 @@ void Designit::on_actionNew_surface_triggered()
 
 		project->get_MySurfaces()->at(k)->get_MyControlPoints()->push_back(v_dummy);
 		project->get_MyBaseSurfaces()->at(k)->get_MyControlPoints()->push_back(v_base_dummy);
-
 	}
 
 	IsDataLoaded = true;
@@ -965,6 +964,8 @@ void Designit::on_actionNew_surface_triggered()
 	project->get_MySurfaces()->at(k)->manageComputationOfInterpolatedPoints();
 
 	project->createNewTrajectoryCurve(k);
+
+	w->ui.action_Flexit->setEnabled(true);
 
 	updateSpreadsheet();
 	updateTrajectorySpreadsheet();

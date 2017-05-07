@@ -297,12 +297,6 @@
     <addaction name="actionEuler_Bernoulli"/>
     <addaction name="actionVelocity_field"/>
    </widget>
-   <widget class="QMenu" name="menuTest">
-    <property name="title">
-     <string>Testing</string>
-    </property>
-    <addaction name="actionTest"/>
-   </widget>
    <widget class="QMenu" name="menuPrepocessing">
     <property name="title">
      <string>Prepocessing</string>
@@ -322,7 +316,6 @@
    <addaction name="menuCompute"/>
    <addaction name="menuReplay"/>
    <addaction name="menuAccount"/>
-   <addaction name="menuTest"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -347,7 +340,6 @@
    <addaction name="actionClose"/>
    <addaction name="actionExit"/>
    <addaction name="separator"/>
-   <addaction name="actionTest"/>
    <addaction name="actionWeb_help"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -560,15 +552,6 @@
     <string>Step</string>
    </property>
   </action>
-  <action name="actionTest">
-   <property name="icon">
-    <iconset resource="flexit.qrc">
-     <normaloff>:/Resources/icon_test.png</normaloff>:/Resources/icon_test.png</iconset>
-   </property>
-   <property name="text">
-    <string>Test</string>
-   </property>
-  </action>
   <action name="actionDrawVelocityField">
    <property name="text">
     <string>Velocity field</string>
@@ -639,14 +622,14 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>MyGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>myglwidget.h</header>
+  </customwidget>
+  <customwidget>
    <class>MatrixViewGLWidget</class>
    <extends>QOpenGLWidget</extends>
    <header>matrixviewglwidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyGLWidget</class>
-   <extends>QOpenGLWidget</extends>
-   <header location="global">myglwidget.h</header>
   </customwidget>
   <customwidget>
    <class>MyTrajectoryGLWidget</class>

@@ -557,12 +557,6 @@
     <addaction name="actionNew_surface"/>
     <addaction name="actionDelete_surface"/>
    </widget>
-   <widget class="QMenu" name="menuTest">
-    <property name="title">
-     <string>Test</string>
-    </property>
-    <addaction name="actionPlayout_Test"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
@@ -588,7 +582,6 @@
    <addaction name="menuSurface"/>
    <addaction name="menuView"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuTest"/>
    <addaction name="menuAnalysis"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -635,7 +628,6 @@
    <addaction name="actionMerge_surfaces_by_row_reverse"/>
    <addaction name="actionMeasure_distance"/>
    <addaction name="separator"/>
-   <addaction name="actionPlayout_Test"/>
    <addaction name="actionWeb_help"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -738,15 +730,6 @@
    </property>
    <property name="text">
     <string>Shear</string>
-   </property>
-  </action>
-  <action name="actionPlayout_Test">
-   <property name="icon">
-    <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_test.png</normaloff>:/Resources/icon_test.png</iconset>
-   </property>
-   <property name="text">
-    <string>Playout Test</string>
    </property>
   </action>
   <action name="actionFlip">
@@ -961,7 +944,7 @@
     <string>action_Flexit</string>
    </property>
    <property name="toolTip">
-    <string>Open the current project in Flexit</string>
+    <string>Open the current project in FlexIT</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -973,7 +956,7 @@
     <string>Undo</string>
    </property>
    <property name="toolTip">
-    <string>Undo last action.</string>
+    <string>Undo last action</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
@@ -988,7 +971,7 @@
     <string>Redo</string>
    </property>
    <property name="toolTip">
-    <string>Redo action.</string>
+    <string>Redo action</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Y</string>
