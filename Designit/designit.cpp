@@ -222,7 +222,7 @@ void Designit::on_actionOpen_triggered()
 	else
 	{
 		// There is already a file open.
-		QMessageBox::information(0, tr("Project already loaded"), tr("You have a project loaded already.\nPlease close the existing project before loading another."));
+		QMessageBox::information(0, tr("Project already loaded"), tr("You have a project loaded already.\nPlease save and create an empty project before loading another."));
 	}
 }
 
@@ -862,7 +862,7 @@ void Designit::on_actionDelete_surface_triggered()
 		MY_EDIT_MODE = DELETE_SURFACE;
 
 		/// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_delete_surface_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_delete_surface_highlight.png");
 		this->ui.actionDelete_surface->setIcon(icon);
 	}
 	else
@@ -871,7 +871,7 @@ void Designit::on_actionDelete_surface_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_delete_surface.png");
+		QIcon icon = QIcon(":/Resources/icon_delete_surface.png");
 		this->ui.actionDelete_surface->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -982,7 +982,7 @@ void Designit::on_actionCopy_surface_triggered()
 		MY_EDIT_MODE = COPY_SURFACE;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_copy_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_copy_highlight.png");
 		this->ui.actionCopy_surface->setIcon(icon);
 	}
 	else
@@ -991,7 +991,7 @@ void Designit::on_actionCopy_surface_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_copy.png");
+		QIcon icon = QIcon(":/Resources/icon_copy.png");
 		this->ui.actionCopy_surface->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1016,7 +1016,7 @@ void Designit::on_actionDrag_triggered()
 		MY_EDIT_MODE = DRAG;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_drag_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_drag_highlight.png");
 		this->ui.actionDrag->setIcon(icon);
 
 		IsHorizontalDragOnly = false;
@@ -1028,7 +1028,7 @@ void Designit::on_actionDrag_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_drag.png");
+		QIcon icon = QIcon(":/Resources/icon_drag.png");
 		this->ui.actionDrag->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1113,7 +1113,7 @@ void Designit::on_actionCopy_surface_mirror_triggered()
 		MY_EDIT_MODE = COPY_SURFACE_MIRROR;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_copy_mirror_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_copy_mirror_highlight.png");
 		this->ui.actionCopy_surface_mirror->setIcon(icon);
 	}
 	else
@@ -1122,7 +1122,7 @@ void Designit::on_actionCopy_surface_mirror_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_copy_mirror.png");
+		QIcon icon = QIcon(":/Resources/icon_copy_mirror.png");
 		this->ui.actionCopy_surface_mirror->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1149,7 +1149,7 @@ void Designit::on_actionRotate_triggered()
 		MY_EDIT_MODE = ROTATE;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_rotate_all_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_rotate_all_highlight.png");
 		this->ui.actionRotate->setIcon(icon);
 	}
 	else
@@ -1158,7 +1158,7 @@ void Designit::on_actionRotate_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_rotate_all.png");
+		QIcon icon = QIcon(":/Resources/icon_rotate_all.png");
 		this->ui.actionRotate->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1182,7 +1182,7 @@ void Designit::on_actionInsert_row_triggered()
 		MY_EDIT_MODE = INSERT_ROW;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_insert_row_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_insert_row_highlight.png");
 		this->ui.actionInsert_row->setIcon(icon);
 	}
 	else
@@ -1191,7 +1191,7 @@ void Designit::on_actionInsert_row_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_insert_row.png");
+		QIcon icon = QIcon(":/Resources/icon_insert_row.png");
 		this->ui.actionInsert_row->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1215,7 +1215,7 @@ void Designit::on_actionMerge_surfaces_by_row_reverse_triggered()
 		MY_EDIT_MODE = MERGE_SURFACES_BY_ROW_REVERSE;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_merge_surfaces_reverse_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_merge_surfaces_reverse_highlight.png");
 		this->ui.actionMerge_surfaces_by_row_reverse->setIcon(icon);
 	}
 	else
@@ -1224,7 +1224,7 @@ void Designit::on_actionMerge_surfaces_by_row_reverse_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_merge_surfaces_reverse.png");
+		QIcon icon = QIcon(":/Resources/icon_merge_surfaces_reverse.png");
 		this->ui.actionMerge_surfaces_by_row_reverse->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1249,7 +1249,7 @@ void Designit::on_actionMerge_surfaces_by_row_triggered()
 		MY_EDIT_MODE = MERGE_SURFACES_BY_ROW;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_merge_surfaces_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_merge_surfaces_highlight.png");
 		this->ui.actionMerge_surfaces_by_row->setIcon(icon);
 	}
 	else
@@ -1258,7 +1258,7 @@ void Designit::on_actionMerge_surfaces_by_row_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_merge_surfaces.png");
+		QIcon icon = QIcon(":/Resources/icon_merge_surfaces.png");
 		this->ui.actionMerge_surfaces_by_row->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1284,7 +1284,7 @@ void Designit::on_actionMeasure_distance_triggered()
 		MY_EDIT_MODE = MEASURE_DISTANCE;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_measure_distance_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_measure_distance_highlight.png");
 		this->ui.actionMeasure_distance->setIcon(icon);
 	}
 	else
@@ -1293,7 +1293,7 @@ void Designit::on_actionMeasure_distance_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_measure_distance.png");
+		QIcon icon = QIcon(":/Resources/icon_measure_distance.png");
 		this->ui.actionMeasure_distance->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1482,7 +1482,7 @@ void Designit::on_actionMate_points_triggered()
 		MY_EDIT_MODE = MATE_POINTS;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_mate_points_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_mate_points_highlight.png");
 		this->ui.actionMate_points->setIcon(icon);
 	}
 	else
@@ -1491,7 +1491,7 @@ void Designit::on_actionMate_points_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_mate_points.png");
+		QIcon icon = QIcon(":/Resources/icon_mate_points.png");
 		this->ui.actionMate_points->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1516,7 +1516,7 @@ void Designit::on_actionInsert_col_triggered()
 		MY_EDIT_MODE = INSERT_COL;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_insert_column_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_insert_column_highlight.png");
 		this->ui.actionInsert_col->setIcon(icon);
 	}
 	else
@@ -1525,7 +1525,7 @@ void Designit::on_actionInsert_col_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_insert_column.png");
+		QIcon icon = QIcon(":/Resources/icon_insert_column.png");
 		this->ui.actionInsert_col->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1549,7 +1549,7 @@ void Designit::on_actionDelete_row_triggered()
 		MY_EDIT_MODE = DELETE_ROW;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_delete_row_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_delete_row_highlight.png");
 		this->ui.actionDelete_row->setIcon(icon);
 	}
 	else
@@ -1558,7 +1558,7 @@ void Designit::on_actionDelete_row_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_delete_row.png");
+		QIcon icon = QIcon(":/Resources/icon_delete_row.png");
 		this->ui.actionDelete_row->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1583,7 +1583,7 @@ void Designit::on_actionDelete_col_triggered()
 		MY_EDIT_MODE = DELETE_COL;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_delete_column_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_delete_column_highlight.png");
 		this->ui.actionDelete_col->setIcon(icon);
 	}
 	else
@@ -1592,7 +1592,7 @@ void Designit::on_actionDelete_col_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_delete_column.png");
+		QIcon icon = QIcon(":/Resources/icon_delete_column.png");
 		this->ui.actionDelete_col->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1616,7 +1616,7 @@ void Designit::on_actionDuplicate_row_triggered()
 		MY_EDIT_MODE = DUPLICATE_ROW;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_duplicate_row_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_duplicate_row_highlight.png");
 		this->ui.actionDuplicate_row->setIcon(icon);
 	}
 	else
@@ -1625,7 +1625,7 @@ void Designit::on_actionDuplicate_row_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_duplicate_row.png");
+		QIcon icon = QIcon(":/Resources/icon_duplicate_row.png");
 		this->ui.actionDuplicate_row->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1650,7 +1650,7 @@ void Designit::on_actionDuplicate_col_triggered()
 		MY_EDIT_MODE = DUPLICATE_COL;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_duplicate_column_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_duplicate_column_highlight.png");
 		this->ui.actionDuplicate_col->setIcon(icon);
 	}
 	else
@@ -1659,7 +1659,7 @@ void Designit::on_actionDuplicate_col_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_duplicate_column.png");
+		QIcon icon = QIcon(":/Resources/icon_duplicate_column.png");
 		this->ui.actionDuplicate_col->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1690,7 +1690,7 @@ void Designit::on_actionResize_triggered()
 		MY_EDIT_MODE = RESIZE;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_resize_all_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_resize_all_highlight.png");
 		this->ui.actionResize->setIcon(icon);
 	}
 	else
@@ -1699,7 +1699,7 @@ void Designit::on_actionResize_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_Resize_all.png");
+		QIcon icon = QIcon(":/Resources/icon_Resize_all.png");
 		this->ui.actionResize->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1724,7 +1724,7 @@ void Designit::on_actionShear_triggered()
 		MY_EDIT_MODE = SHEAR;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_shear_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_shear_highlight.png");
 		this->ui.actionShear->setIcon(icon);
 	}
 	else
@@ -1733,7 +1733,7 @@ void Designit::on_actionShear_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_shear.png");
+		QIcon icon = QIcon(":/Resources/icon_shear.png");
 		this->ui.actionShear->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1759,7 +1759,7 @@ void Designit::on_actionFlip_triggered()
 		MY_EDIT_MODE = FLIP;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_flip_horizontal_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_flip_horizontal_highlight.png");
 		this->ui.actionFlip->setIcon(icon);
 	}
 	else
@@ -1768,7 +1768,7 @@ void Designit::on_actionFlip_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_flip_horizontal.png");
+		QIcon icon = QIcon(":/Resources/icon_flip_horizontal.png");
 		this->ui.actionFlip->setIcon(icon);
 
 		// Empty the focus vectors.
@@ -1794,7 +1794,7 @@ void Designit::on_actionCentred_rotate_triggered()
 		MY_EDIT_MODE = CENTRED_ROTATE;
 
 		// Highlight the icon.
-		QIcon icon = QIcon("Resources/icon_centred_rotate_highlight.png");
+		QIcon icon = QIcon(":/Resources/icon_centred_rotate_highlight.png");
 		this->ui.actionCentred_rotate->setIcon(icon);
 	}
 	else
@@ -1803,7 +1803,7 @@ void Designit::on_actionCentred_rotate_triggered()
 		MY_EDIT_MODE = NONE;
 
 		// Reset the icon.
-		QIcon icon = QIcon("Resources/icon_centred_rotate.png");
+		QIcon icon = QIcon(":/Resources/icon_centred_rotate.png");
 		this->ui.actionCentred_rotate->setIcon(icon);
 
 		// Empty the focus vectors.

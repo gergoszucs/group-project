@@ -72,5 +72,6 @@
         <file>Resources/button_black_repeat.png</file>
         <file>Resources/designit.png</file>
         <file>Resources/flexit.png</file>
+        <file>Resources/icon_insert_row_highlight.png</file>
     </qresource>
 </RCC>

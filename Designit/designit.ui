@@ -773,7 +773,14 @@
   <action name="actionDelete_surface">
    <property name="icon">
     <iconset resource="designit.qrc">
-     <normaloff>:/Resources/icon_delete_surface.png</normaloff>:/Resources/icon_delete_surface.png</iconset>
+     <normaloff>:/Resources/icon_delete_surface.png</normaloff>
+     <normalon>:/Resources/icon_delete_surface.png</normalon>
+     <disabledoff>:/Resources/icon_delete_surface.png</disabledoff>
+     <disabledon>:/Resources/icon_delete_surface.png</disabledon>
+     <activeoff>:/Resources/icon_delete_surface.png</activeoff>
+     <activeon>:/Resources/icon_delete_surface.png</activeon>
+     <selectedoff>:/Resources/icon_delete_surface.png</selectedoff>
+     <selectedon>:/Resources/icon_delete_surface.png</selectedon>:/Resources/icon_delete_surface.png</iconset>
    </property>
    <property name="text">
     <string>Delete surface</string>
